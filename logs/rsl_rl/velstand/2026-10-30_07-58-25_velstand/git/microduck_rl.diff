@@ -1,0 +1,152 @@
+--- git commit ---
+b02fdea4902c2b93b7d34a83a6f05da4ececb7d3
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab_microduck/tasks/mdp.py
+	modified:   src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+	modified:   src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+	tests/test_standup_support_gate.py
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab_microduck/tasks/mdp.py b/src/mjlab_microduck/tasks/mdp.py
+index 6db9a063..04de9477 100644
+--- a/src/mjlab_microduck/tasks/mdp.py
++++ b/src/mjlab_microduck/tasks/mdp.py
+@@ -7704,3 +7704,29 @@ def roulade_lateral_velocity_penalty(
+     """Body-frame lateral (y) linear velocity² — keeps the roll straight."""
+     asset: Entity = env.scene[asset_cfg.name]
+     return torch.nan_to_num(asset.data.root_link_lin_vel_b[:, 1].pow(2), nan=0.0)
++
++
++# ── StandUp support-contact gate ──────────────────────────────────────────────
++# "Standing" payoffs pay zero while any non-foot body touches the floor: the
++# head-tripod (feet + head planted, trunk high at ~30° lean) otherwise collects
++# most of the height / composite reward and becomes a stable basin.
++
++def feet_only_support(env: ManagerBasedRlEnv, sensor_name: str) -> torch.Tensor:
++    """1.0 where no body matched by the sensor touches the floor, else 0.0."""
++    return (env.scene[sensor_name].data.found.sum(dim=-1) == 0).float()
++
++
++def height_target_gaussian_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return height_target_gaussian(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def upright_gaussian_at_height_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return upright_gaussian_at_height(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def standing_composite_score_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return standing_composite_score(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def pose_target_match_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return pose_target_match(env, **kwargs) * feet_only_support(env, sensor_name)
+diff --git a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+index 358b567c..f5f40757 100644
+--- a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+@@ -24,6 +24,12 @@ from copy import deepcopy
+ # Symmetry
+ ENABLE_SYMMETRY = False
+ 
++# Standing payoffs pay zero while any non-foot body touches the floor (kills the
++# head-tripod basin: feet + head planted, trunk high at ~30° lean). Local addition,
++# 2026-10-29: two seeds + halved body_ang_vel all converged to that tripod.
++ENABLE_SUPPORT_CONTACT_GATE = True
++NONFOOT_BODIES_PATTERN = r"^(trunk_base|hip_l|leg|hip_l_2|leg_2|jaw_soft)$"
++
+ # ── Domain randomisation (matched to the velocity env for sim2real parity) ────
+ ENABLE_COM_RANDOMIZATION             = True
+ ENABLE_HEAD_COM_RANDOMIZATION        = True   # match velocity: randomize head-assembly CoM
+@@ -187,6 +193,16 @@ def make_microduck_standup_env_cfg(
+ 
+     cfg.scene.entities = {"robot": MICRODUCK_STANDUP_ROBOT_CFG}
+     cfg.scene.sensors  = (feet_ground_cfg, self_collision_cfg)
++    if ENABLE_SUPPORT_CONTACT_GATE:
++        nonfoot_ground_cfg = ContactSensorCfg(
++            name="nonfoot_ground_contact",
++            primary=ContactMatch(mode="body", pattern=NONFOOT_BODIES_PATTERN, entity="robot"),
++            secondary=ContactMatch(mode="body", pattern="terrain"),
++            fields=("found",),
++            reduce="none",
++            num_slots=1,
++        )
++        cfg.scene.sensors = cfg.scene.sensors + (nonfoot_ground_cfg,)
+     cfg.viewer.body_name = "trunk_base"
+ 
+     cfg.episode_length_s = EPISODE_LENGTH_S
+@@ -507,7 +523,19 @@ def make_microduck_standup_env_cfg(
+     )
+ 
+     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = ("trunk_base",)
+-    cfg.rewards["body_ang_vel"].weight = -0.05      # motion-blocker: kept LIGHT (velocity value)
++    cfg.rewards["body_ang_vel"].weight = -0.025     # halved per the freeze remedy above (seeds 42+7 froze at -0.05)
++
++    if ENABLE_SUPPORT_CONTACT_GATE:
++        _gated = {
++            "height_stand":       microduck_mdp.height_target_gaussian_feet_only,
++            "height_stand_sharp": microduck_mdp.height_target_gaussian_feet_only,
++            "upright_sharp":      microduck_mdp.upright_gaussian_at_height_feet_only,
++            "standing_composite": microduck_mdp.standing_composite_score_feet_only,
++            "pose_stand_legs":    microduck_mdp.pose_target_match_feet_only,
++        }
++        for _name, _func in _gated.items():
++            cfg.rewards[_name].func = _func
++            cfg.rewards[_name].params["sensor_name"] = "nonfoot_ground_contact"
+     cfg.rewards["angular_momentum"].weight = -0.02  # velocity value
+     cfg.rewards.pop("soft_landing", None)           # velocity removes it
+ 
+diff --git a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+index ff5b6dab..4dc8e304 100644
+--- a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+@@ -302,6 +302,8 @@ RECOVERY_ECON_KICKIN_ITER = 600 if WARM_START else 1200
+ # distill the deployed stand expert into the fallen frames (see distill.py).
+ # The expert recovers 100% face-down/up and 95% side on this model in ~1 s.
+ ENABLE_EXPERT_BC = True
++LOCAL_STAND_EXPERT_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/microduck_stand/2026-10-29_20-14-19_supportgate/model_3500.pt"
++LOCAL_WALK_ANCHOR_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/velocity/2026-10-26_16-43-15_velocity/model_4750.pt"
+ EXPERT_BC_COEF = 1.0
+ EXPERT_BC_GATE_TILT_DEG = 35.0
+ 
+@@ -378,7 +380,7 @@ TURN_IN_PLACE_MIN_FRAC = 0.1             # velocity recipe: 0.4
+ # stand expert → the stand-up is untouched. Plus the fine yaw-only term (reward agrees
+ # with the labels; the stock term preferred standing still at 0.3 in place) and a
+ # turn-in-place bucket reaching down to 0.2 rad/s.
+-ENABLE_ANCHOR_YAW_REMAP = True
++ENABLE_ANCHOR_YAW_REMAP = False  # local: table below is calibrated for Pollen's walk (441tzs6d), not ours
+ ANCHOR_YAW_REMAP = {
+     "lin": (0.0, 0.1, 0.2, 0.3, 0.4),
+     "targets": (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0),
+@@ -437,7 +439,7 @@ YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| <
+ #   - WIDER SPAWNS in the same 45 % prone slice: random servo joints (head
+ #     included) on half of it, a quarter of it at a uniformly random orientation,
+ #     plus a small sitting slice — the states where the freeze happens.
+-ENABLE_JOINT_MASKED_TEACHER = True
++ENABLE_JOINT_MASKED_TEACHER = False  # local: masking drops OUR expert's face-up get-up 100% -> 55% (tuned for alpha_stand)
+ TEACHER_MASK_TILT_DEG = 75.0
+ # Flat 61D actor obs: ang_vel 0:3, gravity 3:6, joint_pos 6:20, joint_vel 20:34, last action 34:48.
+ TEACHER_MASK_COLS = tuple(range(6, 48))
+@@ -990,6 +992,9 @@ MicroduckVelStandRlCfg = RslRlOnPolicyRunnerCfg(
+         symmetry_cfg=None,
+         bc_cfg={
+             **default_bc_cfg(), "coef": EXPERT_BC_COEF, "gate_tilt_deg": EXPERT_BC_GATE_TILT_DEG,
++            # local teachers (Pollen's wandb runs are private): our gated StandUp expert + our walk
++            "checkpoint_path": LOCAL_STAND_EXPERT_CKPT,
++            "anchor_checkpoint_path": LOCAL_WALK_ANCHOR_CKPT,
+             **({"body_slice": (55, 61)} if ENABLE_BODY_CONTROL else {}),
+             **({"unanchor_turn_in_place": True} if ENABLE_YAW_FIX else {}),
+             **({"anchor_yaw_remap": ANCHOR_YAW_REMAP} if ENABLE_ANCHOR_YAW_REMAP else {}),

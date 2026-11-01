@@ -1,0 +1,32 @@
+--- git commit ---
+b02fdea4902c2b93b7d34a83a6f05da4ececb7d3
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+index 358b567c..2c6647c4 100644
+--- a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+@@ -507,7 +507,7 @@ def make_microduck_standup_env_cfg(
+     )
+ 
+     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = ("trunk_base",)
+-    cfg.rewards["body_ang_vel"].weight = -0.05      # motion-blocker: kept LIGHT (velocity value)
++    cfg.rewards["body_ang_vel"].weight = -0.025     # halved per the freeze remedy above (seeds 42+7 froze at -0.05)
+     cfg.rewards["angular_momentum"].weight = -0.02  # velocity value
+     cfg.rewards.pop("soft_landing", None)           # velocity removes it
+ 

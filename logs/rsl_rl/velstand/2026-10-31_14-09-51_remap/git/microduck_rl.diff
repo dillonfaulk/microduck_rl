@@ -1,0 +1,271 @@
+--- git commit ---
+b02fdea4902c2b93b7d34a83a6f05da4ececb7d3
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab_microduck/tasks/distill.py
+	modified:   src/mjlab_microduck/tasks/mdp.py
+	modified:   src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+	modified:   src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+	modified:   tests/test_velstand_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+	tests/test_standup_support_gate.py
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab_microduck/tasks/distill.py b/src/mjlab_microduck/tasks/distill.py
+index 793ea33f..a9fd0458 100644
+--- a/src/mjlab_microduck/tasks/distill.py
++++ b/src/mjlab_microduck/tasks/distill.py
+@@ -206,6 +206,29 @@ def remap_anchor_yaw(obs: torch.Tensor, twist_slice: tuple[int, int], table: dic
+     return out
+ 
+ 
++def remap_anchor_twist(obs: torch.Tensor, twist_slice: tuple[int, int], table: dict) -> torch.Tensor:
++    """remap_anchor_yaw, plus optional 1-D linear-axis remaps (local, 2026-10-31: our walk
++    anchor also has x/y dead zones). table["x"] / table["y"] = {"targets": |v| knots,
++    "pos"/"neg": fed |v|}; sign kept, 0 → 0, targets past the last knot get the last fed.
++    The yaw lookup uses the TARGET |v_xy| (its rows are keyed by the anchor's achieved speed)."""
++    out = remap_anchor_yaw(obs, twist_slice, table) if table.get("pos") else obs.clone()
++    dev = obs.device
++    for axis, key in ((0, "x"), (1, "y")):
++        t = table.get(key)
++        if not t:
++            continue
++        v = obs[:, twist_slice[0] + axis]
++        tk = torch.as_tensor([0.0, *t["targets"]], dtype=obs.dtype, device=dev)
++        fed = torch.zeros_like(v)
++        for side, sign in (("pos", 1.0), ("neg", -1.0)):
++            rows = (v * sign) > 0
++            if rows.any():
++                fp = torch.as_tensor([0.0, *t[side]], dtype=obs.dtype, device=dev).expand(int(rows.sum()), -1)
++                fed[rows] = sign * _interp_rows(v[rows].abs(), tk, fp)
++        out[:, twist_slice[0] + axis] = fed
++    return out
++
++
+ def _with_flat(td: TensorDict, groups: list[str], flat: torch.Tensor) -> TensorDict:
+     """Rebuild the obs groups of ``td`` from a modified flat obs."""
+     off = 0
+@@ -310,7 +333,7 @@ class PpoWithExpertBc(PPO):
+                 anc_td = obs_td[~fallen]
+                 if cfg.get("anchor_yaw_remap"):
+                     anc_td = anc_td.clone()
+-                    anc_flat = remap_anchor_yaw(torch.cat([anc_td[g] for g in groups], dim=-1), tuple(cfg["twist_slice"]),
++                    anc_flat = remap_anchor_twist(torch.cat([anc_td[g] for g in groups], dim=-1), tuple(cfg["twist_slice"]),
+                                                 cfg["anchor_yaw_remap"])
+                     anc_td = _with_flat(anc_td, groups, anc_flat)
+                 target[~fallen] = self.anchor(anc_td)
+diff --git a/src/mjlab_microduck/tasks/mdp.py b/src/mjlab_microduck/tasks/mdp.py
+index 6db9a063..04de9477 100644
+--- a/src/mjlab_microduck/tasks/mdp.py
++++ b/src/mjlab_microduck/tasks/mdp.py
+@@ -7704,3 +7704,29 @@ def roulade_lateral_velocity_penalty(
+     """Body-frame lateral (y) linear velocity² — keeps the roll straight."""
+     asset: Entity = env.scene[asset_cfg.name]
+     return torch.nan_to_num(asset.data.root_link_lin_vel_b[:, 1].pow(2), nan=0.0)
++
++
++# ── StandUp support-contact gate ──────────────────────────────────────────────
++# "Standing" payoffs pay zero while any non-foot body touches the floor: the
++# head-tripod (feet + head planted, trunk high at ~30° lean) otherwise collects
++# most of the height / composite reward and becomes a stable basin.
++
++def feet_only_support(env: ManagerBasedRlEnv, sensor_name: str) -> torch.Tensor:
++    """1.0 where no body matched by the sensor touches the floor, else 0.0."""
++    return (env.scene[sensor_name].data.found.sum(dim=-1) == 0).float()
++
++
++def height_target_gaussian_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return height_target_gaussian(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def upright_gaussian_at_height_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return upright_gaussian_at_height(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def standing_composite_score_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return standing_composite_score(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++def pose_target_match_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
++    return pose_target_match(env, **kwargs) * feet_only_support(env, sensor_name)
+diff --git a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+index 358b567c..f5f40757 100644
+--- a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+@@ -24,6 +24,12 @@ from copy import deepcopy
+ # Symmetry
+ ENABLE_SYMMETRY = False
+ 
++# Standing payoffs pay zero while any non-foot body touches the floor (kills the
++# head-tripod basin: feet + head planted, trunk high at ~30° lean). Local addition,
++# 2026-10-29: two seeds + halved body_ang_vel all converged to that tripod.
++ENABLE_SUPPORT_CONTACT_GATE = True
++NONFOOT_BODIES_PATTERN = r"^(trunk_base|hip_l|leg|hip_l_2|leg_2|jaw_soft)$"
++
+ # ── Domain randomisation (matched to the velocity env for sim2real parity) ────
+ ENABLE_COM_RANDOMIZATION             = True
+ ENABLE_HEAD_COM_RANDOMIZATION        = True   # match velocity: randomize head-assembly CoM
+@@ -187,6 +193,16 @@ def make_microduck_standup_env_cfg(
+ 
+     cfg.scene.entities = {"robot": MICRODUCK_STANDUP_ROBOT_CFG}
+     cfg.scene.sensors  = (feet_ground_cfg, self_collision_cfg)
++    if ENABLE_SUPPORT_CONTACT_GATE:
++        nonfoot_ground_cfg = ContactSensorCfg(
++            name="nonfoot_ground_contact",
++            primary=ContactMatch(mode="body", pattern=NONFOOT_BODIES_PATTERN, entity="robot"),
++            secondary=ContactMatch(mode="body", pattern="terrain"),
++            fields=("found",),
++            reduce="none",
++            num_slots=1,
++        )
++        cfg.scene.sensors = cfg.scene.sensors + (nonfoot_ground_cfg,)
+     cfg.viewer.body_name = "trunk_base"
+ 
+     cfg.episode_length_s = EPISODE_LENGTH_S
+@@ -507,7 +523,19 @@ def make_microduck_standup_env_cfg(
+     )
+ 
+     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = ("trunk_base",)
+-    cfg.rewards["body_ang_vel"].weight = -0.05      # motion-blocker: kept LIGHT (velocity value)
++    cfg.rewards["body_ang_vel"].weight = -0.025     # halved per the freeze remedy above (seeds 42+7 froze at -0.05)
++
++    if ENABLE_SUPPORT_CONTACT_GATE:
++        _gated = {
++            "height_stand":       microduck_mdp.height_target_gaussian_feet_only,
++            "height_stand_sharp": microduck_mdp.height_target_gaussian_feet_only,
++            "upright_sharp":      microduck_mdp.upright_gaussian_at_height_feet_only,
++            "standing_composite": microduck_mdp.standing_composite_score_feet_only,
++            "pose_stand_legs":    microduck_mdp.pose_target_match_feet_only,
++        }
++        for _name, _func in _gated.items():
++            cfg.rewards[_name].func = _func
++            cfg.rewards[_name].params["sensor_name"] = "nonfoot_ground_contact"
+     cfg.rewards["angular_momentum"].weight = -0.02  # velocity value
+     cfg.rewards.pop("soft_landing", None)           # velocity removes it
+ 
+diff --git a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+index ff5b6dab..1e47e672 100644
+--- a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+@@ -302,6 +302,8 @@ RECOVERY_ECON_KICKIN_ITER = 600 if WARM_START else 1200
+ # distill the deployed stand expert into the fallen frames (see distill.py).
+ # The expert recovers 100% face-down/up and 95% side on this model in ~1 s.
+ ENABLE_EXPERT_BC = True
++LOCAL_STAND_EXPERT_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/microduck_stand/2026-10-29_20-14-19_supportgate/model_3500.pt"
++LOCAL_WALK_ANCHOR_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/velocity/2026-10-26_16-43-15_velocity/model_4750.pt"
+ EXPERT_BC_COEF = 1.0
+ EXPERT_BC_GATE_TILT_DEG = 35.0
+ 
+@@ -378,8 +380,8 @@ TURN_IN_PLACE_MIN_FRAC = 0.1             # velocity recipe: 0.4
+ # stand expert → the stand-up is untouched. Plus the fine yaw-only term (reward agrees
+ # with the labels; the stock term preferred standing still at 0.3 in place) and a
+ # turn-in-place bucket reaching down to 0.2 rad/s.
+-ENABLE_ANCHOR_YAW_REMAP = True
+-ANCHOR_YAW_REMAP = {
++ENABLE_ANCHOR_YAW_REMAP = True  # local: with LOCAL_ANCHOR_TWIST_REMAP (Pollen's table is for 441tzs6d)
++POLLEN_ANCHOR_YAW_REMAP = {
+     "lin": (0.0, 0.1, 0.2, 0.3, 0.4),
+     "targets": (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0),
+     "pos": (
+@@ -397,6 +399,32 @@ ANCHOR_YAW_REMAP = {
+         (0.17, 0.30, 0.44, 0.64, 0.85, 1.02, 1.15, 1.42, 1.60, 1.73),
+     ),
+ }
++# Local (2026-10-31): OUR walk anchor (velocity model_4750) measured in the training sim
++# (logs/warp_cmd_response.py → logs/anchor_cmd_response_4750.txt, built by
++# logs/build_anchor_remap.py): x dead below fed 0.1 and ~0.6× above, y ~0.25× (max ~0.1 m/s),
++# in-place yaw dead below 0.5 rad/s, 0 falls up to fed x ±0.6 / y ±0.45 / wz ±1.6. VelStand
++# model_3000 copied that curve. So the anchor is fed x, y AND yaw (distill.remap_anchor_twist);
++# fed caps x +0.5 / −0.4 (more back-drift beyond), y 0.4, wz 1.3. Targets past the anchor's
++# reach (x > 0.25, y > 0.1 m/s) get the cap.
++LOCAL_ANCHOR_TWIST_REMAP = {
++    "x": {"targets": (0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25),
++          "pos": (0.11, 0.128, 0.146, 0.17, 0.196, 0.236, 0.278, 0.35, 0.388, 0.5),
++          "neg": (0.114, 0.133, 0.153, 0.175, 0.197, 0.253, 0.289, 0.352, 0.4, 0.4)},
++    "y": {"targets": (0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1),
++          "pos": (0.131, 0.163, 0.197, 0.219, 0.24, 0.273, 0.317, 0.362, 0.4, 0.4),
++          "neg": (0.138, 0.159, 0.171, 0.184, 0.196, 0.223, 0.259, 0.304, 0.342, 0.386)},
++    "lin": (0.0, 0.128, 0.177, 0.217),
++    "targets": (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0),
++    "pos": ((0.409, 0.479, 0.515, 0.536, 0.558, 0.579, 0.601, 0.726, 0.802, 0.934),
++            (0.095, 0.19, 0.286, 0.387, 0.489, 0.714, 0.806, 0.898, 1.03, 1.147),
++            (0.118, 0.235, 0.385, 0.542, 0.649, 0.762, 0.878, 0.994, 1.113, 1.263),
++            (0.123, 0.247, 0.406, 0.559, 0.68, 0.83, 0.954, 1.051, 1.176, 1.3)),
++    "neg": ((0.437, 0.523, 0.552, 0.581, 0.628, 0.712, 0.817, 0.956, 1.038, 1.088),
++            (0.126, 0.252, 0.344, 0.415, 0.486, 0.614, 0.778, 0.929, 1.002, 1.075),
++            (0.136, 0.273, 0.362, 0.44, 0.53, 0.664, 0.778, 0.886, 0.982, 1.077),
++            (0.15, 0.3, 0.38, 0.461, 0.552, 0.653, 0.796, 0.942, 1.041, 1.13)),
++}
++ANCHOR_YAW_REMAP = LOCAL_ANCHOR_TWIST_REMAP
+ YAW_REMAP_TURN_IN_PLACE_FRACTION = 0.2   # velocity recipe: 0.15
+ YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| < 0.4 never trained)
+ 
+@@ -437,7 +465,7 @@ YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| <
+ #   - WIDER SPAWNS in the same 45 % prone slice: random servo joints (head
+ #     included) on half of it, a quarter of it at a uniformly random orientation,
+ #     plus a small sitting slice — the states where the freeze happens.
+-ENABLE_JOINT_MASKED_TEACHER = True
++ENABLE_JOINT_MASKED_TEACHER = False  # local: masking drops OUR expert's face-up get-up 100% -> 55% (tuned for alpha_stand)
+ TEACHER_MASK_TILT_DEG = 75.0
+ # Flat 61D actor obs: ang_vel 0:3, gravity 3:6, joint_pos 6:20, joint_vel 20:34, last action 34:48.
+ TEACHER_MASK_COLS = tuple(range(6, 48))
+@@ -990,6 +1018,9 @@ MicroduckVelStandRlCfg = RslRlOnPolicyRunnerCfg(
+         symmetry_cfg=None,
+         bc_cfg={
+             **default_bc_cfg(), "coef": EXPERT_BC_COEF, "gate_tilt_deg": EXPERT_BC_GATE_TILT_DEG,
++            # local teachers (Pollen's wandb runs are private): our gated StandUp expert + our walk
++            "checkpoint_path": LOCAL_STAND_EXPERT_CKPT,
++            "anchor_checkpoint_path": LOCAL_WALK_ANCHOR_CKPT,
+             **({"body_slice": (55, 61)} if ENABLE_BODY_CONTROL else {}),
+             **({"unanchor_turn_in_place": True} if ENABLE_YAW_FIX else {}),
+             **({"anchor_yaw_remap": ANCHOR_YAW_REMAP} if ENABLE_ANCHOR_YAW_REMAP else {}),
+diff --git a/tests/test_velstand_cfg.py b/tests/test_velstand_cfg.py
+index 15e69d7c..c9237632 100644
+--- a/tests/test_velstand_cfg.py
++++ b/tests/test_velstand_cfg.py
+@@ -558,7 +558,7 @@ def test_joint_masked_teacher_wired():
+ 
+ def test_remap_anchor_yaw_table_lookup():
+     from mjlab_microduck.tasks.distill import remap_anchor_yaw
+-    t = vs.ANCHOR_YAW_REMAP
++    t = vs.POLLEN_ANCHOR_YAW_REMAP  # its lin knots (0, 0.1, 0.2, ...) are what the cases below hit
+     obs = torch.zeros(6, 61)
+     obs[:, 48:51] = torch.tensor([[0.0, 0.0, 0.0], [0.0, 0.0, 0.3], [0.0, 0.0, -1.0], [0.2, 0.0, 0.6], [0.15, 0.0, 0.6], [0.3, 0.0, 0.0]])
+     obs[:, 0] = 7.0
+@@ -574,6 +574,25 @@ def test_remap_anchor_yaw_table_lookup():
+     assert (obs[:, 50] != out[:, 50]).any() and obs[1, 50] == 0.3               # input untouched
+ 
+ 
++def test_remap_anchor_twist_linear_axes():
++    from mjlab_microduck.tasks.distill import remap_anchor_twist, remap_anchor_yaw
++    t = vs.LOCAL_ANCHOR_TWIST_REMAP
++    obs = torch.zeros(6, 61)
++    obs[:, 48:51] = torch.tensor([[0.0, 0.0, 0.0], [0.1, 0.0, 0.0], [-0.1, 0.0, 0.0], [0.4, 0.0, 0.0],
++                                  [0.0, -0.05, 0.0], [0.15, 0.0, 0.5]])
++    out = remap_anchor_twist(obs, (48, 51), t)
++    xi = lambda c: list(t["x"]["targets"]).index(c)
++    assert (out[0, 48:51] == 0).all()                                            # standing unchanged
++    assert abs(out[1, 48].item() - t["x"]["pos"][xi(0.1)]) < 1e-5
++    assert abs(out[2, 48].item() + t["x"]["neg"][xi(0.1)]) < 1e-5                # sign kept, own direction table
++    assert abs(out[3, 48].item() - t["x"]["pos"][-1]) < 1e-5                     # past the anchor's reach → cap
++    assert abs(out[4, 49].item() + t["y"]["neg"][list(t["y"]["targets"]).index(0.05)]) < 1e-5
++    # yaw keyed by the TARGET |v_xy| (0.15), not the remapped x
++    assert abs(out[5, 50].item() - remap_anchor_yaw(obs, (48, 51), t)[5, 50].item()) < 1e-6
++    assert out[5, 48].item() > 0.15
++    assert (out[:, :48] == obs[:, :48]).all() and (out[:, 51:] == obs[:, 51:]).all()
++
++
+ def test_anchor_yaw_remap_wired():
+     bc = vs.MicroduckVelStandRlCfg.algorithm.bc_cfg
+     if not vs.ENABLE_ANCHOR_YAW_REMAP:

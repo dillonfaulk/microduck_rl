@@ -1,0 +1,16 @@
+checkpoint logs/rsl_rl/velstand/2026-10-31_14-09-51_remap/model_6000.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s)  98.5%  t_med=0.00s  recycled before up   1.5%  peak|w| med 14.2 rad/s  | fell later  95.6%, of those back up  92.9%
+prone g_x<0         n= 408  got up (held 1s)  95.6%  t_med=0.70s  recycled before up   4.4%  peak|w| med 14.0 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  96.8%  t_med=0.28s  recycled before up   3.2%  peak|w| med 14.0 rad/s
+checkpoint logs/rsl_rl/velstand/2026-10-31_14-09-51_remap/model_6500.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s)  99.0%  t_med=0.00s  recycled before up   1.0%  peak|w| med 14.1 rad/s  | fell later  97.1%, of those back up  92.5%
+prone g_x<0         n= 408  got up (held 1s)  90.9%  t_med=0.74s  recycled before up   9.1%  peak|w| med 13.9 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  97.8%  t_med=0.28s  recycled before up   2.2%  peak|w| med 14.1 rad/s
+checkpoint logs/rsl_rl/velstand/2026-10-31_14-09-51_remap/model_6750.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s)  97.6%  t_med=0.00s  recycled before up   2.4%  peak|w| med 14.1 rad/s  | fell later  93.2%, of those back up  95.3%
+prone g_x<0         n= 408  got up (held 1s)  99.0%  t_med=0.66s  recycled before up   1.0%  peak|w| med 13.9 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  99.5%  t_med=0.28s  recycled before up   0.5%  peak|w| med 13.9 rad/s
+checkpoint logs/rsl_rl/velstand/2026-10-31_14-09-51_remap/model_6999.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s) 100.0%  t_med=0.00s  recycled before up   0.0%  peak|w| med 14.1 rad/s  | fell later  97.1%, of those back up  95.0%
+prone g_x<0         n= 408  got up (held 1s)  96.1%  t_med=0.66s  recycled before up   3.9%  peak|w| med 14.1 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  99.3%  t_med=0.28s  recycled before up   0.7%  peak|w| med 14.1 rad/s

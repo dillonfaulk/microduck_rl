@@ -1,0 +1,19 @@
+stand (all-zero cmd)       cmd=(+0.00,+0.00,+0.00)  achieved=(+0.00,+0.00,+0.00)  trunk_z=116.2mm  max_tilt= 2.1deg  dis
+forward 0.15 m/s           cmd=(+0.15,+0.00,+0.00)  achieved=(+0.14,-0.01,-0.04)  trunk_z=118.5mm  max_tilt= 4.7deg  dis
+forward 0.30 m/s (max)     cmd=(+0.30,+0.00,+0.00)  achieved=(+0.26,-0.01,+0.06)  trunk_z=118.2mm  max_tilt= 4.6deg  dis
+forward 0.10 m/s           cmd=(+0.10,+0.00,+0.00)  achieved=(-0.00,+0.00,+0.00)  trunk_z=115.6mm  max_tilt= 2.5deg  dis
+backward 0.10 m/s          cmd=(-0.10,+0.00,+0.00)  achieved=(+0.00,+0.00,+0.00)  trunk_z=116.3mm  max_tilt= 1.2deg  dis
+backward 0.20 m/s          cmd=(-0.20,+0.00,+0.00)  achieved=(-0.14,+0.01,-0.53)  trunk_z=119.7mm  max_tilt= 3.8deg  dis
+turn left 0.5 rad/s        cmd=(+0.00,+0.00,+0.50)  achieved=(+0.00,+0.00,-0.00)  trunk_z=116.4mm  max_tilt= 2.0deg  dis
+turn right 0.5 rad/s       cmd=(+0.00,+0.00,-0.50)  achieved=(+0.01,+0.00,-0.57)  trunk_z=118.9mm  max_tilt= 3.9deg  dis
+strafe left 0.15 m/s       cmd=(+0.00,+0.15,+0.00)  achieved=(+0.01,+0.08,+0.09)  trunk_z=119.6mm  max_tilt= 5.2deg  dis
+turn left 1.0 rad/s        cmd=(+0.00,+0.00,+1.00)  achieved=(+0.02,-0.01,+1.14)  trunk_z=121.2mm  max_tilt= 5.0deg  dis
+turn right 1.0 rad/s       cmd=(+0.00,+0.00,-1.00)  achieved=(+0.02,+0.00,-1.07)  trunk_z=119.4mm  max_tilt= 4.0deg  dis
+fwd 0.2 + turn 0.5         cmd=(+0.20,+0.00,+0.50)  achieved=(+0.17,-0.02,+0.57)  trunk_z=119.3mm  max_tilt= 4.8deg  dis
+fallen spawns: HOME joints +-0.1 rad noise, random yaw, 8 trials, 12 s, recovered = tilt<25deg & z>90mm held 1 s
+upright (control)  recovered 8/8  (median 0.0s, max 0.0s)
+face-down          recovered 8/8  (median 0.3s, max 0.3s)
+face-up            recovered 8/8  (median 0.5s, max 0.6s)
+left side          recovered 8/8  (median 0.7s, max 0.8s)
+right side         recovered 8/8  (median 0.4s, max 0.4s)
+sitting            recovered 7/8  (median 0.9s, max 1.6s)

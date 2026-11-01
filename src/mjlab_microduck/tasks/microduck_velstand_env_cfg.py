@@ -302,6 +302,8 @@ RECOVERY_ECON_KICKIN_ITER = 600 if WARM_START else 1200
 # distill the deployed stand expert into the fallen frames (see distill.py).
 # The expert recovers 100% face-down/up and 95% side on this model in ~1 s.
 ENABLE_EXPERT_BC = True
+LOCAL_STAND_EXPERT_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/microduck_stand/2026-10-29_20-14-19_supportgate/model_3500.pt"
+LOCAL_WALK_ANCHOR_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/velocity/2026-10-26_16-43-15_velocity/model_4750.pt"
 EXPERT_BC_COEF = 1.0
 EXPERT_BC_GATE_TILT_DEG = 35.0
 
@@ -378,8 +380,8 @@ TURN_IN_PLACE_MIN_FRAC = 0.1             # velocity recipe: 0.4
 # stand expert → the stand-up is untouched. Plus the fine yaw-only term (reward agrees
 # with the labels; the stock term preferred standing still at 0.3 in place) and a
 # turn-in-place bucket reaching down to 0.2 rad/s.
-ENABLE_ANCHOR_YAW_REMAP = True
-ANCHOR_YAW_REMAP = {
+ENABLE_ANCHOR_YAW_REMAP = True  # local: with LOCAL_ANCHOR_TWIST_REMAP (Pollen's table is for 441tzs6d)
+POLLEN_ANCHOR_YAW_REMAP = {
     "lin": (0.0, 0.1, 0.2, 0.3, 0.4),
     "targets": (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0),
     "pos": (
@@ -397,6 +399,32 @@ ANCHOR_YAW_REMAP = {
         (0.17, 0.30, 0.44, 0.64, 0.85, 1.02, 1.15, 1.42, 1.60, 1.73),
     ),
 }
+# Local (2026-10-31): OUR walk anchor (velocity model_4750) measured in the training sim
+# (logs/warp_cmd_response.py → logs/anchor_cmd_response_4750.txt, built by
+# logs/build_anchor_remap.py): x dead below fed 0.1 and ~0.6× above, y ~0.25× (max ~0.1 m/s),
+# in-place yaw dead below 0.5 rad/s, 0 falls up to fed x ±0.6 / y ±0.45 / wz ±1.6. VelStand
+# model_3000 copied that curve. So the anchor is fed x, y AND yaw (distill.remap_anchor_twist);
+# fed caps x +0.5 / −0.4 (more back-drift beyond), y 0.4, wz 1.3. Targets past the anchor's
+# reach (x > 0.25, y > 0.1 m/s) get the cap.
+LOCAL_ANCHOR_TWIST_REMAP = {
+    "x": {"targets": (0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25),
+          "pos": (0.11, 0.128, 0.146, 0.17, 0.196, 0.236, 0.278, 0.35, 0.388, 0.5),
+          "neg": (0.114, 0.133, 0.153, 0.175, 0.197, 0.253, 0.289, 0.352, 0.4, 0.4)},
+    "y": {"targets": (0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1),
+          "pos": (0.131, 0.163, 0.197, 0.219, 0.24, 0.273, 0.317, 0.362, 0.4, 0.4),
+          "neg": (0.138, 0.159, 0.171, 0.184, 0.196, 0.223, 0.259, 0.304, 0.342, 0.386)},
+    "lin": (0.0, 0.128, 0.177, 0.217),
+    "targets": (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0),
+    "pos": ((0.409, 0.479, 0.515, 0.536, 0.558, 0.579, 0.601, 0.726, 0.802, 0.934),
+            (0.095, 0.19, 0.286, 0.387, 0.489, 0.714, 0.806, 0.898, 1.03, 1.147),
+            (0.118, 0.235, 0.385, 0.542, 0.649, 0.762, 0.878, 0.994, 1.113, 1.263),
+            (0.123, 0.247, 0.406, 0.559, 0.68, 0.83, 0.954, 1.051, 1.176, 1.3)),
+    "neg": ((0.437, 0.523, 0.552, 0.581, 0.628, 0.712, 0.817, 0.956, 1.038, 1.088),
+            (0.126, 0.252, 0.344, 0.415, 0.486, 0.614, 0.778, 0.929, 1.002, 1.075),
+            (0.136, 0.273, 0.362, 0.44, 0.53, 0.664, 0.778, 0.886, 0.982, 1.077),
+            (0.15, 0.3, 0.38, 0.461, 0.552, 0.653, 0.796, 0.942, 1.041, 1.13)),
+}
+ANCHOR_YAW_REMAP = LOCAL_ANCHOR_TWIST_REMAP
 YAW_REMAP_TURN_IN_PLACE_FRACTION = 0.2   # velocity recipe: 0.15
 YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| < 0.4 never trained)
 
@@ -437,7 +465,7 @@ YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| <
 #   - WIDER SPAWNS in the same 45 % prone slice: random servo joints (head
 #     included) on half of it, a quarter of it at a uniformly random orientation,
 #     plus a small sitting slice — the states where the freeze happens.
-ENABLE_JOINT_MASKED_TEACHER = True
+ENABLE_JOINT_MASKED_TEACHER = False  # local: masking drops OUR expert's face-up get-up 100% -> 55% (tuned for alpha_stand)
 TEACHER_MASK_TILT_DEG = 75.0
 # Flat 61D actor obs: ang_vel 0:3, gravity 3:6, joint_pos 6:20, joint_vel 20:34, last action 34:48.
 TEACHER_MASK_COLS = tuple(range(6, 48))
@@ -990,6 +1018,9 @@ MicroduckVelStandRlCfg = RslRlOnPolicyRunnerCfg(
         symmetry_cfg=None,
         bc_cfg={
             **default_bc_cfg(), "coef": EXPERT_BC_COEF, "gate_tilt_deg": EXPERT_BC_GATE_TILT_DEG,
+            # local teachers (Pollen's wandb runs are private): our gated StandUp expert + our walk
+            "checkpoint_path": LOCAL_STAND_EXPERT_CKPT,
+            "anchor_checkpoint_path": LOCAL_WALK_ANCHOR_CKPT,
             **({"body_slice": (55, 61)} if ENABLE_BODY_CONTROL else {}),
             **({"unanchor_turn_in_place": True} if ENABLE_YAW_FIX else {}),
             **({"anchor_yaw_remap": ANCHOR_YAW_REMAP} if ENABLE_ANCHOR_YAW_REMAP else {}),

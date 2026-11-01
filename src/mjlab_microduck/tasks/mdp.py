@@ -7704,3 +7704,29 @@ def roulade_lateral_velocity_penalty(
     """Body-frame lateral (y) linear velocity² — keeps the roll straight."""
     asset: Entity = env.scene[asset_cfg.name]
     return torch.nan_to_num(asset.data.root_link_lin_vel_b[:, 1].pow(2), nan=0.0)
+
+
+# ── StandUp support-contact gate ──────────────────────────────────────────────
+# "Standing" payoffs pay zero while any non-foot body touches the floor: the
+# head-tripod (feet + head planted, trunk high at ~30° lean) otherwise collects
+# most of the height / composite reward and becomes a stable basin.
+
+def feet_only_support(env: ManagerBasedRlEnv, sensor_name: str) -> torch.Tensor:
+    """1.0 where no body matched by the sensor touches the floor, else 0.0."""
+    return (env.scene[sensor_name].data.found.sum(dim=-1) == 0).float()
+
+
+def height_target_gaussian_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
+    return height_target_gaussian(env, **kwargs) * feet_only_support(env, sensor_name)
+
+
+def upright_gaussian_at_height_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
+    return upright_gaussian_at_height(env, **kwargs) * feet_only_support(env, sensor_name)
+
+
+def standing_composite_score_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
+    return standing_composite_score(env, **kwargs) * feet_only_support(env, sensor_name)
+
+
+def pose_target_match_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
+    return pose_target_match(env, **kwargs) * feet_only_support(env, sensor_name)

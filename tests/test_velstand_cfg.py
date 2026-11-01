@@ -558,7 +558,7 @@ def test_joint_masked_teacher_wired():
 
 def test_remap_anchor_yaw_table_lookup():
     from mjlab_microduck.tasks.distill import remap_anchor_yaw
-    t = vs.ANCHOR_YAW_REMAP
+    t = vs.POLLEN_ANCHOR_YAW_REMAP  # its lin knots (0, 0.1, 0.2, ...) are what the cases below hit
     obs = torch.zeros(6, 61)
     obs[:, 48:51] = torch.tensor([[0.0, 0.0, 0.0], [0.0, 0.0, 0.3], [0.0, 0.0, -1.0], [0.2, 0.0, 0.6], [0.15, 0.0, 0.6], [0.3, 0.0, 0.0]])
     obs[:, 0] = 7.0
@@ -572,6 +572,25 @@ def test_remap_anchor_yaw_table_lookup():
     assert abs(out[4, 50].item() - mid) < 1e-5                                   # linear in |v_xy| between knots
     assert (out[:, :50] == obs[:, :50]).all() and (out[:, 51:] == obs[:, 51:]).all()  # only the yaw command changes
     assert (obs[:, 50] != out[:, 50]).any() and obs[1, 50] == 0.3               # input untouched
+
+
+def test_remap_anchor_twist_linear_axes():
+    from mjlab_microduck.tasks.distill import remap_anchor_twist, remap_anchor_yaw
+    t = vs.LOCAL_ANCHOR_TWIST_REMAP
+    obs = torch.zeros(6, 61)
+    obs[:, 48:51] = torch.tensor([[0.0, 0.0, 0.0], [0.1, 0.0, 0.0], [-0.1, 0.0, 0.0], [0.4, 0.0, 0.0],
+                                  [0.0, -0.05, 0.0], [0.15, 0.0, 0.5]])
+    out = remap_anchor_twist(obs, (48, 51), t)
+    xi = lambda c: list(t["x"]["targets"]).index(c)
+    assert (out[0, 48:51] == 0).all()                                            # standing unchanged
+    assert abs(out[1, 48].item() - t["x"]["pos"][xi(0.1)]) < 1e-5
+    assert abs(out[2, 48].item() + t["x"]["neg"][xi(0.1)]) < 1e-5                # sign kept, own direction table
+    assert abs(out[3, 48].item() - t["x"]["pos"][-1]) < 1e-5                     # past the anchor's reach → cap
+    assert abs(out[4, 49].item() + t["y"]["neg"][list(t["y"]["targets"]).index(0.05)]) < 1e-5
+    # yaw keyed by the TARGET |v_xy| (0.15), not the remapped x
+    assert abs(out[5, 50].item() - remap_anchor_yaw(obs, (48, 51), t)[5, 50].item()) < 1e-6
+    assert out[5, 48].item() > 0.15
+    assert (out[:, :48] == obs[:, :48]).all() and (out[:, 51:] == obs[:, 51:]).all()
 
 
 def test_anchor_yaw_remap_wired():

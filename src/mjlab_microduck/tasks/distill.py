@@ -206,6 +206,29 @@ def remap_anchor_yaw(obs: torch.Tensor, twist_slice: tuple[int, int], table: dic
     return out
 
 
+def remap_anchor_twist(obs: torch.Tensor, twist_slice: tuple[int, int], table: dict) -> torch.Tensor:
+    """remap_anchor_yaw, plus optional 1-D linear-axis remaps (local, 2026-10-31: our walk
+    anchor also has x/y dead zones). table["x"] / table["y"] = {"targets": |v| knots,
+    "pos"/"neg": fed |v|}; sign kept, 0 → 0, targets past the last knot get the last fed.
+    The yaw lookup uses the TARGET |v_xy| (its rows are keyed by the anchor's achieved speed)."""
+    out = remap_anchor_yaw(obs, twist_slice, table) if table.get("pos") else obs.clone()
+    dev = obs.device
+    for axis, key in ((0, "x"), (1, "y")):
+        t = table.get(key)
+        if not t:
+            continue
+        v = obs[:, twist_slice[0] + axis]
+        tk = torch.as_tensor([0.0, *t["targets"]], dtype=obs.dtype, device=dev)
+        fed = torch.zeros_like(v)
+        for side, sign in (("pos", 1.0), ("neg", -1.0)):
+            rows = (v * sign) > 0
+            if rows.any():
+                fp = torch.as_tensor([0.0, *t[side]], dtype=obs.dtype, device=dev).expand(int(rows.sum()), -1)
+                fed[rows] = sign * _interp_rows(v[rows].abs(), tk, fp)
+        out[:, twist_slice[0] + axis] = fed
+    return out
+
+
 def _with_flat(td: TensorDict, groups: list[str], flat: torch.Tensor) -> TensorDict:
     """Rebuild the obs groups of ``td`` from a modified flat obs."""
     off = 0
@@ -310,7 +333,7 @@ class PpoWithExpertBc(PPO):
                 anc_td = obs_td[~fallen]
                 if cfg.get("anchor_yaw_remap"):
                     anc_td = anc_td.clone()
-                    anc_flat = remap_anchor_yaw(torch.cat([anc_td[g] for g in groups], dim=-1), tuple(cfg["twist_slice"]),
+                    anc_flat = remap_anchor_twist(torch.cat([anc_td[g] for g in groups], dim=-1), tuple(cfg["twist_slice"]),
                                                 cfg["anchor_yaw_remap"])
                     anc_td = _with_flat(anc_td, groups, anc_flat)
                 target[~fallen] = self.anchor(anc_td)

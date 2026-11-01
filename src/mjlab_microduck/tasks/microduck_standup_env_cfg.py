@@ -24,6 +24,12 @@ from copy import deepcopy
 # Symmetry
 ENABLE_SYMMETRY = False
 
+# Standing payoffs pay zero while any non-foot body touches the floor (kills the
+# head-tripod basin: feet + head planted, trunk high at ~30° lean). Local addition,
+# 2026-10-29: two seeds + halved body_ang_vel all converged to that tripod.
+ENABLE_SUPPORT_CONTACT_GATE = True
+NONFOOT_BODIES_PATTERN = r"^(trunk_base|hip_l|leg|hip_l_2|leg_2|jaw_soft)$"
+
 # ── Domain randomisation (matched to the velocity env for sim2real parity) ────
 ENABLE_COM_RANDOMIZATION             = True
 ENABLE_HEAD_COM_RANDOMIZATION        = True   # match velocity: randomize head-assembly CoM
@@ -187,6 +193,16 @@ def make_microduck_standup_env_cfg(
 
     cfg.scene.entities = {"robot": MICRODUCK_STANDUP_ROBOT_CFG}
     cfg.scene.sensors  = (feet_ground_cfg, self_collision_cfg)
+    if ENABLE_SUPPORT_CONTACT_GATE:
+        nonfoot_ground_cfg = ContactSensorCfg(
+            name="nonfoot_ground_contact",
+            primary=ContactMatch(mode="body", pattern=NONFOOT_BODIES_PATTERN, entity="robot"),
+            secondary=ContactMatch(mode="body", pattern="terrain"),
+            fields=("found",),
+            reduce="none",
+            num_slots=1,
+        )
+        cfg.scene.sensors = cfg.scene.sensors + (nonfoot_ground_cfg,)
     cfg.viewer.body_name = "trunk_base"
 
     cfg.episode_length_s = EPISODE_LENGTH_S
@@ -507,7 +523,19 @@ def make_microduck_standup_env_cfg(
     )
 
     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = ("trunk_base",)
-    cfg.rewards["body_ang_vel"].weight = -0.05      # motion-blocker: kept LIGHT (velocity value)
+    cfg.rewards["body_ang_vel"].weight = -0.025     # halved per the freeze remedy above (seeds 42+7 froze at -0.05)
+
+    if ENABLE_SUPPORT_CONTACT_GATE:
+        _gated = {
+            "height_stand":       microduck_mdp.height_target_gaussian_feet_only,
+            "height_stand_sharp": microduck_mdp.height_target_gaussian_feet_only,
+            "upright_sharp":      microduck_mdp.upright_gaussian_at_height_feet_only,
+            "standing_composite": microduck_mdp.standing_composite_score_feet_only,
+            "pose_stand_legs":    microduck_mdp.pose_target_match_feet_only,
+        }
+        for _name, _func in _gated.items():
+            cfg.rewards[_name].func = _func
+            cfg.rewards[_name].params["sensor_name"] = "nonfoot_ground_contact"
     cfg.rewards["angular_momentum"].weight = -0.02  # velocity value
     cfg.rewards.pop("soft_landing", None)           # velocity removes it
 

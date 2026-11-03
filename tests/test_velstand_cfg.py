@@ -122,6 +122,8 @@ def test_warm_start_collapses_inherited_curricula_only():
     cfg = vs.make_microduck_velstand_env_cfg()
     # body_pose_range is REPLACED by velstand's own body-control ramp (ENABLE_BODY_CONTROL)
     replaced = {"body_pose_range"} if vs.ENABLE_BODY_CONTROL else set()
+    if not vs.INHERIT_WALK_FINE_TRACKING:  # walk v2 terms are stripped, not collapsed
+        replaced |= {"track_lin_vel_fine_weight", "track_yaw_fine_weight"}
     for name, term in base.curriculum.items():
         if name in replaced:
             continue
@@ -591,6 +593,35 @@ def test_remap_anchor_twist_linear_axes():
     assert abs(out[5, 50].item() - remap_anchor_yaw(obs, (48, 51), t)[5, 50].item()) < 1e-6
     assert out[5, 48].item() > 0.15
     assert (out[:, :48] == obs[:, :48]).all() and (out[:, 51:] == obs[:, 51:]).all()
+
+
+def test_walk_v2_fine_tracking_wired():
+    from mjlab_microduck.tasks import microduck_velocity_env_cfg as vel
+    if not vel.ENABLE_FINE_TRACKING:
+        pytest.skip("fine tracking disabled")
+    cfg = make_microduck_velocity_env_cfg()
+    assert cfg.commands["twist"].turn_in_place_min_frac == vel.FINE_TURN_IN_PLACE_MIN_FRAC
+    for name in ("track_lin_vel_fine", "track_yaw_fine"):
+        assert cfg.rewards[name].weight == 0.0  # ramped in after the gait bootstraps
+        stages = cfg.curriculum[f"{name}_weight"].params["weight_stages"]
+        assert stages[0]["weight"] == 0.0 and stages[-1]["weight"] > 0
+    # the stock terms stay (replacing the stock yaw term made turning worse)
+    assert cfg.rewards["track_linear_velocity"].weight > 0 and cfg.rewards["track_angular_velocity"].weight > 0
+    if not vs.INHERIT_WALK_FINE_TRACKING:
+        v = vs.make_microduck_velstand_env_cfg()
+        assert "track_lin_vel_fine" not in v.rewards
+        assert not any(k.startswith("track_") and k.endswith("_fine_weight") for k in v.curriculum)
+
+
+def test_track_lin_vel_xy_fine_prices_standing_still():
+    class _D:
+        root_link_lin_vel_b = torch.tensor([[0.0, 0.0, 0.0], [0.1, 0.0, 0.3]])
+    class _Env:
+        scene = {"robot": type("R", (), {"data": _D})()}
+        command_manager = type("C", (), {"get_command": staticmethod(lambda n: torch.tensor([[0.1, 0.0, 0.0]] * 2))})()
+    r = microduck_mdp.track_lin_vel_xy_fine(_Env(), std=0.1, command_name="twist")
+    assert r[0] == pytest.approx(math.exp(-1.0))  # standing still at 0.1 m/s
+    assert r[1] == pytest.approx(1.0)              # tracked; z velocity ignored
 
 
 def test_anchor_yaw_remap_wired():

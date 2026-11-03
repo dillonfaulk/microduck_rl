@@ -785,6 +785,23 @@ def servo_acc_spike_penalty(
     return torch.clamp(acc.abs() - acc_thresh, min=0.0).sum(dim=1)
 
 
+def trunk_ang_vel_excess(
+    env: ManagerBasedRlEnv,
+    w_thresh: float = 6.0,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """ReLU(|ω_trunk| - w_thresh)², ω = full body-frame angular velocity (rad/s).
+
+    Gentle stand-up (2026-11-01): our StandUp expert rises face-up with a ~14 rad/s
+    median peak (Pollen's alpha_stand ~10.7, masked ~6.7) and body_ang_vel's plain ω²
+    is paid everywhere, so raising it taxes the whole flip. This bills only the spike
+    above the threshold. Returns >= 0 — weight it negatively, and only once the rise
+    skill exists (see the standup cfg's smoothness-polish timing notes)."""
+    asset: Entity = env.scene[asset_cfg.name]
+    w = torch.nan_to_num(asset.data.root_link_ang_vel_b, nan=0.0).norm(dim=-1)
+    return torch.square(torch.clamp(w - w_thresh, min=0.0))
+
+
 def _fallen_scale(env: ManagerBasedRlEnv, asset: Entity, fallen_scale: float, gate_tilt_above_deg: float) -> torch.Tensor:
     fallen = _fallen_mask(env, asset, 0.0, gate_tilt_above_deg).bool()
     return torch.where(fallen, torch.full_like(fallen, fallen_scale, dtype=torch.float), torch.ones(fallen.shape, device=env.device))
@@ -5472,6 +5489,25 @@ def track_yaw_rate_fine(
     asset: Entity = env.scene[asset_cfg.name]
     cmd = env.command_manager.get_command(command_name)
     return torch.exp(-torch.square(cmd[:, 2] - asset.data.root_link_ang_vel_b[:, 2]) / std**2)
+
+
+def track_lin_vel_xy_fine(
+    env: ManagerBasedRlEnv,
+    std: float,
+    command_name: str,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """Planar-velocity-only Gaussian, exp(-|v_cmd_xy - v_xy|²/std²), ADDED next to the
+    stock track_linear_velocity (same pattern as track_yaw_rate_fine).
+
+    Why (walk v2, 2026-11-01): the stock term (std² 0.1) pays standing still 90 % of max
+    at a 0.1 m/s command, so the walk learned x < 0.1 and strafe ≈ 0 as dead zones. With
+    std 0.1 standing still at 0.1 m/s scores 0.37 instead; the stock term keeps the
+    far-error gradient where this one is flat."""
+    asset: Entity = env.scene[asset_cfg.name]
+    cmd = env.command_manager.get_command(command_name)
+    err = torch.sum(torch.square(cmd[:, :2] - asset.data.root_link_lin_vel_b[:, :2]), dim=1)
+    return torch.exp(-err / std**2)
 
 
 def upright_body_cmd_relative(

@@ -24,6 +24,22 @@ NUM_STEPS_PER_ENV = 24
 # Fraction of envs commanded to spin on the spot (lin=0, |ang| ∈ [0.4·max, max]).
 TURN_IN_PLACE_FRACTION = 0.15
 
+# Walk v2 (2026-11-01): low-speed dead zones. model_4750 (this recipe) is dead below
+# x 0.1 m/s, in-place yaw 0.5 rad/s and strafes ≤ 0.1 m/s: the stock tracking stds are
+# loose at Microduck speeds (standing still at 0.1 m/s earns 90 % of track_linear_velocity)
+# and in-place |wz| < 0.4 is never sampled. Fix = sharp xy + yaw terms ADDED next to the
+# stock ones (replacing the stock yaw term made turning worse, see velstand cfg), ramped
+# in after the gait bootstraps, and the turn-in-place bucket reaching down to 0.1 rad/s.
+ENABLE_FINE_TRACKING = True
+TRACK_LIN_FINE_STD = 0.1
+TRACK_YAW_FINE_STD = 0.35
+FINE_TRACKING_WEIGHT_STAGES = [
+    {"step": 0, "weight": 0.0},
+    {"step": 500 * NUM_STEPS_PER_ENV, "weight": 1.0},
+    {"step": 1000 * NUM_STEPS_PER_ENV, "weight": 2.0},
+]
+FINE_TURN_IN_PLACE_MIN_FRAC = 0.1  # stock 0.4
+
 # Symmetry
 ENABLE_SYMMETRY = False
 
@@ -789,6 +805,24 @@ def make_microduck_velocity_env_cfg(
             ],
         },
     )
+
+    if ENABLE_FINE_TRACKING:
+        cfg.commands["twist"].turn_in_place_min_frac = FINE_TURN_IN_PLACE_MIN_FRAC
+        cfg.rewards["track_lin_vel_fine"] = RewardTermCfg(
+            func=microduck_mdp.track_lin_vel_xy_fine,
+            weight=0.0,
+            params={"std": TRACK_LIN_FINE_STD, "command_name": "twist"},
+        )
+        cfg.rewards["track_yaw_fine"] = RewardTermCfg(
+            func=microduck_mdp.track_yaw_rate_fine,
+            weight=0.0,
+            params={"std": TRACK_YAW_FINE_STD, "command_name": "twist"},
+        )
+        for name in ("track_lin_vel_fine", "track_yaw_fine"):
+            cfg.curriculum[f"{name}_weight"] = CurriculumTermCfg(
+                func=microduck_mdp.reward_weight,
+                params={"reward_name": name, "weight_stages": deepcopy(FINE_TRACKING_WEIGHT_STAGES)},
+            )
 
     # Gradually increase standing env fraction after walking is established
     cfg.curriculum["standing_envs"] = CurriculumTermCfg(

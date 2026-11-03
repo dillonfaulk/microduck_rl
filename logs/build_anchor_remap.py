@@ -33,6 +33,11 @@ def axis(col, sign, other_zero, cap, targets):
 
 XT = (0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25)
 YT = (0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1)
+if "--wide" in sys.argv:
+    # walk v2 reaches ~0.36 m/s / strafe ~0.13: targets past the last knot get the last fed
+    # (distill.remap_anchor_twist), so the knots must span the commanded range.
+    XT = XT + (0.3, 0.35, 0.4)
+    YT = YT + (0.115, 0.13, 0.15)
 WT = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 table = {
     "x": {"targets": XT, "pos": axis(0, 1, [1, 2], FED_CAP["x_pos"], XT), "neg": axis(0, -1, [1, 2], FED_CAP["x_neg"], XT)},

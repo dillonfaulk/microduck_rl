@@ -26,7 +26,12 @@ env = ManagerBasedRlEnv(cfg=env_cfg, device="cuda:0")
 env.common_step_counter = 4000 * 24  # curricula at their final stage, as at the end of training
 vec = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
 runner = (load_runner_cls(TASK) or OnPolicyRunner)(vec, asdict(agent_cfg), device="cuda:0")
-runner.load(ckpt, map_location="cuda:0")
+try:
+    runner.load(ckpt, map_location="cuda:0")
+except RuntimeError:
+    # VelStand checkpoint: same 61-D actor, wider critic -> rise-only test of the actor
+    runner.alg.actor.load_state_dict(torch.load(ckpt, map_location="cuda:0")["actor_state_dict"])
+    print("loaded actor only (critic shape differs)")
 policy = runner.get_inference_policy(device="cuda:0")
 
 robot = env.scene["robot"]

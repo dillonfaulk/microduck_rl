@@ -1,0 +1,20 @@
+== 11997
+standing        n= 145  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   8.4deg  final z med 115.8mm  peak|w| med/p90  3.0/ 4.2 rad/s  non-foot floor contact   0.0%
+sitting         n= 223  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   8.4deg  final z med 115.9mm  peak|w| med/p90  3.5/ 4.8 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 341  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   8.9deg  final z med 115.6mm  peak|w| med/p90  9.8/11.2 rad/s  non-foot floor contact   0.3%
+prone g_x>=0    n= 315  recovered(held 1s) 100.0%  t_med=0.24s  final tilt med   9.2deg  final z med 115.8mm  peak|w| med/p90  6.7/ 7.8 rad/s  non-foot floor contact   0.0%
+== 11000
+standing        n= 151  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   9.3deg  final z med 116.1mm  peak|w| med/p90  2.9/ 4.4 rad/s  non-foot floor contact   0.0%
+sitting         n= 195  recovered(held 1s) 100.0%  t_med=0.18s  final tilt med   8.1deg  final z med 116.2mm  peak|w| med/p90  3.7/ 5.2 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 343  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   8.5deg  final z med 116.1mm  peak|w| med/p90  9.7/11.1 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 335  recovered(held 1s) 100.0%  t_med=0.26s  final tilt med   9.0deg  final z med 116.0mm  peak|w| med/p90  6.6/ 7.7 rad/s  non-foot floor contact   0.0%
+== 10000
+standing        n= 131  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   9.0deg  final z med 116.3mm  peak|w| med/p90  2.9/ 4.3 rad/s  non-foot floor contact   0.0%
+sitting         n= 221  recovered(held 1s) 100.0%  t_med=0.18s  final tilt med   8.2deg  final z med 116.3mm  peak|w| med/p90  4.0/ 5.5 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 379  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   7.5deg  final z med 116.1mm  peak|w| med/p90  9.7/11.0 rad/s  non-foot floor contact   0.3%
+prone g_x>=0    n= 293  recovered(held 1s) 100.0%  t_med=0.24s  final tilt med   8.3deg  final z med 116.1mm  peak|w| med/p90  6.8/ 7.9 rad/s  non-foot floor contact   0.0%
+== 9000
+standing        n= 158  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   6.6deg  final z med 116.4mm  peak|w| med/p90  3.1/ 4.4 rad/s  non-foot floor contact   0.0%
+sitting         n= 204  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   9.4deg  final z med 116.3mm  peak|w| med/p90  3.5/ 4.9 rad/s  non-foot floor contact   0.5%
+prone g_x<0     n= 367  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   8.8deg  final z med 116.4mm  peak|w| med/p90  9.8/11.0 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 295  recovered(held 1s) 100.0%  t_med=0.24s  final tilt med   7.9deg  final z med 116.3mm  peak|w| med/p90  6.9/ 8.1 rad/s  non-foot floor contact   0.0%

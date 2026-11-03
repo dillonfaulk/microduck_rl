@@ -1,0 +1,287 @@
+--- git commit ---
+f19c6ae8fa0dc30baf24174419ed53c96845efcd
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab_microduck/tasks/mdp.py
+	modified:   src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+	modified:   src/mjlab_microduck/tasks/microduck_velocity_env_cfg.py
+	modified:   src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+	modified:   tests/test_standup_support_gate.py
+	modified:   tests/test_velstand_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab_microduck/tasks/mdp.py b/src/mjlab_microduck/tasks/mdp.py
+index 04de9477..b41994df 100644
+--- a/src/mjlab_microduck/tasks/mdp.py
++++ b/src/mjlab_microduck/tasks/mdp.py
+@@ -785,6 +785,23 @@ def servo_acc_spike_penalty(
+     return torch.clamp(acc.abs() - acc_thresh, min=0.0).sum(dim=1)
+ 
+ 
++def trunk_ang_vel_excess(
++    env: ManagerBasedRlEnv,
++    w_thresh: float = 6.0,
++    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
++) -> torch.Tensor:
++    """ReLU(|ω_trunk| - w_thresh)², ω = full body-frame angular velocity (rad/s).
++
++    Gentle stand-up (2026-11-01): our StandUp expert rises face-up with a ~14 rad/s
++    median peak (Pollen's alpha_stand ~10.7, masked ~6.7) and body_ang_vel's plain ω²
++    is paid everywhere, so raising it taxes the whole flip. This bills only the spike
++    above the threshold. Returns >= 0 — weight it negatively, and only once the rise
++    skill exists (see the standup cfg's smoothness-polish timing notes)."""
++    asset: Entity = env.scene[asset_cfg.name]
++    w = torch.nan_to_num(asset.data.root_link_ang_vel_b, nan=0.0).norm(dim=-1)
++    return torch.square(torch.clamp(w - w_thresh, min=0.0))
++
++
+ def _fallen_scale(env: ManagerBasedRlEnv, asset: Entity, fallen_scale: float, gate_tilt_above_deg: float) -> torch.Tensor:
+     fallen = _fallen_mask(env, asset, 0.0, gate_tilt_above_deg).bool()
+     return torch.where(fallen, torch.full_like(fallen, fallen_scale, dtype=torch.float), torch.ones(fallen.shape, device=env.device))
+@@ -5474,6 +5491,25 @@ def track_yaw_rate_fine(
+     return torch.exp(-torch.square(cmd[:, 2] - asset.data.root_link_ang_vel_b[:, 2]) / std**2)
+ 
+ 
++def track_lin_vel_xy_fine(
++    env: ManagerBasedRlEnv,
++    std: float,
++    command_name: str,
++    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
++) -> torch.Tensor:
++    """Planar-velocity-only Gaussian, exp(-|v_cmd_xy - v_xy|²/std²), ADDED next to the
++    stock track_linear_velocity (same pattern as track_yaw_rate_fine).
++
++    Why (walk v2, 2026-11-01): the stock term (std² 0.1) pays standing still 90 % of max
++    at a 0.1 m/s command, so the walk learned x < 0.1 and strafe ≈ 0 as dead zones. With
++    std 0.1 standing still at 0.1 m/s scores 0.37 instead; the stock term keeps the
++    far-error gradient where this one is flat."""
++    asset: Entity = env.scene[asset_cfg.name]
++    cmd = env.command_manager.get_command(command_name)
++    err = torch.sum(torch.square(cmd[:, :2] - asset.data.root_link_lin_vel_b[:, :2]), dim=1)
++    return torch.exp(-err / std**2)
++
++
+ def upright_body_cmd_relative(
+     env: ManagerBasedRlEnv,
+     std: float,
+diff --git a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+index f5f40757..555272db 100644
+--- a/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_standup_env_cfg.py
+@@ -30,6 +30,23 @@ ENABLE_SYMMETRY = False
+ ENABLE_SUPPORT_CONTACT_GATE = True
+ NONFOOT_BODIES_PATTERN = r"^(trunk_base|hip_l|leg|hip_l_2|leg_2|jaw_soft)$"
+ 
++# Gentle rise (2026-11-01): supportgate model_3500 gets up 100 % but face-up rises peak
++# at ~14 rad/s trunk |ω| (median). Spin cap = ReLU(|ω| - 6)², weight 0 until iter 4000,
++# so it only lands on a RESUMED run whose rise skill already exists (timing lesson in
++# the smoothness-polish notes below). At -0.05 a 14 rad/s frame costs 3.2, 10 rad/s 0.8.
++ENABLE_SPIN_CAP = True
++SPIN_CAP_THRESH = 6.0
++SPIN_CAP_WEIGHT_STAGES = [
++    {"step": 0,          "weight": 0.0},
++    {"step": 4000 * 24,  "weight": -0.01},
++    {"step": 4500 * 24,  "weight": -0.025},
++    {"step": 5000 * 24,  "weight": -0.05},
++    # spincap chunk 1 (→ 7998): face-up peak 13.7 → 12.0 by 6000 then flat, get-ups
++    # still 100 % everywhere → chunk 2 raises it 4×.
++    {"step": 8000 * 24,  "weight": -0.1},
++    {"step": 8500 * 24,  "weight": -0.2},
++]
++
+ # ── Domain randomisation (matched to the velocity env for sim2real parity) ────
+ ENABLE_COM_RANDOMIZATION             = True
+ ENABLE_HEAD_COM_RANDOMIZATION        = True   # match velocity: randomize head-assembly CoM
+@@ -1033,6 +1050,19 @@ def make_microduck_standup_env_cfg(
+             ],
+         },
+     )
++    if ENABLE_SPIN_CAP:
++        cfg.rewards["spin_cap"] = RewardTermCfg(
++            func=microduck_mdp.trunk_ang_vel_excess,
++            weight=0.0,
++            params={
++                "w_thresh":  SPIN_CAP_THRESH,
++                "asset_cfg": SceneEntityCfg("robot", body_names=("trunk_base",)),
++            },
++        )
++        cfg.curriculum["spin_cap_weight"] = CurriculumTermCfg(
++            func=microduck_mdp.reward_weight,
++            params={"reward_name": "spin_cap", "weight_stages": deepcopy(SPIN_CAP_WEIGHT_STAGES)},
++        )
+ 
+     # ── Body-control curricula ────────────────────────────────────────────────
+     # Everything below is body-control only — NOTE the early return; add any
+diff --git a/src/mjlab_microduck/tasks/microduck_velocity_env_cfg.py b/src/mjlab_microduck/tasks/microduck_velocity_env_cfg.py
+index 45a1f6d5..8f8fd49b 100644
+--- a/src/mjlab_microduck/tasks/microduck_velocity_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_velocity_env_cfg.py
+@@ -24,6 +24,22 @@ NUM_STEPS_PER_ENV = 24
+ # Fraction of envs commanded to spin on the spot (lin=0, |ang| ∈ [0.4·max, max]).
+ TURN_IN_PLACE_FRACTION = 0.15
+ 
++# Walk v2 (2026-11-01): low-speed dead zones. model_4750 (this recipe) is dead below
++# x 0.1 m/s, in-place yaw 0.5 rad/s and strafes ≤ 0.1 m/s: the stock tracking stds are
++# loose at Microduck speeds (standing still at 0.1 m/s earns 90 % of track_linear_velocity)
++# and in-place |wz| < 0.4 is never sampled. Fix = sharp xy + yaw terms ADDED next to the
++# stock ones (replacing the stock yaw term made turning worse, see velstand cfg), ramped
++# in after the gait bootstraps, and the turn-in-place bucket reaching down to 0.1 rad/s.
++ENABLE_FINE_TRACKING = True
++TRACK_LIN_FINE_STD = 0.1
++TRACK_YAW_FINE_STD = 0.35
++FINE_TRACKING_WEIGHT_STAGES = [
++    {"step": 0, "weight": 0.0},
++    {"step": 500 * NUM_STEPS_PER_ENV, "weight": 1.0},
++    {"step": 1000 * NUM_STEPS_PER_ENV, "weight": 2.0},
++]
++FINE_TURN_IN_PLACE_MIN_FRAC = 0.1  # stock 0.4
++
+ # Symmetry
+ ENABLE_SYMMETRY = False
+ 
+@@ -790,6 +806,24 @@ def make_microduck_velocity_env_cfg(
+         },
+     )
+ 
++    if ENABLE_FINE_TRACKING:
++        cfg.commands["twist"].turn_in_place_min_frac = FINE_TURN_IN_PLACE_MIN_FRAC
++        cfg.rewards["track_lin_vel_fine"] = RewardTermCfg(
++            func=microduck_mdp.track_lin_vel_xy_fine,
++            weight=0.0,
++            params={"std": TRACK_LIN_FINE_STD, "command_name": "twist"},
++        )
++        cfg.rewards["track_yaw_fine"] = RewardTermCfg(
++            func=microduck_mdp.track_yaw_rate_fine,
++            weight=0.0,
++            params={"std": TRACK_YAW_FINE_STD, "command_name": "twist"},
++        )
++        for name in ("track_lin_vel_fine", "track_yaw_fine"):
++            cfg.curriculum[f"{name}_weight"] = CurriculumTermCfg(
++                func=microduck_mdp.reward_weight,
++                params={"reward_name": name, "weight_stages": deepcopy(FINE_TRACKING_WEIGHT_STAGES)},
++            )
++
+     # Gradually increase standing env fraction after walking is established
+     cfg.curriculum["standing_envs"] = CurriculumTermCfg(
+         func=microduck_mdp.standing_envs_curriculum,
+diff --git a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+index 1e47e672..35096922 100644
+--- a/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_velstand_env_cfg.py
+@@ -361,6 +361,7 @@ BODY_POSE_STD = {
+ # v7 (j4i6yoq2@1250) track 0.5-1.0 rad/s in sim (see docs/velstand_policy.md). Kept OFF
+ # so this file reproduces the published v7 recipe (commit 53fb7d1).
+ ENABLE_YAW_FIX = False
++INHERIT_WALK_FINE_TRACKING = False  # True once the anchor/warm start is walk v2
+ TRACK_YAW_FINE_STD = 0.35
+ TRACK_YAW_FINE_WEIGHT = 2.0
+ TURN_IN_PLACE_FRACTION_VELSTAND = 0.2    # velocity recipe: 0.15
+@@ -626,6 +627,14 @@ def make_microduck_velstand_env_cfg(play: bool = False, rough: bool = False) ->
+     # Walk layer: the PROVEN velocity recipe, verbatim.
+     cfg = make_microduck_velocity_env_cfg(play=play, rough=rough)
+ 
++    # Walk v2's fine tracking terms (velocity cfg ENABLE_FINE_TRACKING) stay out of
++    # VelStand until a round trains on the v2 walk — rounds 1-2 ran without them.
++    if not INHERIT_WALK_FINE_TRACKING:
++        for name in ("track_lin_vel_fine", "track_yaw_fine"):
++            cfg.rewards.pop(name, None)
++            cfg.curriculum.pop(f"{name}_weight", None)
++        cfg.commands["twist"].turn_in_place_min_frac = 0.4
++
+     # In play mode the curriculum doesn't run, so the fall-termination disable
+     # below never fires — just delete the termination outright.
+     if play:
+diff --git a/tests/test_standup_support_gate.py b/tests/test_standup_support_gate.py
+index 3e0868fe..0a73958f 100644
+--- a/tests/test_standup_support_gate.py
++++ b/tests/test_standup_support_gate.py
+@@ -36,6 +36,28 @@ def test_nonfoot_pattern_covers_every_collision_body_except_feet():
+     assert matched == collision_bodies - feet
+ 
+ 
++def test_spin_cap_starts_after_the_discovery_phase():
++    if not su.ENABLE_SPIN_CAP:
++        return
++    cfg = su.make_microduck_standup_env_cfg()
++    assert cfg.rewards["spin_cap"].weight == 0.0
++    stages = cfg.curriculum["spin_cap_weight"].params["weight_stages"]
++    # every nonzero stage lands at/after iter 4000 (the rise skill must already exist)
++    assert all(s["weight"] == 0.0 or s["step"] >= 4000 * 24 for s in stages)
++    assert all(s["weight"] <= 0.0 for s in stages) and stages[-1]["weight"] < 0
++
++
++def test_trunk_ang_vel_excess_bills_only_the_spike():
++    import pytest
++    import torch
++
++    class _D:
++        root_link_ang_vel_b = torch.tensor([[0.0, 3.0, 4.0], [0.0, 0.0, 14.0]])  # |ω| 5, 14
++    env = type("E", (), {"scene": {"robot": type("R", (), {"data": _D})()}})()
++    r = microduck_mdp.trunk_ang_vel_excess(env, w_thresh=6.0)
++    assert r[0] == 0.0 and r[1] == pytest.approx(64.0)
++
++
+ def test_gate_wrappers_exist():
+     for fn in ("height_target_gaussian_feet_only", "upright_gaussian_at_height_feet_only",
+                "standing_composite_score_feet_only", "pose_target_match_feet_only", "feet_only_support"):
+diff --git a/tests/test_velstand_cfg.py b/tests/test_velstand_cfg.py
+index c9237632..35ec1747 100644
+--- a/tests/test_velstand_cfg.py
++++ b/tests/test_velstand_cfg.py
+@@ -122,6 +122,8 @@ def test_warm_start_collapses_inherited_curricula_only():
+     cfg = vs.make_microduck_velstand_env_cfg()
+     # body_pose_range is REPLACED by velstand's own body-control ramp (ENABLE_BODY_CONTROL)
+     replaced = {"body_pose_range"} if vs.ENABLE_BODY_CONTROL else set()
++    if not vs.INHERIT_WALK_FINE_TRACKING:  # walk v2 terms are stripped, not collapsed
++        replaced |= {"track_lin_vel_fine_weight", "track_yaw_fine_weight"}
+     for name, term in base.curriculum.items():
+         if name in replaced:
+             continue
+@@ -593,6 +595,35 @@ def test_remap_anchor_twist_linear_axes():
+     assert (out[:, :48] == obs[:, :48]).all() and (out[:, 51:] == obs[:, 51:]).all()
+ 
+ 
++def test_walk_v2_fine_tracking_wired():
++    from mjlab_microduck.tasks import microduck_velocity_env_cfg as vel
++    if not vel.ENABLE_FINE_TRACKING:
++        pytest.skip("fine tracking disabled")
++    cfg = make_microduck_velocity_env_cfg()
++    assert cfg.commands["twist"].turn_in_place_min_frac == vel.FINE_TURN_IN_PLACE_MIN_FRAC
++    for name in ("track_lin_vel_fine", "track_yaw_fine"):
++        assert cfg.rewards[name].weight == 0.0  # ramped in after the gait bootstraps
++        stages = cfg.curriculum[f"{name}_weight"].params["weight_stages"]
++        assert stages[0]["weight"] == 0.0 and stages[-1]["weight"] > 0
++    # the stock terms stay (replacing the stock yaw term made turning worse)
++    assert cfg.rewards["track_linear_velocity"].weight > 0 and cfg.rewards["track_angular_velocity"].weight > 0
++    if not vs.INHERIT_WALK_FINE_TRACKING:
++        v = vs.make_microduck_velstand_env_cfg()
++        assert "track_lin_vel_fine" not in v.rewards
++        assert not any(k.startswith("track_") and k.endswith("_fine_weight") for k in v.curriculum)
++
++
++def test_track_lin_vel_xy_fine_prices_standing_still():
++    class _D:
++        root_link_lin_vel_b = torch.tensor([[0.0, 0.0, 0.0], [0.1, 0.0, 0.3]])
++    class _Env:
++        scene = {"robot": type("R", (), {"data": _D})()}
++        command_manager = type("C", (), {"get_command": staticmethod(lambda n: torch.tensor([[0.1, 0.0, 0.0]] * 2))})()
++    r = microduck_mdp.track_lin_vel_xy_fine(_Env(), std=0.1, command_name="twist")
++    assert r[0] == pytest.approx(math.exp(-1.0))  # standing still at 0.1 m/s
++    assert r[1] == pytest.approx(1.0)              # tracked; z velocity ignored
++
++
+ def test_anchor_yaw_remap_wired():
+     bc = vs.MicroduckVelStandRlCfg.algorithm.bc_cfg
+     if not vs.ENABLE_ANCHOR_YAW_REMAP:

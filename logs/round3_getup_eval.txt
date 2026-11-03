@@ -1,0 +1,52 @@
+== 3999
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 204.76 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 171.55 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+[distill] expert BC ON: stand expert (iter 11000) on tilt>35.0° coef=1.0; walk anchor ON on tilt<25.0° coef=1.0; lr=0.0003 epochs=5 mini_batches=4 min_mb=512
+checkpoint logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/model_3999.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s) 100.0%  t_med=0.00s  recycled before up   0.0%  peak|w| med 13.1 rad/s  | fell later  95.1%, of those back up  96.4%
+prone g_x<0         n= 408  got up (held 1s)  99.3%  t_med=0.78s  recycled before up   0.7%  peak|w| med 13.3 rad/s
+prone g_x>=0        n= 410  got up (held 1s) 100.0%  t_med=0.28s  recycled before up   0.0%  peak|w| med 13.4 rad/s
+== 3500
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 204.06 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 173.06 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+[distill] expert BC ON: stand expert (iter 11000) on tilt>35.0° coef=1.0; walk anchor ON on tilt<25.0° coef=1.0; lr=0.0003 epochs=5 mini_batches=4 min_mb=512
+checkpoint logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/model_3500.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s) 100.0%  t_med=0.00s  recycled before up   0.0%  peak|w| med 13.4 rad/s  | fell later  96.1%, of those back up  94.9%
+prone g_x<0         n= 408  got up (held 1s)  98.5%  t_med=0.82s  recycled before up   1.5%  peak|w| med 13.2 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  99.0%  t_med=0.30s  recycled before up   1.0%  peak|w| med 13.4 rad/s
+== 3000
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 201.26 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 171.32 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+[distill] expert BC ON: stand expert (iter 11000) on tilt>35.0° coef=1.0; walk anchor ON on tilt<25.0° coef=1.0; lr=0.0003 epochs=5 mini_batches=4 min_mb=512
+checkpoint logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/model_3000.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s) 100.0%  t_med=0.00s  recycled before up   0.0%  peak|w| med 13.7 rad/s  | fell later  94.2%, of those back up  96.9%
+prone g_x<0         n= 408  got up (held 1s)  99.0%  t_med=0.78s  recycled before up   1.0%  peak|w| med 13.3 rad/s
+prone g_x>=0        n= 410  got up (held 1s)  99.3%  t_med=0.28s  recycled before up   0.7%  peak|w| med 13.5 rad/s
+== 2000
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 195.61 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 166.74 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+[distill] expert BC ON: stand expert (iter 11000) on tilt>35.0° coef=1.0; walk anchor ON on tilt<25.0° coef=1.0; lr=0.0003 epochs=5 mini_batches=4 min_mb=512
+checkpoint logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/model_2000.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s)  99.5%  t_med=0.00s  recycled before up   0.5%  peak|w| med 13.3 rad/s  | fell later  96.1%, of those back up  95.5%
+prone g_x<0         n= 408  got up (held 1s)  99.3%  t_med=0.82s  recycled before up   0.7%  peak|w| med 13.6 rad/s
+prone g_x>=0        n= 410  got up (held 1s) 100.0%  t_med=0.28s  recycled before up   0.0%  peak|w| med 13.5 rad/s

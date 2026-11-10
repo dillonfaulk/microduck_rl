@@ -32,6 +32,7 @@ at the same relative strength.
 """
 
 import math
+import os
 from copy import deepcopy
 
 # ── Kicking foot: "right" or "left" ───────────────────────────────────────────
@@ -92,7 +93,12 @@ BALL_POS_NOISE_XY = 0.015
 # controlled tap. NOTE: the kick reward weights below are scaled to keep the
 # at-target payoff ≈ +3/step regardless of this value (weight ≈ 3/target for
 # the capped term) — if you change the target, rescale the weights with it.
-BALL_TARGET_SPEED = 1.0
+# Local (fork) change: MICRODUCK_BALL_TARGET_SPEED overrides the target so two
+# variants can train side by side from one tree. Upstream's 2a0b1b08 set the
+# target back to 1.0 but kept the 12.0/-4.0 weights sized for 0.25 (a3fb8635),
+# so the default below trains at ~+12/step at target, not ~+3. Unset = 1.0,
+# byte-identical to upstream behavior.
+BALL_TARGET_SPEED = float(os.environ.get("MICRODUCK_BALL_TARGET_SPEED", "1.0"))
 
 # Trunk standing height (measured natural equilibrium at HOME — see standup env).
 STAND_Z = 0.115

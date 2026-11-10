@@ -125,11 +125,11 @@ class RunLog:
                            "ach_vx": round(avx, 4), "ach_wz": round(awz, 4)})
 
     def save(self, stem):
-        if not self.trace:
-            return
         with open(stem + "_events.jsonl", "w") as f:
             for e in self.events:
-                f.write(json.dumps(e) + "\n")
+                f.write(json.dumps(e, default=float) + "\n")
+        if not self.trace:
+            return
         with open(stem + "_trace.csv", "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(self.trace[0].keys()))
             w.writeheader()

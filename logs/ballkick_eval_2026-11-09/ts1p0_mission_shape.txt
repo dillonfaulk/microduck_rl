@@ -1,0 +1,10 @@
+
+== 2026-11-09_13-08-02_ts1p0_chunk1_model_3250.onnx on allcollisions_ball, swapped in after 1.5s of VelStand standing, VelStand handoff at 2.0s: 50 episodes, target 1.0 m/s
+  kicked (ball moved forward): 48/50
+  peak ball speed: median 1.06 m/s (p10 0.91, p90 1.15) = 1.1x target
+  ball travel (forward, 5 s): median 4.29 m (p10 4.01, p90 4.57)
+  direction error |deg|: median 16.2 (p90 19.9, max 21.6)
+  contact time: median 0.14 s after the swap-in
+  duck at end: standing 50/50, not upright (never fell, held a lean) 0, fell-recovered 0, fell 0
+  GOOD KICKS (kicked AND standing at the end, never fell): 48/50
+  (9 s wall)

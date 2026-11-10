@@ -1,0 +1,1142 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [1.764, -0.001], "kick_heading_deg": -26.9, "stance": [1.702, 0.077], "route": [[1.346, 0.258], [1.595, 0.131]]}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [1.3457735399121526, 0.2581230401601321], "pose": [0.0, 0.0, -0.375]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.158, 0.733], "heading_err_deg": 32.3, "dist": 1.37, "cmd": [0.2, 0.0, 0.846]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.191, 0.169], "heading_err_deg": 8.1, "dist": 1.203, "cmd": [0.2, 0.0, 0.211]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.992, 0.043], "heading_err_deg": 2.5, "dist": 0.993, "cmd": [0.2, 0.0, 0.066]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.781, 0.011], "heading_err_deg": 0.8, "dist": 0.781, "cmd": [0.2, 0.0, 0.022]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.566, 0.016], "heading_err_deg": 1.7, "dist": 0.566, "cmd": [0.2, 0.0, 0.044]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.35, 0.013], "heading_err_deg": 2.1, "dist": 0.35, "cmd": [0.2, 0.0, 0.055]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.135, 0.011], "heading_err_deg": 4.6, "dist": 0.136, "cmd": [0.2, 0.0, 0.12]}
+{"t": 6.42, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.056, "pose": [1.294, 0.238, 0.259]}
+{"t": 6.44, "event": "GO_TO_START", "wp": 2, "goal": [1.5954377122970609, 0.13136420998503598], "pose": [1.299, 0.237, 0.272]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.273, -0.089], "heading_err_deg": -18.1, "dist": 0.287, "cmd": [0.2, 0.0, -0.473]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.095, -0.017], "heading_err_deg": -9.9, "dist": 0.097, "cmd": [0.2, 0.0, -0.258]}
+{"t": 8.28, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.057, "pose": [1.561, 0.176, -0.682]}
+{"t": 8.28, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 8.28, "event": "ALIGN_START"}
+{"t": 9.1, "event": "ALIGN_PULSE", "n": 1, "axis": "heading", "ticks": 12, "err_mm": [155.4, 58.4], "err_heading_deg": -17.95}
+{"t": 10.14, "event": "ALIGN_APPROACH", "err_mm": [162.0, 20.8]}
+{"t": 11.04, "event": "ALIGN_APPROACH_STOP", "err_mm": [26.2, 3.8]}
+{"t": 11.86, "event": "ALIGN_PULSE", "n": 2, "axis": "step", "ticks": 15, "err_mm": [15.2, -0.4], "err_heading_deg": -2.2}
+{"t": 12.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 12.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 12.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 12.96, "event": "ALIGN_PULSE", "n": 3, "axis": "heading", "ticks": 9, "err_mm": [7.3, -4.5], "err_heading_deg": 7.43}
+{"t": 13.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 13.94, "event": "ALIGN_PULSE", "n": 4, "axis": "lateral", "ticks": 6, "err_mm": [113.4, 43.9], "err_heading_deg": -0.94}
+{"t": 14.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 14.86, "event": "ALIGN_PULSE", "n": 5, "axis": "lateral", "ticks": 6, "err_mm": [223.1, 37.8], "err_heading_deg": 1.23}
+{"t": 14.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.78, "event": "ALIGN_LOST", "dist": 0.326}
+{"t": 15.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 15.8, "event": "GO_TO_START", "wp": 1, "goal": [1.9508042707056237, 0.07134571926742776], "pose": [1.749, 0.12, -0.429]}
+{"t": 15.8, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.204, 0.04], "heading_err_deg": 11.1, "dist": 0.208, "cmd": [0.2, 0.0, 0.29]}
+{"t": 15.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.82, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.063, 0.023], "heading_err_deg": 20.1, "dist": 0.067, "cmd": [0.0, 0.0, 0.8]}
+{"t": 16.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 16.94, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.058, "pose": [1.894, 0.061, -0.162]}
+{"t": 16.94, "event": "GO_TO_DONE", "arrived": [1], "rejected": [], "falls": 0}
+{"t": 16.94, "event": "ALIGN_START"}
+{"t": 17.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.76, "event": "ALIGN_LOST", "dist": 0.381}
+{"t": 17.78, "event": "GO_TO_START", "wp": 1, "goal": [2.172364421164258, 0.03479924639198204], "pose": [1.905, 0.052, -0.12]}
+{"t": 17.78, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.268, 0.015], "heading_err_deg": 3.3, "dist": 0.268, "cmd": [0.2, 0.0, 0.085]}
+{"t": 17.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 17.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 18.8, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.121, 0.029], "heading_err_deg": 13.6, "dist": 0.125, "cmd": [0.2, 0.0, 0.355]}
+{"t": 18.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.12, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.06, "pose": [2.118, 0.011, 0.039]}
+{"t": 19.12, "event": "GO_TO_DONE", "arrived": [1], "rejected": [], "falls": 0}
+{"t": 19.12, "event": "ALIGN_START"}
+{"t": 19.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 19.94, "event": "ALIGN_LOST", "dist": 0.408}
+{"t": 19.96, "event": "GO_TO_START", "wp": 1, "goal": [2.416304384800532, -0.005438789400177314], "pose": [2.122, 0.015, -0.005]}
+{"t": 19.96, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.294, -0.019], "heading_err_deg": -3.7, "dist": 0.295, "cmd": [0.2, 0.0, -0.098]}
+{"t": 20.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 20.98, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.134, 0.015], "heading_err_deg": 6.6, "dist": 0.135, "cmd": [0.2, 0.0, 0.173]}
+{"t": 21.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.36, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.058, "pose": [2.36, -0.017, 0.029]}
+{"t": 21.36, "event": "GO_TO_DONE", "arrived": [1], "rejected": [], "falls": 0}
+{"t": 21.36, "event": "ALIGN_START"}
+{"t": 21.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 21.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.18, "event": "ALIGN_LOST", "dist": 0.406}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [2.666958292390098, -0.04678429406735444], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 22.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.2, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 22.2, "event": "ALIGN_START"}
+{"t": 22.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 22.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.02, "event": "ALIGN_LOST", "dist": 0.501}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [2.7609535077361853, -0.06228885831754586], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 23.04, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 23.04, "event": "ALIGN_START"}
+{"t": 23.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 23.86, "event": "ALIGN_LOST", "dist": 0.596}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [2.8549487230822725, -0.07779342256773727], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 23.88, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 23.88, "event": "ALIGN_START"}
+{"t": 23.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.7, "event": "ALIGN_LOST", "dist": 0.691}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [2.94894393842836, -0.0932979868179287], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 24.72, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 24.72, "event": "ALIGN_START"}
+{"t": 24.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 24.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.54, "event": "ALIGN_LOST", "dist": 0.786}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.042939153774447, -0.10880255106812012], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 25.56, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 25.56, "event": "ALIGN_START"}
+{"t": 25.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 25.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.38, "event": "ALIGN_LOST", "dist": 0.881}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.1369343691205342, -0.12430711531831154], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 26.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.4, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 26.4, "event": "ALIGN_START"}
+{"t": 26.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 26.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.22, "event": "ALIGN_LOST", "dist": 0.977}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.2309295844666215, -0.13981167956850296], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 27.24, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 27.24, "event": "ALIGN_START"}
+{"t": 27.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 27.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.06, "event": "ALIGN_LOST", "dist": 1.072}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.3249247998127087, -0.15531624381869438], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 28.08, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 28.08, "event": "ALIGN_START"}
+{"t": 28.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 28.9, "event": "ALIGN_LOST", "dist": 1.167}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.418920015158796, -0.1708208080688858], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 28.92, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 28.92, "event": "ALIGN_START"}
+{"t": 29.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.74, "event": "ALIGN_LOST", "dist": 1.262}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.512915230504883, -0.18632537231907723], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 29.76, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 29.76, "event": "ALIGN_START"}
+{"t": 29.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 29.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.58, "event": "ALIGN_LOST", "dist": 1.357}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.6069104458509704, -0.20182993656926865], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 30.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.6, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 30.6, "event": "ALIGN_START"}
+{"t": 30.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 30.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.42, "event": "ALIGN_LOST", "dist": 1.452}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.7009056611970577, -0.21733450081946007], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 31.44, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 31.44, "event": "ALIGN_START"}
+{"t": 31.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 31.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.26, "event": "ALIGN_LOST", "dist": 1.548}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.794900876543145, -0.2328390650696515], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 32.28, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 32.28, "event": "ALIGN_START"}
+{"t": 32.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 32.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.1, "event": "ALIGN_LOST", "dist": 1.643}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.8888960918891864, -0.2483436293198429], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 33.12, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 33.12, "event": "ALIGN_START"}
+{"t": 33.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 33.94, "event": "ALIGN_LOST", "dist": 1.738}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [3.982891307235199, -0.2638481935700343], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 33.96, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 33.96, "event": "ALIGN_START"}
+{"t": 34.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.78, "event": "ALIGN_LOST", "dist": 1.834}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.076886522581211, -0.27935275782022573], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 34.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 34.8, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 34.8, "event": "ALIGN_START"}
+{"t": 34.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.62, "event": "ALIGN_LOST", "dist": 1.929}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.170881737927224, -0.29485732207041715], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 35.64, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 35.64, "event": "ALIGN_START"}
+{"t": 35.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 35.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.46, "event": "ALIGN_LOST", "dist": 2.024}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.2648769532732365, -0.31036188632060857], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 36.48, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 36.48, "event": "ALIGN_START"}
+{"t": 36.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 36.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.3, "event": "ALIGN_LOST", "dist": 2.119}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.358872168619249, -0.3258664505708], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 37.32, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 37.32, "event": "ALIGN_START"}
+{"t": 37.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 37.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.14, "event": "ALIGN_LOST", "dist": 2.215}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.452867383965262, -0.3413710148209914], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 38.16, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 38.16, "event": "ALIGN_START"}
+{"t": 38.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 38.98, "event": "ALIGN_LOST", "dist": 2.31}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.546862599311274, -0.35687557907118284], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 39.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.0, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 39.0, "event": "ALIGN_START"}
+{"t": 39.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 39.82, "event": "ALIGN_LOST", "dist": 2.405}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.640857814657287, -0.37238014332137426], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 39.84, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 39.84, "event": "ALIGN_START"}
+{"t": 39.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.66, "event": "ALIGN_LOST", "dist": 2.5}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.7348530300033, -0.3878847075715657], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 40.68, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 40.68, "event": "ALIGN_START"}
+{"t": 40.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 40.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.5, "event": "ALIGN_LOST", "dist": 2.596}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.828848245349312, -0.4033892718217571], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 41.52, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 41.52, "event": "ALIGN_START"}
+{"t": 41.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 41.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.34, "event": "ALIGN_LOST", "dist": 2.691}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [4.922843460695325, -0.4188938360719485], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 42.36, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 42.36, "event": "ALIGN_START"}
+{"t": 42.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 42.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.18, "event": "ALIGN_LOST", "dist": 2.786}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.0168386760413375, -0.43439840032213994], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 43.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.2, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 43.2, "event": "ALIGN_START"}
+{"t": 43.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 43.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.02, "event": "ALIGN_LOST", "dist": 2.882}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.11083389138735, -0.44990296457233137], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 44.04, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 44.04, "event": "ALIGN_START"}
+{"t": 44.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 44.86, "event": "ALIGN_LOST", "dist": 2.977}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.204829106733363, -0.4654075288225228], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 44.88, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 44.88, "event": "ALIGN_START"}
+{"t": 44.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.7, "event": "ALIGN_LOST", "dist": 3.072}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.298824322079375, -0.4809120930727142], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 45.72, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 45.72, "event": "ALIGN_START"}
+{"t": 45.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 45.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.54, "event": "ALIGN_LOST", "dist": 3.167}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.392819537425388, -0.49641665732290563], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 46.56, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 46.56, "event": "ALIGN_START"}
+{"t": 46.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 46.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.38, "event": "ALIGN_LOST", "dist": 3.263}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.486814752771401, -0.511921221573097], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 47.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.4, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 47.4, "event": "ALIGN_START"}
+{"t": 47.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 47.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.22, "event": "ALIGN_LOST", "dist": 3.358}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.580809968117413, -0.5274257858232885], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 48.24, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 48.24, "event": "ALIGN_START"}
+{"t": 48.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 48.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.06, "event": "ALIGN_LOST", "dist": 3.453}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.674805183463426, -0.5429303500734799], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 49.08, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 49.08, "event": "ALIGN_START"}
+{"t": 49.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 49.9, "event": "ALIGN_LOST", "dist": 3.548}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.7688003988094385, -0.5584349143236713], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 49.92, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 49.92, "event": "ALIGN_START"}
+{"t": 50.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.74, "event": "ALIGN_LOST", "dist": 3.644}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.862795614155451, -0.5739394785738627], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 50.76, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 50.76, "event": "ALIGN_START"}
+{"t": 50.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 50.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.58, "event": "ALIGN_LOST", "dist": 3.739}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [5.956790829501464, -0.5894440428240542], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 51.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.6, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 51.6, "event": "ALIGN_START"}
+{"t": 51.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 51.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.42, "event": "ALIGN_LOST", "dist": 3.834}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.050786044847476, -0.6049486070742456], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 52.44, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 52.44, "event": "ALIGN_START"}
+{"t": 52.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 52.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.26, "event": "ALIGN_LOST", "dist": 3.93}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.144781260193489, -0.620453171324437], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 53.28, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 53.28, "event": "ALIGN_START"}
+{"t": 53.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 53.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.1, "event": "ALIGN_LOST", "dist": 4.025}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.238776475539502, -0.6359577355746284], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 54.12, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 54.12, "event": "ALIGN_START"}
+{"t": 54.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 54.94, "event": "ALIGN_LOST", "dist": 4.12}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.332771690885514, -0.6514622998248198], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 54.96, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 54.96, "event": "ALIGN_START"}
+{"t": 55.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.78, "event": "ALIGN_LOST", "dist": 4.215}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.426766906231527, -0.6669668640750113], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 55.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 55.8, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 55.8, "event": "ALIGN_START"}
+{"t": 55.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.62, "event": "ALIGN_LOST", "dist": 4.311}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.5207621215775395, -0.6824714283252027], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 56.64, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 56.64, "event": "ALIGN_START"}
+{"t": 56.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 56.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.46, "event": "ALIGN_LOST", "dist": 4.406}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.614757336923552, -0.6979759925753941], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 57.48, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 57.48, "event": "ALIGN_START"}
+{"t": 57.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 57.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.3, "event": "ALIGN_LOST", "dist": 4.501}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.708752552269565, -0.7134805568255855], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 58.32, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 58.32, "event": "ALIGN_START"}
+{"t": 58.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 58.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.14, "event": "ALIGN_LOST", "dist": 4.596}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.802747767615577, -0.728985121075777], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 59.16, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 59.16, "event": "ALIGN_START"}
+{"t": 59.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 59.98, "event": "ALIGN_LOST", "dist": 4.692}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.89674298296159, -0.7444896853259684], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 60.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.0, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 60.0, "event": "ALIGN_START"}
+{"t": 60.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 60.82, "event": "ALIGN_LOST", "dist": 4.787}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [6.990738198307603, -0.7599942495761598], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 60.84, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 60.84, "event": "ALIGN_START"}
+{"t": 60.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.66, "event": "ALIGN_LOST", "dist": 4.882}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.084733413653615, -0.7754988138263512], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 61.68, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 61.68, "event": "ALIGN_START"}
+{"t": 61.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 61.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.5, "event": "ALIGN_LOST", "dist": 4.977}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.178728628999628, -0.7910033780765426], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 62.52, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 62.52, "event": "ALIGN_START"}
+{"t": 62.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 62.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.34, "event": "ALIGN_LOST", "dist": 5.073}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.272723844345641, -0.8065079423267341], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 63.36, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 63.36, "event": "ALIGN_START"}
+{"t": 63.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 63.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.18, "event": "ALIGN_LOST", "dist": 5.168}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.366719059691653, -0.8220125065769255], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 64.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.2, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 64.2, "event": "ALIGN_START"}
+{"t": 64.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 64.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.02, "event": "ALIGN_LOST", "dist": 5.263}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.460714275037666, -0.8375170708271169], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 65.04, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 65.04, "event": "ALIGN_START"}
+{"t": 65.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 65.86, "event": "ALIGN_LOST", "dist": 5.359}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.5547094903836784, -0.8530216350773083], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 65.88, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 65.88, "event": "ALIGN_START"}
+{"t": 65.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.7, "event": "ALIGN_LOST", "dist": 5.454}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.648704705729691, -0.8685261993274996], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 66.72, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 66.72, "event": "ALIGN_START"}
+{"t": 66.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 66.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.54, "event": "ALIGN_LOST", "dist": 5.549}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.742699921075704, -0.8840307635776911], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 67.56, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 67.56, "event": "ALIGN_START"}
+{"t": 67.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 67.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.38, "event": "ALIGN_LOST", "dist": 5.644}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.836695136421716, -0.8995353278278825], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 68.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.4, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 68.4, "event": "ALIGN_START"}
+{"t": 68.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 68.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.22, "event": "ALIGN_LOST", "dist": 5.74}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [7.930690351767729, -0.9150398920780739], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 69.24, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 69.24, "event": "ALIGN_START"}
+{"t": 69.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 69.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.06, "event": "ALIGN_LOST", "dist": 5.835}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.024685567113742, -0.9305444563282653], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 70.08, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 70.08, "event": "ALIGN_START"}
+{"t": 70.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 70.9, "event": "ALIGN_LOST", "dist": 5.93}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.118680782459755, -0.9460490205784566], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 70.92, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 70.92, "event": "ALIGN_START"}
+{"t": 71.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.74, "event": "ALIGN_LOST", "dist": 6.025}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.212675997805768, -0.9615535848286481], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 71.76, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 71.76, "event": "ALIGN_START"}
+{"t": 71.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 71.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.58, "event": "ALIGN_LOST", "dist": 6.121}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.30667121315178, -0.9770581490788395], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 72.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.6, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 72.6, "event": "ALIGN_START"}
+{"t": 72.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 72.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.42, "event": "ALIGN_LOST", "dist": 6.216}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.400666428497793, -0.9925627133290309], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 73.44, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 73.44, "event": "ALIGN_START"}
+{"t": 73.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 73.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.26, "event": "ALIGN_LOST", "dist": 6.311}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.494661643843806, -1.0080672775792223], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 74.28, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 74.28, "event": "ALIGN_START"}
+{"t": 74.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 74.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.1, "event": "ALIGN_LOST", "dist": 6.406}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.588656859189818, -1.0235718418294137], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 75.12, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 75.12, "event": "ALIGN_START"}
+{"t": 75.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 75.94, "event": "ALIGN_LOST", "dist": 6.502}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.68265207453583, -1.0390764060796052], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 75.96, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 75.96, "event": "ALIGN_START"}
+{"t": 76.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.78, "event": "ALIGN_LOST", "dist": 6.597}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.776647289881844, -1.0545809703297966], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 76.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 76.8, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 76.8, "event": "ALIGN_START"}
+{"t": 76.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.62, "event": "ALIGN_LOST", "dist": 6.692}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.870642505227856, -1.070085534579988], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 77.64, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 77.64, "event": "ALIGN_START"}
+{"t": 77.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 77.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.46, "event": "ALIGN_LOST", "dist": 6.787}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [8.964637720573869, -1.0855900988301794], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 78.48, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 78.48, "event": "ALIGN_START"}
+{"t": 78.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 78.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.3, "event": "ALIGN_LOST", "dist": 6.883}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.058632935919881, -1.1010946630803709], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 79.32, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 79.32, "event": "ALIGN_START"}
+{"t": 79.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 79.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.14, "event": "ALIGN_LOST", "dist": 6.978}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.152628151265894, -1.1165992273305623], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 80.16, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 80.16, "event": "ALIGN_START"}
+{"t": 80.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 80.98, "event": "ALIGN_LOST", "dist": 7.073}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.246623366611907, -1.1321037915807537], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 81.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.0, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 81.0, "event": "ALIGN_START"}
+{"t": 81.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 81.82, "event": "ALIGN_LOST", "dist": 7.169}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.34061858195792, -1.1476083558309451], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 81.84, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 81.84, "event": "ALIGN_START"}
+{"t": 81.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.66, "event": "ALIGN_LOST", "dist": 7.264}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.434613797303932, -1.1631129200811365], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 82.68, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 82.68, "event": "ALIGN_START"}
+{"t": 82.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 82.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.5, "event": "ALIGN_LOST", "dist": 7.359}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.528609012649945, -1.178617484331328], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 83.52, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 83.52, "event": "ALIGN_START"}
+{"t": 83.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 83.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.34, "event": "ALIGN_LOST", "dist": 7.454}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.622604227995957, -1.1941220485815194], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 84.36, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 84.36, "event": "ALIGN_START"}
+{"t": 84.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 84.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.18, "event": "ALIGN_LOST", "dist": 7.55}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.71659944334197, -1.2096266128317108], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 85.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.2, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 85.2, "event": "ALIGN_START"}
+{"t": 85.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 85.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.02, "event": "ALIGN_LOST", "dist": 7.645}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.810594658687982, -1.2251311770819022], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 86.04, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 86.04, "event": "ALIGN_START"}
+{"t": 86.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 86.86, "event": "ALIGN_LOST", "dist": 7.74}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.904589874033995, -1.2406357413320936], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 86.88, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 86.88, "event": "ALIGN_START"}
+{"t": 86.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.7, "event": "ALIGN_LOST", "dist": 7.835}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [9.998585089380008, -1.256140305582285], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 87.72, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 87.72, "event": "ALIGN_START"}
+{"t": 87.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 87.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.54, "event": "ALIGN_LOST", "dist": 7.931}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [10.09258030472602, -1.2716448698324765], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 88.56, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 88.56, "event": "ALIGN_START"}
+{"t": 88.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 88.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.0, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.1, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.2, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.3, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.38, "event": "ALIGN_LOST", "dist": 8.026}
+{"t": 0.0, "event": "GO_TO_REJECT", "wp": 1, "goal": [10.186575520072033, -1.287149434082668], "reason": "outside arena x[-2.5, 2.5] y[-2.5, 2.5]"}
+{"t": 89.4, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.4, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 89.4, "event": "ALIGN_START"}
+{"t": 89.5, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.6, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.7, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.8, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 89.9, "event": "BALL_DISTURBED", "moved_m": 0.011}
+{"t": 90.0, "event": "BALL_DISTURBED", "moved_m": 0.011}

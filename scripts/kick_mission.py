@@ -96,6 +96,13 @@ PRECISE_MAX_YAW = math.radians(15)
 # to the step policy moves this far forward along the kick line. Precision path only: the
 # pulse fallback keeps its own (foot-relative) target.
 PRECISE_STANCE_SHIFT_M = float(os.environ.get("KICK_STANCE_SHIFT", "0.010"))
+# Aim offset for BallKick v1's (right foot, ts0.25 model_1000) left drift. The duck lines up
+# facing kick_heading + KICK_AIM_OFFSET; the ball result is still measured against kick_heading.
+# Sign: +yaw is LEFT (CCW, z up), kick_dir_err_deg > 0 means the ball went left, so the offset
+# is NEGATIVE (aim right). Calibrated 2026-11-11 against the +10 mm stance above: drift
+# +17.9 deg median (std 1.7, IQR 16.5..19.1, flat across ball distance), 60 missions, seeds 0+1.
+# Right foot only; a left-foot kick needs its own measurement.
+KICK_AIM_OFFSET = math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG", "-17.9")))
 
 
 def clamp_align(vx, vy, wz):
@@ -176,7 +183,9 @@ class Aligner:
 
 class Mission:
     def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None):
-        self.sim, self.kick_session, self.kh = sim, kick_session, kick_heading
+        self.sim, self.kick_session = sim, kick_session
+        self.kh_goal = kick_heading                              # where the ball should go
+        self.kh = wrap_angle(kick_heading + KICK_AIM_OFFSET)     # where the duck faces (aim-corrected)
         self.precision_session = precision_session
         self.precise_entries = 0
         self.on_ticks = 0
@@ -196,7 +205,7 @@ class Mission:
         b, _ = sim.ball()
         self.ball0 = b.copy()
         stance = self.stance_point(b)
-        k = np.array([math.cos(kick_heading), math.sin(kick_heading)])
+        k = np.array([math.cos(self.kh), math.sin(self.kh)])
         line_up, pre = stance - LINE_UP_M * k, stance - PRE_STANCE_M * k
         (x, y, _), _, _ = sim.pose()
         route = [tuple(line_up), tuple(pre)]
@@ -207,6 +216,9 @@ class Mission:
         self.nav = GotoSupervisor(route, ARENA, GotoConfig(arrival_radius=0.06), log=log.event)
         log.event({"t": 0.0, "event": "MISSION_START", "ball": [round(v, 3) for v in b],
                    "kick_heading_deg": round(math.degrees(kick_heading), 1),
+                   "aim_heading_deg": round(math.degrees(self.kh), 1),
+                   "aim_offset_deg": round(math.degrees(KICK_AIM_OFFSET), 1),
+                   "stance_shift_mm": round(PRECISE_STANCE_SHIFT_M * 1000, 1),
                    "stance": [round(v, 3) for v in stance], "route": [[round(v, 3) for v in p] for p in route]})
 
     def stance_point(self, ball_xy):
@@ -452,7 +464,7 @@ class Mission:
 
         _, bv = sim.ball()
         if self.state == "KICK":
-            fwd = float(bv @ np.array([math.cos(self.kh), math.sin(self.kh)]))
+            fwd = float(bv @ np.array([math.cos(self.kh_goal), math.sin(self.kh_goal)]))
             if "kick_contact_t" not in self.result and np.linalg.norm(bv) > 0.05:
                 self.result["kick_contact_t"] = round(t - self.t_state, 2)
                 self.log.event({"t": round(t, 3), "event": "KICK_FIRE", "after_swap_s": self.result["kick_contact_t"]})
@@ -465,7 +477,7 @@ class Mission:
             return (0.0, 0.0, 0.0)
 
         if self.state == "SETTLE":
-            self.peak = max(self.peak, float(bv @ np.array([math.cos(self.kh), math.sin(self.kh)])))
+            self.peak = max(self.peak, float(bv @ np.array([math.cos(self.kh_goal), math.sin(self.kh_goal)])))
             if (tilt > 35 or z < 0.06) and not self.fell:
                 self.fell = True
                 self.result["falls"] = self.result.get("falls", 0) + 1
@@ -477,7 +489,7 @@ class Mission:
             if t - self.t_state >= SETTLE_S and up:
                 d = b - self.kick_ball0
                 self.result.update(peak_ball_fwd=round(self.peak, 3), ball_travel=round(float(np.linalg.norm(d)), 3),
-                                   kick_dir_err_deg=round(math.degrees(wrap_angle(math.atan2(d[1], d[0]) - self.kh)), 1)
+                                   kick_dir_err_deg=round(math.degrees(wrap_angle(math.atan2(d[1], d[0]) - self.kh_goal)), 1)
                                    if np.linalg.norm(d) > 0.02 else None, t_done=round(t, 2))
                 self.log.event({"t": round(t, 3), "event": "MISSION_DONE", **self.result})
                 self._goto("DONE")
@@ -505,7 +517,7 @@ def draw_mission(scn, m, sim):
     if m.state == "DONE":
         return
     b, _ = sim.ball()
-    k = np.array([math.cos(m.kh), math.sin(m.kh)])
+    k = np.array([math.cos(m.kh_goal), math.sin(m.kh_goal)])   # the intended kick line (the duck aims off it)
     line((*b, 0.004), (*(b + 0.35 * k), 0.004), [1.0, 0.85, 0.1, 0.9], 0.005)
     tip = b + 0.35 * k
     side = np.array([-k[1], k[0]])
@@ -635,7 +647,8 @@ def run_headless(args):
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
     os.makedirs(out, exist_ok=True)
     print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
-    print(f"precision stance shift {PRECISE_STANCE_SHIFT_M*1000:+.1f} mm along the kick line")
+    print(f"precision stance shift {PRECISE_STANCE_SHIFT_M*1000:+.1f} mm along the kick line; "
+          f"aim offset {math.degrees(KICK_AIM_OFFSET):+.1f} deg (+ = left)")
     rows = []
     for k in range(args.runs):
         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))

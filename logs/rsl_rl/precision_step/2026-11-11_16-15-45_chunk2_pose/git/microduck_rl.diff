@@ -1,0 +1,758 @@
+--- git commit ---
+0eb1a226a8a890ce04cdea2a5721ad95e527536e
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   scripts/kick_mission.py
+	modified:   src/mjlab_microduck/tasks/__init__.py
+	modified:   src/mjlab_microduck/tasks/mdp.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	scripts/step_battery.py
+	src/mjlab_microduck/tasks/microduck_precision_step_env_cfg.py
+	tensorboard.log
+	tests/test_precision_step_cfg.py
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/scripts/kick_mission.py b/scripts/kick_mission.py
+index bebea2f4..f61e6fce 100644
+--- a/scripts/kick_mission.py
++++ b/scripts/kick_mission.py
+@@ -20,6 +20,16 @@ Phases (one control loop at 50 Hz, VelStand driving except during KICK):
+             command as in kick training), held KICK_HOLD_S, then swap back.
+   SETTLE    VelStand, zero twist. A fall here gets the go-to-point fall rule:
+             zero twist until upright 1 s.
++With --precision <onnx> the final approach is the PrecisionStep policy instead:
++  PRECISE_PIVOT  VelStand pivots onto the kick line (|heading err| < 8 deg; the
++                 step policy trained on +-15 deg).
++  PRECISE        hard swap to the step policy; the 3 twist slots carry the
++                 remaining offset to the stance pose [dx, dy, dyaw] in the trunk
++                 yaw frame (option A). On target (+-12 mm, 3 deg) and still for
++                 0.5 s -> KICK directly.
++  The pulse ALIGN stays as the FALLBACK: a 6 s timeout or a fall in PRECISE swaps
++  VelStand back in and hands over to it; a bumped ball re-enters PRECISE at most
++  twice. Every mission records its approach_mode.
+ ALIGN uses its own clamps (|vx| <= 0.2, |vy| <= 0.15, pulses <= 20 ticks, only
+ within ALIGN_ZONE_M of the stance): go-to-point's forward-only / no-strafe
+ clamps can't place the duck to +-15 mm.
+@@ -68,6 +78,17 @@ SQUARE_MAX = 3
+ SQUARE_MOVE = [((0.0, 0.15, 0.0), 5), ((0.0, -0.15, 0.0), 10)]
+ KICK_HOLD_S = 2.0
+ SETTLE_S = 2.0
++# Precision-step final approach (--precision <onnx>; Mjlab-PrecisionStep-Flat-MicroDuck).
++# The pulse aligner above stays as the FALLBACK: a precision timeout, a fall, or
++# too many re-entries hands the last stretch back to it.
++PRECISE_PIVOT_TOL = math.radians(8)   # VelStand pivots first: the step policy trained on +-15 deg
++PRECISE_PIVOT_MAX_S = 5.0
++PRECISE_STILL_V = 0.02                # m/s trunk speed counted as "stopped"
++PRECISE_HOLD_TICKS = 25               # 0.5 s on target and still -> kick
++PRECISE_TIMEOUT_S = 6.0               # = the training episode length
++PRECISE_MAX_ENTRIES = 2               # (re-)entries after a ball bump, then pulses
++PRECISE_MAX_R = 0.25                  # offset clipped to the training range
++PRECISE_MAX_YAW = math.radians(15)
+ 
+ 
+ def clamp_align(vx, vy, wz):
+@@ -147,8 +168,11 @@ class Aligner:
+ 
+ 
+ class Mission:
+-    def __init__(self, sim, kick_session, kick_heading, log, foot="right"):
++    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None):
+         self.sim, self.kick_session, self.kh = sim, kick_session, kick_heading
++        self.precision_session = precision_session
++        self.precise_entries = 0
++        self.on_ticks = 0
+         self.walk_session = sim.policy.ort_session
+         self.log = log
+         self.aligner = Aligner(foot)
+@@ -161,7 +185,7 @@ class Mission:
+         self.pulse_left = 0
+         self.settle_left = 0
+         self.pulse_twist = (0.0, 0.0, 0.0)
+-        self.result = {}
++        self.result = {"approach_mode": "precision" if precision_session is not None else "pulse"}
+         b, _ = sim.ball()
+         self.ball0 = b.copy()
+         stance = self.stance_point(b)
+@@ -193,12 +217,67 @@ class Mission:
+     def _goto(self, state):
+         self.state, self.t_state = state, self.sim.t
+ 
++    def _enter_fine(self, t):
++        """Hand the last stretch to the precision policy if there is one (and entries left), else pulses."""
++        if self.precision_session is not None and self.precise_entries < PRECISE_MAX_ENTRIES:
++            self.settle_left = 20
++            self._goto("PRECISE_PIVOT")
++        else:
++            self.log.event({"t": round(t, 3), "event": "ALIGN_START"})
++            self.settle_left = ALIGN_SETTLE_TICKS
++            self._goto("ALIGN")
++
++    def _precise_fail(self, t, why):
++        """Precision step gave up: VelStand back in, the pulse aligner (fallback) takes over."""
++        self.sim.policy.ort_session = self.walk_session
++        self.result["approach_mode"] = "precision->pulse fallback"
++        self.result["precise_fail"] = why
++        if why == "fall":
++            self.result["falls"] = self.result.get("falls", 0) + 1
++            self.down = True
++        self.log.event({"t": round(t, 3), "event": "PRECISE_FALLBACK", "why": why})
++        self.settle_left = ALIGN_SETTLE_TICKS
++        self._goto("ALIGN")
++        return (0.0, 0.0, 0.0)
++
++    def precise_offset(self, pose, ball_xy):
++        """Option-A command: remaining offset to the stance pose in the trunk yaw frame, clipped to training range."""
++        x, y, yaw = pose
++        st = self.stance_point(ball_xy)
++        c, s = math.cos(yaw), math.sin(yaw)
++        dx, dy = c * (st[0] - x) + s * (st[1] - y), -s * (st[0] - x) + c * (st[1] - y)
++        r = math.hypot(dx, dy)
++        if r > PRECISE_MAX_R:
++            dx, dy = dx * PRECISE_MAX_R / r, dy * PRECISE_MAX_R / r
++        return (dx, dy, float(np.clip(wrap_angle(self.kh - yaw), -PRECISE_MAX_YAW, PRECISE_MAX_YAW)))
++
++    def _swap_kick(self, t, pose, b, tilt, ex, ey, eh, aligned):
++        sim = self.sim
++        foot, lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
++        vb = sim.data.qvel[sim.va:sim.va + 3]
++        self.result.update(foot_vs_home_mm=[round(v, 1) for v in (foot - sim.home_foot) * 1000],
++                           lfoot_vs_home_mm=[round(v, 1) for v in (lfoot - sim.home_lfoot) * 1000],
++                           trunk_speed_mm_s=round(float(np.linalg.norm(vb[:2])) * 1000, 1),
++                           tilt_deg=round(tilt, 1))
++        self.result.update(align_ex_mm=round(ex * 1000, 1), align_ey_mm=round(ey * 1000, 1),
++                           align_eh_deg=round(math.degrees(eh), 2), pulses=self.pulses,
++                           aligned=aligned, t_swap=round(t, 2))
++        self.log.event({"t": round(t, 3), "event": "KICK_SWAP_IN", "aligned": aligned, "pulses": self.pulses,
++                        "mode": self.result["approach_mode"],
++                        "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
++        sim.policy.ort_session = self.kick_session
++        self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
++        self.kick_ball0 = b.copy()
++        self.peak = 0.0
++        self._goto("KICK")
++        return (0.0, 0.0, 0.0)
++
+     def tick(self):
+         """Returns the twist for this control tick (and swaps sessions as the state changes)."""
+         sim, t = self.sim, self.sim.t
+         pose, tilt, z = sim.pose()
+         b, bv = sim.ball()
+-        if self.state in ("NAVIGATE", "ALIGN"):
++        if self.state in ("NAVIGATE", "ALIGN", "PRECISE_PIVOT", "PRECISE"):
+             # A bumped ball: stand still until it stops rolling, then re-plan from where
+             # it rests (ALIGN re-navigates if the new stance is out of reach). Chasing a
+             # rolling ball with pulses never converges.
+@@ -207,6 +286,7 @@ class Mission:
+                     self.ball_rolling, self.t_bump = True, t
+                     self.pulse_left, self.approaching = 0, False
+                     self.result["ball_disturbed"] = self.result.get("ball_disturbed", 0) + 1
++                    sim.policy.ort_session = self.walk_session   # (a no-op unless the step policy had it)
+                     self.log.event({"t": round(t, 3), "event": "BALL_DISTURBED", "phase": self.state})
+                 if np.linalg.norm(bv) > 0.02:
+                     if t - self.t_bump < BALL_WAIT_S:
+@@ -221,20 +301,50 @@ class Mission:
+                 self.log.event({"t": round(t, 3), "event": "BALL_SETTLED",
+                                 "moved_m": round(float(np.linalg.norm(b - self.ball0)), 3)})
+                 self.ball0 = b.copy()
+-                self.settle_left = ALIGN_SETTLE_TICKS
+-                self._goto("ALIGN")
++                self._enter_fine(t)
+                 return (0.0, 0.0, 0.0)
+ 
+         if self.state == "NAVIGATE":
+             self.nav.update(t, pose, tilt, z)
+             twist = self.nav.command(t)
+             if self.nav.state == "DONE":
+-                self.log.event({"t": round(t, 3), "event": "ALIGN_START"})
+-                self.settle_left = ALIGN_SETTLE_TICKS
+-                self._goto("ALIGN")
++                self._enter_fine(t)
+                 return (0.0, 0.0, 0.0)
+             return twist
+ 
++        if self.state == "PRECISE_PIVOT":   # VelStand turns onto the kick line first
++            if tilt > 35 or z < 0.06:
++                return self._precise_fail(t, "fall")
++            eh = wrap_angle(pose[2] - self.kh)
++            if abs(eh) < PRECISE_PIVOT_TOL or t - self.t_state > PRECISE_PIVOT_MAX_S:
++                if self.settle_left > 0:
++                    self.settle_left -= 1
++                    return (0.0, 0.0, 0.0)
++                self.precise_entries += 1
++                self.on_ticks = 0
++                sim.policy.ort_session = self.precision_session
++                self.log.event({"t": round(t, 3), "event": "PRECISE_START", "n": self.precise_entries,
++                                "offset": [round(v, 4) for v in self.precise_offset(pose, b)]})
++                self._goto("PRECISE")
++                return self.precise_offset(pose, b)
++            self.settle_left = 20
++            return (0.0, 0.0, -math.copysign(0.8, eh))
++
++        if self.state == "PRECISE":
++            if tilt > 35 or z < 0.06:
++                return self._precise_fail(t, "fall")
++            off = self.precise_offset(pose, b)
++            vb = sim.data.qvel[sim.va:sim.va + 2]
++            on = math.hypot(off[0], off[1]) < ALIGN_TOL and abs(off[2]) < ALIGN_HEADING_TOL
++            self.on_ticks = self.on_ticks + 1 if on and np.linalg.norm(vb) < PRECISE_STILL_V else 0
++            if self.on_ticks >= PRECISE_HOLD_TICKS:
++                ex, ey, eh, _ = self.aligner.errors(pose, b, self.kh, sim.site_local("right_foot"), sim.home_foot)
++                self.log.event({"t": round(t, 3), "event": "PRECISE_ARRIVED", "after_s": round(t - self.t_state, 2)})
++                return self._swap_kick(t, pose, b, tilt, ex, ey, eh, aligned=True)
++            if t - self.t_state > PRECISE_TIMEOUT_S:
++                return self._precise_fail(t, "timeout")
++            return off
++
+         if self.state == "ALIGN":
+             if tilt > 35 or z < 0.06:  # zero twist while down; VelStand gets up on its own
+                 if not getattr(self, "down", False):
+@@ -318,23 +428,7 @@ class Mission:
+                 self.pulse_left -= 1
+                 return clamp_align(*self.pulse_twist)
+             if p is None or self.pulses >= ALIGN_MAX_PULSES:
+-                foot, lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
+-                vb = sim.data.qvel[sim.va:sim.va + 3]
+-                self.result.update(foot_vs_home_mm=[round(v, 1) for v in (foot - sim.home_foot) * 1000],
+-                                   lfoot_vs_home_mm=[round(v, 1) for v in (lfoot - sim.home_lfoot) * 1000],
+-                                   trunk_speed_mm_s=round(float(np.linalg.norm(vb[:2])) * 1000, 1),
+-                                   tilt_deg=round(tilt, 1))
+-                self.result.update(align_ex_mm=round(ex * 1000, 1), align_ey_mm=round(ey * 1000, 1),
+-                                   align_eh_deg=round(math.degrees(eh), 2), pulses=self.pulses,
+-                                   aligned=p is None, t_swap=round(t, 2))
+-                self.log.event({"t": round(t, 3), "event": "KICK_SWAP_IN", "aligned": p is None, "pulses": self.pulses,
+-                                "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
+-                sim.policy.ort_session = self.kick_session
+-                self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
+-                self.kick_ball0 = b.copy()
+-                self.peak = 0.0
+-                self._goto("KICK")
+-                return (0.0, 0.0, 0.0)
++                return self._swap_kick(t, pose, b, tilt, ex, ey, eh, aligned=p is None)
+             self.pulse_twist, self.pulse_left, axis = p
+             self.pulses += 1
+             self.log.event({"t": round(t, 3), "event": "ALIGN_PULSE", "n": self.pulses, "axis": axis, "ticks": self.pulse_left,
+@@ -414,7 +508,7 @@ def draw_mission(scn, m, sim):
+             prev = (x, y)
+ 
+ 
+-def new_mission(sim, kick, rng, log, ball=None, kick_heading=None):
++def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None):
+     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands."""
+     (x, y, _), _, _ = sim.pose()
+     if ball is None:
+@@ -427,13 +521,14 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None):
+     sim.data.qpos[sim.bqa:sim.bqa + 7] = [ball[0], ball[1], 0.035, 1, 0, 0, 0]
+     sim.data.qvel[sim.bva:sim.bva + 6] = 0
+     mujoco.mj_forward(sim.model, sim.data)
+-    return Mission(sim, kick, kh, log)
++    return Mission(sim, kick, kh, log, precision_session=precision)
+ 
+ 
+ def run_viewer(args):
+     import mujoco.viewer
+     sim = KickSim(args.velstand, SCENES[args.scene])
+     kick = ort.InferenceSession(args.kick)
++    precision = ort.InferenceSession(args.precision) if args.precision else None
+     sim.reset(0, 0, 0)
+     sim.home_foot, sim.home_lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
+     rng = np.random.default_rng(args.seed)
+@@ -442,7 +537,7 @@ def run_viewer(args):
+     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
+     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
+     log = RunLog(echo=not args.auto)
+-    m = new_mission(sim, kick, rng, log, ball, kh)
++    m = new_mission(sim, kick, rng, log, ball, kh, precision)
+     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
+ 
+     def report(m):
+@@ -459,7 +554,8 @@ def run_viewer(args):
+             tally["missed"] += 1
+             outcome = "MISSED"
+         tally["falls"] += r.get("falls", 0)
+-        print(f"  mission {n + 1:2d}: {outcome:58s} aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
++        mode = {"precision": "step", "precision->pulse fallback": "step->pulse", "pulse": "pulse"}[r["approach_mode"]]
++        print(f"  mission {n + 1:2d}: {outcome:58s} [{mode}] aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
+               f"{r.get('align_ey_mm', float('nan')):+.0f}) mm in {r.get('pulses', '-')} pulses   "
+               f"[tally: {tally['kicked']} kicked, {tally['missed']} missed, {tally['aborted']} aborted, "
+               f"{tally['falls']} falls]", flush=True)
+@@ -486,7 +582,7 @@ def run_viewer(args):
+                     log.save(f"{out}/mission{n}")
+                     n += 1
+                     log = RunLog()
+-                    m = new_mission(sim, kick, rng, log)
++                    m = new_mission(sim, kick, rng, log, precision=precision)
+             if args.auto:
+                 over = m.state == "DONE" or sim.t - t_mission > 60.0
+                 if over and t_done is None:
+@@ -501,7 +597,7 @@ def run_viewer(args):
+                               f"{tally['aborted']} aborted, {tally['falls']} falls")
+                         break
+                     log = RunLog(echo=False)
+-                    m = new_mission(sim, kick, rng, log)
++                    m = new_mission(sim, kick, rng, log, precision=precision)
+                     t_mission, t_done = sim.t, None
+             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
+             sim.set_twist(twist)
+@@ -516,6 +612,7 @@ def run_viewer(args):
+ def run_headless(args):
+     sim = KickSim(args.velstand, SCENES[args.scene])
+     kick = ort.InferenceSession(args.kick)
++    precision = ort.InferenceSession(args.precision) if args.precision else None
+     sim.reset(0, 0, 0)
+     sim.home_foot = sim.site_local("right_foot")  # kicking foot at HOME, the kick policy's start stance
+     sim.home_lfoot = sim.site_local("left_foot")
+@@ -523,7 +620,7 @@ def run_headless(args):
+     rng = np.random.default_rng(args.seed)
+     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
+     os.makedirs(out, exist_ok=True)
+-    print(f"velstand={args.velstand}\nkick={args.kick}\nscene={args.scene}  logs -> {out}/")
++    print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
+     rows = []
+     for k in range(args.runs):
+         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))
+@@ -534,7 +631,7 @@ def run_headless(args):
+         sim.data.qvel[sim.bva:sim.bva + 6] = 0
+         mujoco.mj_forward(sim.model, sim.data)
+         log = RunLog(echo=args.verbose)
+-        m = Mission(sim, kick, kh, log)
++        m = Mission(sim, kick, kh, log, precision_session=precision)
+         while m.state != "DONE" and sim.t < args.timeout:
+             twist = m.tick()
+             sim.set_twist(twist)
+@@ -562,6 +659,10 @@ def run_headless(args):
+           f"falls: {sum(r.get('falls', 0) for r in rows)}; ball disturbed before kick: "
+           f"{sum(r.get('ball_disturbed', 0) > 0 for r in rows)} runs; median mission time "
+           f"{np.median([r['t_done'] for r in rows if 't_done' in r]) if any('t_done' in r for r in rows) else float('nan'):.1f} s")
++    modes = {}
++    for r in rows:
++        modes[r["approach_mode"]] = modes.get(r["approach_mode"], 0) + 1
++    print(f"  approach mode: {modes}")
+ 
+ 
+ def main():
+@@ -577,6 +678,8 @@ def main():
+     ap.add_argument("--ball", default=None, help='viewer: "x,y" ball position (default: random 1.0-1.8 m away)')
+     ap.add_argument("--kick-heading", type=float, default=None, help="viewer: kick direction, deg (default: random)")
+     ap.add_argument("--auto", type=int, default=0, help="viewer: run this many missions back to back, with a tally")
++    ap.add_argument("--precision", default=None,
++                    help="PrecisionStep ONNX for the final approach (pulse aligner stays as the fallback)")
+     args = ap.parse_args()
+     run_viewer(args) if args.viewer else run_headless(args)
+ 
+diff --git a/src/mjlab_microduck/tasks/__init__.py b/src/mjlab_microduck/tasks/__init__.py
+index faa73668..8050e56a 100644
+--- a/src/mjlab_microduck/tasks/__init__.py
++++ b/src/mjlab_microduck/tasks/__init__.py
+@@ -43,6 +43,10 @@ from .microduck_ball_kick_env_cfg import (
+     make_microduck_ball_kick_env_cfg,
+     MicroduckBallKickRlCfg,
+ )
++from .microduck_precision_step_env_cfg import (
++    make_microduck_precision_step_env_cfg,
++    MicroduckPrecisionStepRlCfg,
++)
+ from .microduck_sitstand_env_cfg import (
+     make_microduck_sitstand_env_cfg,
+     MicroduckSitStandRlCfg,
+@@ -164,6 +168,17 @@ register_mjlab_task(
+     runner_cls=MicroduckOnPolicyRunner,
+ )
+ 
++# PrecisionStep task (fork-local) — step to a small target pose next to the
++# ball and stop dead with the feet square; the BallKick mission's final approach.
++# Twist slots carry the remaining target offset [dx, dy, dyaw], not a velocity.
++register_mjlab_task(
++    task_id="Mjlab-PrecisionStep-Flat-MicroDuck",
++    env_cfg=make_microduck_precision_step_env_cfg(),
++    play_env_cfg=make_microduck_precision_step_env_cfg(play=True),
++    rl_cfg=MicroduckPrecisionStepRlCfg,
++    runner_cls=MicroduckOnPolicyRunner,
++)
++
+ register_mjlab_task(
+     task_id="Mjlab-GroundPick-Rough-MicroDuck",
+     env_cfg=make_microduck_ground_pick_env_cfg(rough=True),
+diff --git a/src/mjlab_microduck/tasks/mdp.py b/src/mjlab_microduck/tasks/mdp.py
+index b41994df..554e4aad 100644
+--- a/src/mjlab_microduck/tasks/mdp.py
++++ b/src/mjlab_microduck/tasks/mdp.py
+@@ -7766,3 +7766,369 @@ def standing_composite_score_feet_only(env: ManagerBasedRlEnv, sensor_name: str,
+ 
+ def pose_target_match_feet_only(env: ManagerBasedRlEnv, sensor_name: str, **kwargs) -> torch.Tensor:
+     return pose_target_match(env, **kwargs) * feet_only_support(env, sensor_name)
++
++
++# =============================================================================
++# PrecisionStep task — step to a small target pose and stop dead, feet square
++# =============================================================================
++#
++# Command contract (Dillon's call, 2026-11-11, "option A"): the 3 twist slots of
++# the unified 61D layout carry the REMAINING offset to the target pose, in the
++# trunk's current yaw frame: [dx (m, forward), dy (m, left), dyaw (rad)].
++# Head/body slots stay zero-padded. At deployment the supervisor recomputes the
++# same three numbers every tick from the pose estimate. VelStand reads those
++# slots as a velocity; this policy reads them as an offset. The supervisor picks
++# the ONNX, so it fills the slots to match (precedent: the posture flag lives in
++# the twist vx slot).
++#
++# Per-episode state lives on the env (lazily allocated), set by the
++# ``reset_step_target`` event (events run BEFORE the command manager resets).
++
++
++def _pstep_state(env: ManagerBasedRlEnv) -> dict:
++    if not hasattr(env, "_pstep"):
++        n, d = env.num_envs, env.device
++        env._pstep = {
++            "goal": torch.zeros(n, 3, device=d),        # world x, y, yaw
++            "dir0": torch.zeros(n, 2, device=d),        # unit start->goal (0 if no translation)
++            "prev_dist": torch.zeros(n, device=d),      # for potential-based progress
++            "has_ball": torch.zeros(n, dtype=torch.bool, device=d),
++            "ball_home": torch.zeros(n, 2, device=d),   # ball xy at reset
++        }
++    return env._pstep
++
++
++def _yaw_from_quat_wxyz(q: torch.Tensor) -> torch.Tensor:
++    qw, qx, qy, qz = q[..., 0], q[..., 1], q[..., 2], q[..., 3]
++    return torch.atan2(2.0 * (qw * qz + qx * qy), 1.0 - 2.0 * (qy * qy + qz * qz))
++
++
++def world_to_yaw_frame(dx: torch.Tensor, dy: torch.Tensor, yaw: torch.Tensor):
++    """Rotate a world-frame XY delta into a frame with heading ``yaw``."""
++    c, s = torch.cos(yaw), torch.sin(yaw)
++    return c * dx + s * dy, -s * dx + c * dy
++
++
++def sample_step_offsets(
++    n: int,
++    device,
++    near_r: tuple = (0.0, 0.08),
++    far_r: tuple = (0.08, 0.25),
++    far_prob: float = 0.35,
++    fwd_cone_prob: float = 0.5,
++    fwd_cone_half: float = math.pi / 4,
++    yaw_range: float = 0.26,
++    zero_prob: float = 0.1,
++):
++    """(dx, dy, dyaw) target offsets in the START yaw frame. Pure, testable.
++
++    Most mass at small radii (where the pulse aligner fails today), a far tail up
++    to the 0.25 m final-approach zone, half the bearings in a forward cone (the
++    mission approaches from behind the ball), the rest all-around (symmetry: any
++    direction, either foot). An explicit exact-zero bucket trains "hold still".
++    """
++    far = torch.rand(n, device=device) < far_prob
++    u = torch.rand(n, device=device)
++    r = torch.where(far, far_r[0] + u * (far_r[1] - far_r[0]), near_r[0] + u * (near_r[1] - near_r[0]))
++    cone = torch.rand(n, device=device) < fwd_cone_prob
++    b_cone = (torch.rand(n, device=device) * 2 - 1) * fwd_cone_half
++    b_all = (torch.rand(n, device=device) * 2 - 1) * math.pi
++    bearing = torch.where(cone, b_cone, b_all)
++    dyaw = (torch.rand(n, device=device) * 2 - 1) * yaw_range
++    zero = torch.rand(n, device=device) < zero_prob
++    r = torch.where(zero, torch.zeros_like(r), r)
++    dyaw = torch.where(zero, torch.zeros_like(dyaw), dyaw)
++    return r * torch.cos(bearing), r * torch.sin(bearing), dyaw
++
++
++def kick_ball_xy(goal_xy: torch.Tensor, goal_yaw: torch.Tensor, offset_xy: torch.Tensor) -> torch.Tensor:
++    """Ball center for a kick stance at (goal_xy, goal_yaw): offset in that yaw frame."""
++    c, s = torch.cos(goal_yaw), torch.sin(goal_yaw)
++    return torch.stack(
++        [goal_xy[:, 0] + c * offset_xy[:, 0] - s * offset_xy[:, 1],
++         goal_xy[:, 1] + s * offset_xy[:, 0] + c * offset_xy[:, 1]], dim=1)
++
++
++def ball_clear_of_footprint(dx_w, dy_w, yaw, keepout_x, keepout_y, pad):
++    """True where a ball center at world delta (dx_w, dy_w) from the trunk lies
++    outside the footprint box (trunk yaw frame) expanded by ``pad``."""
++    bx, by = world_to_yaw_frame(dx_w, dy_w, yaw)
++    inside = (bx > keepout_x[0] - pad) & (bx < keepout_x[1] + pad) & \
++             (by > keepout_y[0] - pad) & (by < keepout_y[1] + pad)
++    return ~inside
++
++
++def reset_step_target(
++    env: ManagerBasedRlEnv,
++    env_ids: torch.Tensor,
++    near_r: tuple = (0.0, 0.08),
++    far_r: tuple = (0.08, 0.25),
++    far_prob: float = 0.35,
++    fwd_cone_prob: float = 0.5,
++    yaw_range: float = 0.26,
++    zero_prob: float = 0.1,
++    ball_prob: float = 0.7,
++    ball_offset: tuple = (0.09, -0.042),
++    ball_noise_xy: float = 0.015,
++    ball_radius: float = 0.035,
++    keepout_x: tuple = (-0.033, 0.034),
++    keepout_y: tuple = (-0.079, 0.079),
++    keepout_margin: float = 0.006,
++    ball_park_dist: float = 3.0,
++    asset_name: str = "ball",
++):
++    """Sample the episode's target pose and place (or park) the ball.
++
++    The ball goes where it would sit if this were a real final approach: at the
++    BallKick placement (0.09, -0.042 with the same +-15 mm noise) relative to the
++    TARGET stance. The actor never sees it; touching it ends the episode. Ball
++    episodes whose ball would overlap the duck's HOME footprint at the START
++    pose (``keepout_x/y``: collision-geom box within one ball diameter of the
++    soles, measured 2026-11-11, start yaw frame; expanded by the ball radius +
++    ``keepout_margin``) are made ball-free instead; parked balls sit
++    ``ball_park_dist`` away. Must run AFTER set_ground_state (reads the
++    final robot pose from qpos; root_link_pos_w lags until the next forward()).
++    """
++    if env_ids is None or len(env_ids) == 0:
++        return
++    env_ids = env_ids.to(env.device)
++    st = _pstep_state(env)
++    robot: Entity = env.scene["robot"]
++    ball: Entity = env.scene[asset_name]
++    n = len(env_ids)
++
++    root = env.sim.data.qpos[env_ids][:, robot.indexing.free_joint_q_adr]
++    x0, y0 = root[:, 0], root[:, 1]
++    yaw0 = _yaw_from_quat_wxyz(root[:, 3:7])
++
++    dx, dy, dyaw = sample_step_offsets(
++        n, env.device, near_r, far_r, far_prob, fwd_cone_prob, math.pi / 4, yaw_range, zero_prob)
++    c, s = torch.cos(yaw0), torch.sin(yaw0)
++    gx = x0 + c * dx - s * dy
++    gy = y0 + s * dx + c * dy
++    gyaw = wrap_to_pi(yaw0 + dyaw)
++    st["goal"][env_ids] = torch.stack([gx, gy, gyaw], dim=1)
++    dist = torch.sqrt(dx * dx + dy * dy)
++    st["prev_dist"][env_ids] = dist
++    dir_w = torch.stack([gx - x0, gy - y0], dim=1)
++    st["dir0"][env_ids] = torch.where(
++        dist.unsqueeze(1) > 1e-6, dir_w / dist.clamp_min(1e-6).unsqueeze(1), torch.zeros_like(dir_w))
++
++    off = torch.tensor(ball_offset, device=env.device, dtype=torch.float).repeat(n, 1)
++    off += (torch.rand(n, 2, device=env.device) * 2.0 - 1.0) * ball_noise_xy
++    bxy = kick_ball_xy(torch.stack([gx, gy], dim=1), gyaw, off)
++    clear = ball_clear_of_footprint(bxy[:, 0] - x0, bxy[:, 1] - y0, yaw0, keepout_x, keepout_y,
++                                    ball_radius + keepout_margin)
++    has = (torch.rand(n, device=env.device) < ball_prob) & clear
++    park = torch.stack([x0 + ball_park_dist, y0], dim=1)
++    bxy = torch.where(has.unsqueeze(1), bxy, park)
++    st["has_ball"][env_ids] = has
++    st["ball_home"][env_ids] = bxy
++
++    pose = torch.zeros(n, 7, device=env.device)
++    pose[:, 0:2] = bxy
++    pose[:, 2] = env.scene.terrain.env_origins[env_ids, 2] + ball_radius
++    pose[:, 3] = 1.0
++    ball.write_root_link_pose_to_sim(pose, env_ids)
++    ball.write_root_link_velocity_to_sim(torch.zeros(n, 6, device=env.device), env_ids)
++
++
++class StepTargetCommand(CommandTerm):
++    """Remaining offset to the episode's target pose, in the trunk's yaw frame.
++
++    command = [dx, dy, dyaw]. The goal itself is sampled by ``reset_step_target``
++    (an event, which runs before the command manager resets). Metrics hold the
++    LATEST error (not an accumulation), so the value logged at reset is the
++    terminal error of the finished episode.
++    """
++
++    cfg: "StepTargetCommandCfg"
++
++    def __init__(self, cfg: "StepTargetCommandCfg", env: ManagerBasedRlEnv):
++        super().__init__(cfg, env)
++        self.robot: Entity = env.scene["robot"]
++        self._command = torch.zeros(self.num_envs, 3, device=self.device)
++        self.metrics["final_pos_err"] = torch.zeros(self.num_envs, device=self.device)
++        self.metrics["final_yaw_err"] = torch.zeros(self.num_envs, device=self.device)
++
++    @property
++    def command(self) -> torch.Tensor:
++        return self._command
++
++    def _offset(self, x, y, yaw, env_ids=None):
++        goal = _pstep_state(self._env)["goal"]
++        if env_ids is not None:
++            goal = goal[env_ids]
++        bx, by = world_to_yaw_frame(goal[:, 0] - x, goal[:, 1] - y, yaw)
++        return torch.stack([bx, by, wrap_to_pi(goal[:, 2] - yaw)], dim=1)
++
++    def _update_metrics(self) -> None:
++        self.metrics["final_pos_err"][:] = torch.linalg.norm(self._command[:, :2], dim=1)
++        self.metrics["final_yaw_err"][:] = self._command[:, 2].abs()
++
++    def _update_command(self) -> None:
++        pos = self.robot.data.root_link_pos_w
++        yaw = _yaw_from_quat_wxyz(self.robot.data.root_link_quat_w)
++        self._command[:] = torch.nan_to_num(self._offset(pos[:, 0], pos[:, 1], yaw), nan=0.0)
++
++    def _resample_command(self, env_ids: torch.Tensor) -> None:
++        if len(env_ids) == 0:
++            return
++        root = self._env.sim.data.qpos[env_ids][:, self.robot.indexing.free_joint_q_adr]
++        yaw = _yaw_from_quat_wxyz(root[:, 3:7])
++        self._command[env_ids] = self._offset(root[:, 0], root[:, 1], yaw, env_ids)
++
++
++@dataclass(kw_only=True)
++class StepTargetCommandCfg(CommandTermCfg):
++    def build(self, env: ManagerBasedRlEnv) -> "StepTargetCommand":
++        return StepTargetCommand(self, env)
++
++
++def step_target_position(env: ManagerBasedRlEnv, std: float, command_name: str = "twist") -> torch.Tensor:
++    """Gaussian on the remaining XY distance to the target (>= 0)."""
++    cmd = env.command_manager.get_command(command_name)
++    return torch.exp(-(torch.linalg.norm(cmd[:, :2], dim=1) / std) ** 2)
++
++
++def step_target_heading(env: ManagerBasedRlEnv, std: float, command_name: str = "twist") -> torch.Tensor:
++    """Gaussian on the remaining heading error (>= 0)."""
++    cmd = env.command_manager.get_command(command_name)
++    return torch.exp(-(cmd[:, 2] / std) ** 2)
++
++
++def step_target_progress(
++    env: ManagerBasedRlEnv, max_speed: float = 0.3, command_name: str = "twist"
++) -> torch.Tensor:
++    """Potential-based progress: (previous distance - distance) / dt, clamped.
++
++    Pays approach, charges retreat, pays zero for holding: unfarmable, and the
++    only gradient for far targets where the position Gaussians are ~flat.
++    """
++    st = _pstep_state(env)
++    d = torch.linalg.norm(env.command_manager.get_command(command_name)[:, :2], dim=1)
++    rate = (st["prev_dist"] - d) / env.step_dt
++    st["prev_dist"][:] = d
++    return torch.nan_to_num(rate, nan=0.0).clamp(-max_speed, max_speed)
++
++
++def step_target_settled(
++    env: ManagerBasedRlEnv,
++    sensor_name: str,
++    pos_tol: float = 0.015,
++    yaw_tol: float = 0.05,
++    lin_std: float = 0.03,
++    ang_std: float = 0.2,
++    command_name: str = "twist",
++) -> torch.Tensor:
++    """Arrive and STOP DEAD: inside tolerance, both feet down, trunk still (>= 0).
++
++    Gated on a GOOD state (on target), never a bad one.
++    """
++    robot: Entity = env.scene["robot"]
++    cmd = env.command_manager.get_command(command_name)
++    on = (torch.linalg.norm(cmd[:, :2], dim=1) < pos_tol) & (cmd[:, 2].abs() < yaw_tol)
++    found = env.scene.sensors[sensor_name].data.found
++    both_down = (found > 0).all(dim=-1) if found.dim() > 1 else found > 0
++    v = torch.linalg.norm(robot.data.root_link_lin_vel_b[:, :2], dim=1)
++    w = robot.data.root_link_ang_vel_b[:, 2].abs()
++    still = torch.exp(-(v / lin_std) ** 2 - (w / ang_std) ** 2)
++    return torch.nan_to_num(on.float() * both_down.float() * still, nan=0.0)
++
++
++def foot_stagger_from_sites(
++    left_xy: torch.Tensor, right_xy: torch.Tensor, yaw: torch.Tensor, home_width: float, width_weight: float = 0.5
++) -> torch.Tensor:
++    """|front-back offset| + width_weight * |width - home_width| of the feet, in the trunk yaw frame (>= 0)."""
++    fx, fy = world_to_yaw_frame(left_xy[:, 0] - right_xy[:, 0], left_xy[:, 1] - right_xy[:, 1], yaw)
++    return fx.abs() + width_weight * (fy - home_width).abs()
++
++
++def step_foot_stagger_penalty(
++    env: ManagerBasedRlEnv,
++    near: float = 0.04,
++    home_width: float = 0.084,
++    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot", site_names=("left_foot", "right_foot")),
++    command_name: str = "twist",
++) -> torch.Tensor:
++    """SELF-NEGATING (<= 0, positive weight): feet not square, only near the target.
++
++    Attacks the #1 BallKick miss mode (support foot behind home) at the root: the
++    stance at arrival must already be the kick's HOME stance.
++    """
++    robot: Entity = env.scene[asset_cfg.name]
++    sites = robot.data.site_pos_w[:, asset_cfg.site_ids, :2]
++    yaw = _yaw_from_quat_wxyz(robot.data.root_link_quat_w)
++    st = foot_stagger_from_sites(sites[:, 0], sites[:, 1], yaw, home_width)
++    near_m = torch.linalg.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < near
++    return -torch.nan_to_num(st, nan=0.0).clamp(max=0.1) * near_m.float()
++
++
++def step_overshoot_penalty(
++    env: ManagerBasedRlEnv,
++    margin: float = 0.01,
++    cap: float = 0.1,
++    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
++) -> torch.Tensor:
++    """SELF-NEGATING (<= 0): distance past the goal along the start->goal line, beyond ``margin``."""
++    st = _pstep_state(env)
++    robot: Entity = env.scene[asset_cfg.name]
++    rel = robot.data.root_link_pos_w[:, :2] - st["goal"][:, :2]
++    past = (rel * st["dir0"]).sum(dim=1) - margin
++    return -torch.nan_to_num(past, nan=0.0).clamp(0.0, cap)
++
++
++def _ball_displaced(env: ManagerBasedRlEnv, threshold: float, asset_name: str) -> torch.Tensor:
++    st = _pstep_state(env)
++    ball: Entity = env.scene[asset_name]
++    moved = torch.linalg.norm(ball.data.root_link_pos_w[:, :2] - st["ball_home"], dim=1)
++    return st["has_ball"] & (torch.nan_to_num(moved, nan=1.0) > threshold)
++
++
++def ball_displaced_termination(
++    env: ManagerBasedRlEnv, threshold: float = 0.01, asset_name: str = "ball"
++) -> torch.Tensor:
++    """Episode fails as soon as the robot moves the ball more than ``threshold``."""
++    return _ball_displaced(env, threshold, asset_name)
++
++
++def ball_displaced_penalty(
++    env: ManagerBasedRlEnv, threshold: float = 0.01, asset_name: str = "ball"
++) -> torch.Tensor:
++    """SELF-NEGATING (<= 0, positive weight): -1 on the step the ball is displaced (episode ends there)."""
++    return -_ball_displaced(env, threshold, asset_name).float()
++
++
++def _near_target(env: ManagerBasedRlEnv, near: float, command_name: str) -> torch.Tensor:
++    return (torch.linalg.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < near).float()
++
++
++def step_terminal_pose_match(
++    env: ManagerBasedRlEnv,
++    std: float,
++    joint_indices: list,
++    near: float = 0.03,
++    command_name: str = "twist",
++) -> torch.Tensor:
++    """Gaussian leg pose vs HOME, only near the target (>= 0).
++
++    model_1000 of the first run reached every target in a deep crouch (hips ~30
++    deg, knees ~36 deg off HOME) and the kick, trained from HOME +-0.05 rad,
++    never swung from it (0/60 missions). The arrival stance must BE the kick's
++    start stance: tight std, paid only where the stepping is over.
++    """
++    return pose_target_match(env, std=std, joint_indices=joint_indices) * _near_target(env, near, command_name)
++
++
++def step_terminal_pose_penalty(
++    env: ManagerBasedRlEnv,
++    joint_indices: list,
++    near: float = 0.03,
++    command_name: str = "twist",
++) -> torch.Tensor:
++    """SELF-NEGATING (<= 0, positive weight): mean |leg joint - HOME|, only near the target.
++
++    The L1 companion gives a constant gradient out of the crouch, where the
++    tight Gaussian above is flat.
++    """
++    return pose_l1_penalty(env, joint_indices=joint_indices) * _near_target(env, near, command_name)

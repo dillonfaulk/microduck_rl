@@ -1,0 +1,13 @@
+== 2026-11-11_16-15-45_chunk2_pose_model_3000.onnx, training-like start: 50 episodes (40 with a ball)
+  KICK-READY (<= 12 mm, 3 deg, stagger < 10 mm, still, legs within 0.10 rad of HOME, no strike, no fall): 43/50
+  final position error: median 4.1 mm, p90 6.2, worst 8.8
+  final heading error: median 0.51 deg, p90 1.23, worst 1.85
+  front-back foot stagger: median 3.8 mm, p90 7.3, worst 10.4; < 10 mm in 48/50
+  still at the end: 50/50
+  end posture, worst leg joint vs HOME: median 3.6 deg, worst 6.6; within 5.7 deg in 46/50
+  ball struck: 1/40 ball episodes
+  falls: 0/50
+    hold (0)           4 eps: kick-ready 3, median err 3.9 mm, struck 0, falls 0
+    near (<80 mm)     31 eps: kick-ready 28, median err 4.2 mm, struck 0, falls 0
+    far (80-250 mm)   15 eps: kick-ready 12, median err 3.6 mm, struck 1, falls 0
+  (14 s wall)

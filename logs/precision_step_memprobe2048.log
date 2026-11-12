@@ -1,0 +1,1276 @@
+/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/tyro/_parsers.py:353: UserWarning: The field `env.scene.entities.robot.collisions.0.geom-names-expr` is annotated with type `tuple[str, ...]`, but the default value `['.*_collision']` has type `<class 'list'>`. We'll try to handle this gracefully, but it may cause unexpected behavior.
+  warnings.warn(message)
+/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mjlab/entity/entity.py:149: UserWarning: Actuator config matched 14 joint(s) but the same expressions also match 7 site(s): imu, left_foot, head_camera, tof, head_imu, mouth_tip, right_foot. Add a separate config with transmission_type=TransmissionType.SITE if those should be actuated too.
+  self._add_actuators()
+[mdp] Patches 1-2 active: NaN-safe reward/advantage
+[mdp] Patch 4 active: ONNX export filters passive_* joints
+[mdp] Patch 5 active: MICRODUCK_WARM_START=1 restarts curricula after checkpoint load
+[INFO] Training with: device=cuda:0, seed=42, rank=0
+[INFO] Logging experiment in directory: logs/rsl_rl/precision_step/2026-11-11_15-28-13_memprobe2048
+Setting seed: 42
+Warp 1.12.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5060 Ti" (15 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/n3z/.cache/warp/1.12.0
+Warp DeprecationWarning: The symbol `warp.context.runtime` will soon be removed from the public API. It can still be accessed from `warp._src.context.runtime` but might be changed or removed without notice.
+Module mujoco_warp._src.smooth 95a0b8b load on device 'cuda:0' took 919.61 ms  (cached)
+Module mujoco_warp._src.collision_driver 88f7770 load on device 'cuda:0' took 20.01 ms  (cached)
+Module _nxn_broadphase__locals__kernel_e73b1315 e73b131 load on device 'cuda:0' took 19.92 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_c1d0c893 c1d0c89 load on device 'cuda:0' took 829.94 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_079dfa94 079dfa9 load on device 'cuda:0' took 1192.13 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_02484c54 02484c5 load on device 'cuda:0' took 119.43 ms  (cached)
+Module mujoco_warp._src.constraint 27c5750 load on device 'cuda:0' took 469.74 ms  (cached)
+Module _efc_contact_init__locals__kernel_fda71e14 fda71e1 load on device 'cuda:0' took 36.31 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_7974b597 cc0fc30 load on device 'cuda:0' took 25.26 ms  (cached)
+Module _efc_contact_update__locals__kernel_90315d53 90315d5 load on device 'cuda:0' took 38.85 ms  (cached)
+Module mujoco_warp._src.sensor 7fc0378 load on device 'cuda:0' took 607.94 ms  (cached)
+Module mujoco_warp._src.forward f60f76d load on device 'cuda:0' took 386.00 ms  (cached)
+Module mujoco_warp._src.passive 1a5e55c load on device 'cuda:0' took 187.35 ms  (cached)
+Module mujoco_warp._src.forward 8ebfcb1 load on device 'cuda:0' took 386.76 ms  (cached)
+Module mujoco_warp._src.support dd3f924 load on device 'cuda:0' took 35.12 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_37ca3f47 b319ac8 load on device 'cuda:0' took 251.46 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_b16bf393 b7e5d5f load on device 'cuda:0' took 319.07 ms  (cached)
+Module mujoco_warp._src.solver b116efb load on device 'cuda:0' took 451.01 ms  (cached)
+Module solve_init_jaref__locals__kernel_af106063 af10606 load on device 'cuda:0' took 41.24 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_19197cab 19197ca load on device 'cuda:0' took 40.14 ms  (cached)
+Module update_constraint_efc__locals__kernel_32935e9d 32935e9 load on device 'cuda:0' took 28.57 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f02e74ab f02e74a load on device 'cuda:0' took 66.03 ms  (cached)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_73f22f8d 0469885 load on device 'cuda:0' took 39.32 ms  (cached)
+Module update_gradient_cholesky__locals__kernel_a458a9b8 e47f115 load on device 'cuda:0' took 317.38 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_d54ab32b d54ab32 load on device 'cuda:0' took 40.34 ms  (cached)
+Module linesearch_prepare_gauss__locals__kernel_32809bfd 32809bf load on device 'cuda:0' took 70.34 ms  (cached)
+Module update_constraint_efc__locals__kernel_3c1a9816 3c1a981 load on device 'cuda:0' took 28.86 ms  (cached)
+Module _contact_sort__locals__contact_sort_304c86df 6c97b35 load on device 'cuda:0' took 17.36 ms  (cached)
+Module mujoco_warp._src.derivative d0e2fd7 load on device 'cuda:0' took 164.08 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_e7898c5c e7898c5 load on device 'cuda:0' took 15.97 ms  (cached)
+Module reset_data__locals__reset_qM_10d3c793 10d3c79 load on device 'cuda:0' took 15.45 ms  (cached)
+Module reset_data__locals__reset_mocap_ff71f630 ff71f63 load on device 'cuda:0' took 23.98 ms  (cached)
+Module reset_data__locals__reset_contact_df686d47 df686d4 load on device 'cuda:0' took 15.45 ms  (cached)
+Module reset_data__locals__reset_nworld_6e0d904e 6e0d904 load on device 'cuda:0' took 74.37 ms  (cached)
+[BamActuator] model='m6' joints=14 kt=0.3660 R=2.8114 vin=range=(6.5, 8.2) drop_gain_range=(0.0, 0.2) force_limit=±1.07Nm friction_base=0.0048 friction_viscous=0.0054 envs=2048 device=cuda:0
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 2048   |
+| Environment device     | cuda:0 |
+| Environment seed       | 42     |
+| Physics step-size      | 0.005  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 3 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | reset_base                  |
+|   1   | reset_robot_joints          |
+|   2   | reset_action_history        |
+|   3   | set_ground_state            |
+|   4   | reset_step_target           |
+|   5   | randomize_com               |
+|   6   | randomize_head_com          |
+|   7   | randomize_armature          |
+|   8   | randomize_joint_friction    |
++-------+-----------------------------+
++----------------------------------------------+
+|    Active Event Terms in Mode: 'interval'    |
++-------+------------+-------------------------+
+| Index | Name       | Interval time range (s) |
++-------+------------+-------------------------+
+|   0   | push_robot |        (3.0, 6.0)       |
++-------+------------+-------------------------+
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++-------+-------------------------------+
+| Index | Name                          |
++-------+-------------------------------+
+|   0   | foot_friction                 |
+|   1   | encoder_bias                  |
+|   2   | base_com                      |
+|   3   | expand_bam_friction_fields    |
+|   4   | randomize_mass_inertia        |
++-------+-------------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | geom_friction       |
+|   1   | body_ipos           |
+|   2   | body_subtreemass    |
+|   3   | dof_invweight0      |
+|   4   | body_invweight0     |
+|   5   | tendon_length0      |
+|   6   | tendon_invweight0   |
+|   7   | dof_frictionloss    |
+|   8   | dof_damping         |
+|   9   | dof_armature        |
+|   10  | body_mass           |
+|   11  | body_inertia        |
+|   12  | body_iquat          |
++-------+---------------------+
+
+Module repeat_array_kernel_39317a34 b712927 load on device 'cuda:0' took 18.88 ms  (cached)
+Module repeat_array_kernel_39317a34 18fcc7e load on device 'cuda:0' took 29.62 ms  (cached)
+Module repeat_array_kernel_39317a34 5cde7e8 load on device 'cuda:0' took 41.26 ms  (cached)
+Module repeat_array_kernel_39317a34 0fe3117 load on device 'cuda:0' took 54.69 ms  (cached)
+[INFO] <CommandManager> contains 1 active terms.
++-----------------------------------+
+|        Active Command Terms       |
++-------+-------+-------------------+
+| Index | Name  |        Type       |
++-------+-------+-------------------+
+|   0   | twist | StepTargetCommand |
++-------+-------+-------------------+
+
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 14) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          14 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 2 groups.
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'actor' (shape: (61,)) |
++-----------+----------------------------------+------------+
+|   Index   | Name                             |   Shape    |
++-----------+----------------------------------+------------+
+|     0     | base_ang_vel                     |    (3,)    |
+|     1     | projected_gravity                |    (3,)    |
+|     2     | joint_pos                        |   (14,)    |
+|     3     | joint_vel                        |   (14,)    |
+|     4     | actions                          |   (14,)    |
+|     5     | command                          |    (3,)    |
+|     6     | head_command                     |    (4,)    |
+|     7     | body_command                     |    (6,)    |
++-----------+----------------------------------+------------+
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (80,)) |
++----------+------------------------------------+------------+
+|  Index   | Name                               |   Shape    |
++----------+------------------------------------+------------+
+|    0     | base_lin_vel                       |    (3,)    |
+|    1     | base_ang_vel                       |    (3,)    |
+|    2     | projected_gravity                  |    (3,)    |
+|    3     | joint_pos                          |   (14,)    |
+|    4     | joint_vel                          |   (14,)    |
+|    5     | actions                            |   (14,)    |
+|    6     | command                            |    (3,)    |
+|    7     | foot_air_time                      |    (2,)    |
+|    8     | foot_contact                       |    (2,)    |
+|    9     | foot_contact_forces                |    (6,)    |
+|    10    | head_command                       |    (4,)    |
+|    11    | body_command                       |    (6,)    |
+|    12    | ball_position                      |    (3,)    |
+|    13    | ball_velocity                      |    (3,)    |
++----------+------------------------------------+------------+
+
+[INFO] <TerminationManager> contains 5 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | fell_over             |  False   |
+|   2   | out_of_terrain_bounds |   True   |
+|   3   | nan_state             |  False   |
+|   4   | ball_struck           |  False   |
++-------+-----------------------+----------+
+
+[INFO] <RewardManager> contains 18 active terms.
++------------------------------------+
+|        Active Reward Terms         |
++-------+-------------------+--------+
+| Index | Name              | Weight |
++-------+-------------------+--------+
+|   0   | upright           |    2.0 |
+|   1   | body_ang_vel      |  -0.05 |
+|   2   | angular_momentum  |  -0.02 |
+|   3   | dof_pos_limits    |   -1.0 |
+|   4   | action_rate_l2    |   -0.1 |
+|   5   | target_pos_coarse |    1.0 |
+|   6   | target_pos_fine   |    2.0 |
+|   7   | target_yaw_coarse |    0.5 |
+|   8   | target_yaw_fine   |    1.0 |
+|   9   | target_progress   |    5.0 |
+|   10  | target_settled    |    3.0 |
+|   11  | foot_stagger      |   30.0 |
+|   12  | overshoot         |   20.0 |
+|   13  | ball_struck       |   20.0 |
+|   14  | pose_stand_legs   |    1.0 |
+|   15  | pose_stand_neck   |    1.0 |
+|   16  | height_stand      |    1.0 |
+|   17  | self_collisions   |   -1.0 |
++-------+-------------------+--------+
+
+[INFO] <CurriculumManager> contains 4 active terms.
++----------------------------+
+|  Active Curriculum Terms   |
++-------+--------------------+
+| Index | Name               |
++-------+--------------------+
+|   0   | action_rate_weight |
+|   1   | com_range          |
+|   2   | head_com_range     |
+|   3   | push_magnitude     |
++-------+--------------------+
+
+[INFO] <MetricsManager> contains 1 active terms.
++-------------------------+
+|   Active Metrics Terms  |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | mean_action_acc |
++-------+-----------------+
+
+[INFO] <NullRecorderManager> (inactive)
+Module mujoco_warp._src.io 4b387a0 load on device 'cuda:0' took 493.09 ms  (cached)
+Module _tile_cholesky_factorize__locals__cholesky_factorize_68698e2e e5a5250 load on device 'cuda:0' took 156.00 ms  (cached)
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 197.21 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8f106300 2c9154f load on device 'cuda:0' took 148.81 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 170.34 ms  (cached)
+[INFO] Recording videos during training.
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=61, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=14, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (mlp): MLP(
+    (0): Linear(in_features=80, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+Storing git diff for 'microduck_rl' in: logs/rsl_rl/precision_step/2026-11-11_15-28-13_memprobe2048/git/microduck_rl.diff
+################################################################################
+[1m                            Learning iteration 0/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 49152 
+                       Steps per second: 18675 
+                        Collection time: 2.494s 
+                          Learning time: 0.138s 
+                        Mean value loss: 0.0577
+                    Mean surrogate loss: -0.0032
+                      Mean entropy loss: 19.8200
+                            Mean reward: -0.28
+                    Mean episode length: 23.81
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.0448
+            Episode_Reward/body_ang_vel: -0.0189
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0003
+          Episode_Reward/action_rate_l2: -0.1110
+       Episode_Reward/target_pos_coarse: 0.0216
+         Episode_Reward/target_pos_fine: 0.0125
+       Episode_Reward/target_yaw_coarse: 0.0112
+         Episode_Reward/target_yaw_fine: 0.0077
+         Episode_Reward/target_progress: -0.0101
+          Episode_Reward/target_settled: 0.0002
+            Episode_Reward/foot_stagger: -0.0138
+               Episode_Reward/overshoot: -0.0003
+             Episode_Reward/ball_struck: -0.0172
+         Episode_Reward/pose_stand_legs: 0.0362
+         Episode_Reward/pose_stand_neck: 0.0312
+            Episode_Reward/height_stand: 0.0394
+         Episode_Reward/self_collisions: -0.0146
+        Episode_Metrics/mean_action_acc: 1.7523
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.0698
+            Metrics/twist/final_yaw_err: 0.2515
+           Episode_Termination/time_out: 6.6250
+          Episode_Termination/fell_over: 8.3333
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 3.6250
+          Metrics/angular_momentum_mean: 0.0089
+--------------------------------------------------------------------------------
+                         Iteration time: 2.63s
+                           Time elapsed: 00:00:02
+                                    ETA: 00:00:50
+
+################################################################################
+[1m                            Learning iteration 1/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 98304 
+                       Steps per second: 27277 
+                        Collection time: 1.723s 
+                          Learning time: 0.079s 
+                        Mean value loss: 0.0805
+                    Mean surrogate loss: -0.0062
+                      Mean entropy loss: 19.7931
+                            Mean reward: -0.49
+                    Mean episode length: 34.43
+                        Mean action std: 0.99
+                 Episode_Reward/upright: 0.0823
+            Episode_Reward/body_ang_vel: -0.0738
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0013
+          Episode_Reward/action_rate_l2: -0.3052
+       Episode_Reward/target_pos_coarse: 0.0390
+         Episode_Reward/target_pos_fine: 0.0126
+       Episode_Reward/target_yaw_coarse: 0.0210
+         Episode_Reward/target_yaw_fine: 0.0119
+         Episode_Reward/target_progress: -0.0391
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0259
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0073
+         Episode_Reward/pose_stand_legs: 0.0921
+         Episode_Reward/pose_stand_neck: 0.0752
+            Episode_Reward/height_stand: 0.0984
+         Episode_Reward/self_collisions: -0.0478
+        Episode_Metrics/mean_action_acc: 1.9081
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1263
+            Metrics/twist/final_yaw_err: 0.5928
+           Episode_Termination/time_out: 2.2917
+          Episode_Termination/fell_over: 63.7917
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 7.3750
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.80s
+                           Time elapsed: 00:00:04
+                                    ETA: 00:00:39
+
+################################################################################
+[1m                            Learning iteration 2/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 147456 
+                       Steps per second: 27236 
+                        Collection time: 1.722s 
+                          Learning time: 0.082s 
+                        Mean value loss: 0.0668
+                    Mean surrogate loss: -0.0071
+                      Mean entropy loss: 19.7412
+                            Mean reward: -0.30
+                    Mean episode length: 34.62
+                        Mean action std: 0.99
+                 Episode_Reward/upright: 0.0792
+            Episode_Reward/body_ang_vel: -0.0731
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0012
+          Episode_Reward/action_rate_l2: -0.2924
+       Episode_Reward/target_pos_coarse: 0.0383
+         Episode_Reward/target_pos_fine: 0.0126
+       Episode_Reward/target_yaw_coarse: 0.0213
+         Episode_Reward/target_yaw_fine: 0.0124
+         Episode_Reward/target_progress: -0.0349
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0251
+               Episode_Reward/overshoot: -0.0025
+             Episode_Reward/ball_struck: -0.0070
+         Episode_Reward/pose_stand_legs: 0.0900
+         Episode_Reward/pose_stand_neck: 0.0742
+            Episode_Reward/height_stand: 0.0962
+         Episode_Reward/self_collisions: -0.0394
+        Episode_Metrics/mean_action_acc: 1.8945
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1221
+            Metrics/twist/final_yaw_err: 0.5432
+           Episode_Termination/time_out: 0.0833
+          Episode_Termination/fell_over: 58.9167
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.6667
+          Metrics/angular_momentum_mean: 0.0119
+--------------------------------------------------------------------------------
+                         Iteration time: 1.80s
+                           Time elapsed: 00:00:06
+                                    ETA: 00:00:35
+
+################################################################################
+[1m                            Learning iteration 3/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 196608 
+                       Steps per second: 27266 
+                        Collection time: 1.724s 
+                          Learning time: 0.078s 
+                        Mean value loss: 0.0561
+                    Mean surrogate loss: -0.0077
+                      Mean entropy loss: 19.6923
+                            Mean reward: -0.23
+                    Mean episode length: 31.72
+                        Mean action std: 0.99
+                 Episode_Reward/upright: 0.0831
+            Episode_Reward/body_ang_vel: -0.0737
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0013
+          Episode_Reward/action_rate_l2: -0.2961
+       Episode_Reward/target_pos_coarse: 0.0389
+         Episode_Reward/target_pos_fine: 0.0133
+       Episode_Reward/target_yaw_coarse: 0.0225
+         Episode_Reward/target_yaw_fine: 0.0132
+         Episode_Reward/target_progress: -0.0362
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0246
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0068
+         Episode_Reward/pose_stand_legs: 0.0929
+         Episode_Reward/pose_stand_neck: 0.0756
+            Episode_Reward/height_stand: 0.0994
+         Episode_Reward/self_collisions: -0.0357
+        Episode_Metrics/mean_action_acc: 1.8803
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1239
+            Metrics/twist/final_yaw_err: 0.5217
+           Episode_Termination/time_out: 0.0417
+          Episode_Termination/fell_over: 54.8333
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.0833
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.80s
+                           Time elapsed: 00:00:08
+                                    ETA: 00:00:32
+
+################################################################################
+[1m                            Learning iteration 4/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 245760 
+                       Steps per second: 27302 
+                        Collection time: 1.726s 
+                          Learning time: 0.075s 
+                        Mean value loss: 0.0492
+                    Mean surrogate loss: -0.0072
+                      Mean entropy loss: 19.6307
+                            Mean reward: -0.15
+                    Mean episode length: 33.40
+                        Mean action std: 0.98
+                 Episode_Reward/upright: 0.0859
+            Episode_Reward/body_ang_vel: -0.0742
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0014
+          Episode_Reward/action_rate_l2: -0.2953
+       Episode_Reward/target_pos_coarse: 0.0403
+         Episode_Reward/target_pos_fine: 0.0134
+       Episode_Reward/target_yaw_coarse: 0.0228
+         Episode_Reward/target_yaw_fine: 0.0131
+         Episode_Reward/target_progress: -0.0352
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0247
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0071
+         Episode_Reward/pose_stand_legs: 0.0943
+         Episode_Reward/pose_stand_neck: 0.0774
+            Episode_Reward/height_stand: 0.1014
+         Episode_Reward/self_collisions: -0.0329
+        Episode_Metrics/mean_action_acc: 1.8689
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1224
+            Metrics/twist/final_yaw_err: 0.5119
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 56.0000
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.5417
+          Metrics/angular_momentum_mean: 0.0115
+--------------------------------------------------------------------------------
+                         Iteration time: 1.80s
+                           Time elapsed: 00:00:09
+                                    ETA: 00:00:29
+
+################################################################################
+[1m                            Learning iteration 5/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 294912 
+                       Steps per second: 27181 
+                        Collection time: 1.733s 
+                          Learning time: 0.076s 
+                        Mean value loss: 0.0441
+                    Mean surrogate loss: -0.0078
+                      Mean entropy loss: 19.5646
+                            Mean reward: 0.01
+                    Mean episode length: 34.06
+                        Mean action std: 0.98
+                 Episode_Reward/upright: 0.0863
+            Episode_Reward/body_ang_vel: -0.0725
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0014
+          Episode_Reward/action_rate_l2: -0.2895
+       Episode_Reward/target_pos_coarse: 0.0411
+         Episode_Reward/target_pos_fine: 0.0138
+       Episode_Reward/target_yaw_coarse: 0.0224
+         Episode_Reward/target_yaw_fine: 0.0129
+         Episode_Reward/target_progress: -0.0356
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0256
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0077
+         Episode_Reward/pose_stand_legs: 0.0938
+         Episode_Reward/pose_stand_neck: 0.0759
+            Episode_Reward/height_stand: 0.1008
+         Episode_Reward/self_collisions: -0.0270
+        Episode_Metrics/mean_action_acc: 1.8586
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1223
+            Metrics/twist/final_yaw_err: 0.5194
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 56.4167
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 7.2500
+          Metrics/angular_momentum_mean: 0.0115
+--------------------------------------------------------------------------------
+                         Iteration time: 1.81s
+                           Time elapsed: 00:00:11
+                                    ETA: 00:00:27
+
+################################################################################
+[1m                            Learning iteration 6/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 344064 
+                       Steps per second: 27589 
+                        Collection time: 1.707s 
+                          Learning time: 0.075s 
+                        Mean value loss: 0.0397
+                    Mean surrogate loss: -0.0103
+                      Mean entropy loss: 19.4549
+                            Mean reward: -0.05
+                    Mean episode length: 33.83
+                        Mean action std: 0.97
+                 Episode_Reward/upright: 0.0865
+            Episode_Reward/body_ang_vel: -0.0716
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0014
+          Episode_Reward/action_rate_l2: -0.2840
+       Episode_Reward/target_pos_coarse: 0.0418
+         Episode_Reward/target_pos_fine: 0.0151
+       Episode_Reward/target_yaw_coarse: 0.0226
+         Episode_Reward/target_yaw_fine: 0.0133
+         Episode_Reward/target_progress: -0.0350
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0249
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0070
+         Episode_Reward/pose_stand_legs: 0.0930
+         Episode_Reward/pose_stand_neck: 0.0759
+            Episode_Reward/height_stand: 0.1002
+         Episode_Reward/self_collisions: -0.0254
+        Episode_Metrics/mean_action_acc: 1.8456
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1207
+            Metrics/twist/final_yaw_err: 0.5164
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 57.5833
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.5000
+          Metrics/angular_momentum_mean: 0.0116
+--------------------------------------------------------------------------------
+                         Iteration time: 1.78s
+                           Time elapsed: 00:00:13
+                                    ETA: 00:00:24
+
+################################################################################
+[1m                            Learning iteration 7/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 393216 
+                       Steps per second: 27353 
+                        Collection time: 1.722s 
+                          Learning time: 0.075s 
+                        Mean value loss: 0.0395
+                    Mean surrogate loss: -0.0129
+                      Mean entropy loss: 19.2872
+                            Mean reward: 0.02
+                    Mean episode length: 32.87
+                        Mean action std: 0.95
+                 Episode_Reward/upright: 0.0876
+            Episode_Reward/body_ang_vel: -0.0718
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0013
+          Episode_Reward/action_rate_l2: -0.2818
+       Episode_Reward/target_pos_coarse: 0.0422
+         Episode_Reward/target_pos_fine: 0.0136
+       Episode_Reward/target_yaw_coarse: 0.0230
+         Episode_Reward/target_yaw_fine: 0.0136
+         Episode_Reward/target_progress: -0.0350
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0252
+               Episode_Reward/overshoot: -0.0033
+             Episode_Reward/ball_struck: -0.0066
+         Episode_Reward/pose_stand_legs: 0.0940
+         Episode_Reward/pose_stand_neck: 0.0768
+            Episode_Reward/height_stand: 0.1009
+         Episode_Reward/self_collisions: -0.0225
+        Episode_Metrics/mean_action_acc: 1.8311
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1197
+            Metrics/twist/final_yaw_err: 0.5090
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.9583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.8333
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.80s
+                           Time elapsed: 00:00:15
+                                    ETA: 00:00:22
+
+################################################################################
+[1m                            Learning iteration 8/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 442368 
+                       Steps per second: 27035 
+                        Collection time: 1.739s 
+                          Learning time: 0.079s 
+                        Mean value loss: 0.0360
+                    Mean surrogate loss: -0.0136
+                      Mean entropy loss: 19.0944
+                            Mean reward: 0.19
+                    Mean episode length: 33.11
+                        Mean action std: 0.94
+                 Episode_Reward/upright: 0.0916
+            Episode_Reward/body_ang_vel: -0.0723
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0013
+          Episode_Reward/action_rate_l2: -0.2855
+       Episode_Reward/target_pos_coarse: 0.0424
+         Episode_Reward/target_pos_fine: 0.0137
+       Episode_Reward/target_yaw_coarse: 0.0243
+         Episode_Reward/target_yaw_fine: 0.0137
+         Episode_Reward/target_progress: -0.0336
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0245
+               Episode_Reward/overshoot: -0.0028
+             Episode_Reward/ball_struck: -0.0067
+         Episode_Reward/pose_stand_legs: 0.0975
+         Episode_Reward/pose_stand_neck: 0.0803
+            Episode_Reward/height_stand: 0.1048
+         Episode_Reward/self_collisions: -0.0216
+        Episode_Metrics/mean_action_acc: 1.8096
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1213
+            Metrics/twist/final_yaw_err: 0.4604
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 56.4583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.2917
+          Metrics/angular_momentum_mean: 0.0115
+--------------------------------------------------------------------------------
+                         Iteration time: 1.82s
+                           Time elapsed: 00:00:17
+                                    ETA: 00:00:20
+
+################################################################################
+[1m                            Learning iteration 9/20                             [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 491520 
+                       Steps per second: 29017 
+                        Collection time: 1.613s 
+                          Learning time: 0.081s 
+                        Mean value loss: 0.0357
+                    Mean surrogate loss: -0.0120
+                      Mean entropy loss: 18.9570
+                            Mean reward: 0.27
+                    Mean episode length: 34.51
+                        Mean action std: 0.93
+                 Episode_Reward/upright: 0.0914
+            Episode_Reward/body_ang_vel: -0.0710
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0011
+          Episode_Reward/action_rate_l2: -0.2764
+       Episode_Reward/target_pos_coarse: 0.0418
+         Episode_Reward/target_pos_fine: 0.0149
+       Episode_Reward/target_yaw_coarse: 0.0247
+         Episode_Reward/target_yaw_fine: 0.0146
+         Episode_Reward/target_progress: -0.0314
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0246
+               Episode_Reward/overshoot: -0.0028
+             Episode_Reward/ball_struck: -0.0073
+         Episode_Reward/pose_stand_legs: 0.0967
+         Episode_Reward/pose_stand_neck: 0.0806
+            Episode_Reward/height_stand: 0.1041
+         Episode_Reward/self_collisions: -0.0198
+        Episode_Metrics/mean_action_acc: 1.7889
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1194
+            Metrics/twist/final_yaw_err: 0.4503
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.7500
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.5833
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.69s
+                           Time elapsed: 00:00:18
+                                    ETA: 00:00:18
+
+################################################################################
+[1m                            Learning iteration 10/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 540672 
+                       Steps per second: 29107 
+                        Collection time: 1.613s 
+                          Learning time: 0.075s 
+                        Mean value loss: 0.0351
+                    Mean surrogate loss: -0.0115
+                      Mean entropy loss: 18.8192
+                            Mean reward: 0.35
+                    Mean episode length: 35.18
+                        Mean action std: 0.92
+                 Episode_Reward/upright: 0.0931
+            Episode_Reward/body_ang_vel: -0.0709
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0011
+          Episode_Reward/action_rate_l2: -0.2726
+       Episode_Reward/target_pos_coarse: 0.0425
+         Episode_Reward/target_pos_fine: 0.0146
+       Episode_Reward/target_yaw_coarse: 0.0254
+         Episode_Reward/target_yaw_fine: 0.0149
+         Episode_Reward/target_progress: -0.0319
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0234
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0055
+         Episode_Reward/pose_stand_legs: 0.0977
+         Episode_Reward/pose_stand_neck: 0.0820
+            Episode_Reward/height_stand: 0.1049
+         Episode_Reward/self_collisions: -0.0186
+        Episode_Metrics/mean_action_acc: 1.7686
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1182
+            Metrics/twist/final_yaw_err: 0.4415
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.9583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 4.9583
+          Metrics/angular_momentum_mean: 0.0115
+--------------------------------------------------------------------------------
+                         Iteration time: 1.69s
+                           Time elapsed: 00:00:20
+                                    ETA: 00:00:16
+
+################################################################################
+[1m                            Learning iteration 11/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 589824 
+                       Steps per second: 29414 
+                        Collection time: 1.594s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0335
+                    Mean surrogate loss: -0.0120
+                      Mean entropy loss: 18.6877
+                            Mean reward: 0.40
+                    Mean episode length: 33.50
+                        Mean action std: 0.92
+                 Episode_Reward/upright: 0.0944
+            Episode_Reward/body_ang_vel: -0.0696
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0010
+          Episode_Reward/action_rate_l2: -0.2670
+       Episode_Reward/target_pos_coarse: 0.0436
+         Episode_Reward/target_pos_fine: 0.0145
+       Episode_Reward/target_yaw_coarse: 0.0256
+         Episode_Reward/target_yaw_fine: 0.0151
+         Episode_Reward/target_progress: -0.0286
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0238
+               Episode_Reward/overshoot: -0.0034
+             Episode_Reward/ball_struck: -0.0071
+         Episode_Reward/pose_stand_legs: 0.0980
+         Episode_Reward/pose_stand_neck: 0.0828
+            Episode_Reward/height_stand: 0.1047
+         Episode_Reward/self_collisions: -0.0167
+        Episode_Metrics/mean_action_acc: 1.7487
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1127
+            Metrics/twist/final_yaw_err: 0.4037
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 55.0000
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 6.5417
+          Metrics/angular_momentum_mean: 0.0112
+--------------------------------------------------------------------------------
+                         Iteration time: 1.67s
+                           Time elapsed: 00:00:22
+                                    ETA: 00:00:14
+
+################################################################################
+[1m                            Learning iteration 12/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 638976 
+                       Steps per second: 29407 
+                        Collection time: 1.593s 
+                          Learning time: 0.079s 
+                        Mean value loss: 0.0327
+                    Mean surrogate loss: -0.0086
+                      Mean entropy loss: 18.5905
+                            Mean reward: 0.46
+                    Mean episode length: 34.28
+                        Mean action std: 0.91
+                 Episode_Reward/upright: 0.0950
+            Episode_Reward/body_ang_vel: -0.0697
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0009
+          Episode_Reward/action_rate_l2: -0.2632
+       Episode_Reward/target_pos_coarse: 0.0420
+         Episode_Reward/target_pos_fine: 0.0139
+       Episode_Reward/target_yaw_coarse: 0.0261
+         Episode_Reward/target_yaw_fine: 0.0150
+         Episode_Reward/target_progress: -0.0255
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0223
+               Episode_Reward/overshoot: -0.0030
+             Episode_Reward/ball_struck: -0.0064
+         Episode_Reward/pose_stand_legs: 0.0984
+         Episode_Reward/pose_stand_neck: 0.0834
+            Episode_Reward/height_stand: 0.1051
+         Episode_Reward/self_collisions: -0.0146
+        Episode_Metrics/mean_action_acc: 1.7353
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1145
+            Metrics/twist/final_yaw_err: 0.3976
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 55.8333
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.5833
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.67s
+                           Time elapsed: 00:00:23
+                                    ETA: 00:00:12
+
+################################################################################
+[1m                            Learning iteration 13/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 688128 
+                       Steps per second: 29819 
+                        Collection time: 1.571s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0336
+                    Mean surrogate loss: -0.0084
+                      Mean entropy loss: 18.5051
+                            Mean reward: 0.54
+                    Mean episode length: 33.78
+                        Mean action std: 0.90
+                 Episode_Reward/upright: 0.0971
+            Episode_Reward/body_ang_vel: -0.0696
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0009
+          Episode_Reward/action_rate_l2: -0.2606
+       Episode_Reward/target_pos_coarse: 0.0430
+         Episode_Reward/target_pos_fine: 0.0148
+       Episode_Reward/target_yaw_coarse: 0.0271
+         Episode_Reward/target_yaw_fine: 0.0158
+         Episode_Reward/target_progress: -0.0265
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0223
+               Episode_Reward/overshoot: -0.0027
+             Episode_Reward/ball_struck: -0.0055
+         Episode_Reward/pose_stand_legs: 0.0992
+         Episode_Reward/pose_stand_neck: 0.0847
+            Episode_Reward/height_stand: 0.1061
+         Episode_Reward/self_collisions: -0.0138
+        Episode_Metrics/mean_action_acc: 1.7220
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1117
+            Metrics/twist/final_yaw_err: 0.3708
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 57.4583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.0417
+          Metrics/angular_momentum_mean: 0.0114
+--------------------------------------------------------------------------------
+                         Iteration time: 1.65s
+                           Time elapsed: 00:00:25
+                                    ETA: 00:00:10
+
+################################################################################
+[1m                            Learning iteration 14/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 737280 
+                       Steps per second: 29583 
+                        Collection time: 1.582s 
+                          Learning time: 0.079s 
+                        Mean value loss: 0.0346
+                    Mean surrogate loss: -0.0105
+                      Mean entropy loss: 18.3859
+                            Mean reward: 0.56
+                    Mean episode length: 34.80
+                        Mean action std: 0.90
+                 Episode_Reward/upright: 0.0966
+            Episode_Reward/body_ang_vel: -0.0690
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0008
+          Episode_Reward/action_rate_l2: -0.2570
+       Episode_Reward/target_pos_coarse: 0.0454
+         Episode_Reward/target_pos_fine: 0.0144
+       Episode_Reward/target_yaw_coarse: 0.0272
+         Episode_Reward/target_yaw_fine: 0.0161
+         Episode_Reward/target_progress: -0.0230
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0244
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0067
+         Episode_Reward/pose_stand_legs: 0.0990
+         Episode_Reward/pose_stand_neck: 0.0851
+            Episode_Reward/height_stand: 0.1061
+         Episode_Reward/self_collisions: -0.0137
+        Episode_Metrics/mean_action_acc: 1.7111
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1053
+            Metrics/twist/final_yaw_err: 0.3628
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 53.4167
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.7917
+          Metrics/angular_momentum_mean: 0.0112
+--------------------------------------------------------------------------------
+                         Iteration time: 1.66s
+                           Time elapsed: 00:00:27
+                                    ETA: 00:00:09
+
+################################################################################
+[1m                            Learning iteration 15/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 786432 
+                       Steps per second: 29935 
+                        Collection time: 1.565s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0407
+                    Mean surrogate loss: -0.0112
+                      Mean entropy loss: 18.2498
+                            Mean reward: 0.70
+                    Mean episode length: 34.90
+                        Mean action std: 0.89
+                 Episode_Reward/upright: 0.0996
+            Episode_Reward/body_ang_vel: -0.0690
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0008
+          Episode_Reward/action_rate_l2: -0.2583
+       Episode_Reward/target_pos_coarse: 0.0456
+         Episode_Reward/target_pos_fine: 0.0146
+       Episode_Reward/target_yaw_coarse: 0.0282
+         Episode_Reward/target_yaw_fine: 0.0165
+         Episode_Reward/target_progress: -0.0212
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0233
+               Episode_Reward/overshoot: -0.0032
+             Episode_Reward/ball_struck: -0.0054
+         Episode_Reward/pose_stand_legs: 0.1010
+         Episode_Reward/pose_stand_neck: 0.0869
+            Episode_Reward/height_stand: 0.1084
+         Episode_Reward/self_collisions: -0.0130
+        Episode_Metrics/mean_action_acc: 1.6973
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1050
+            Metrics/twist/final_yaw_err: 0.3464
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.9583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 4.7083
+          Metrics/angular_momentum_mean: 0.0111
+--------------------------------------------------------------------------------
+                         Iteration time: 1.64s
+                           Time elapsed: 00:00:28
+                                    ETA: 00:00:07
+
+################################################################################
+[1m                            Learning iteration 16/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 835584 
+                       Steps per second: 30462 
+                        Collection time: 1.537s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0366
+                    Mean surrogate loss: -0.0118
+                      Mean entropy loss: 18.0990
+                            Mean reward: 0.72
+                    Mean episode length: 34.20
+                        Mean action std: 0.88
+                 Episode_Reward/upright: 0.0984
+            Episode_Reward/body_ang_vel: -0.0683
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0008
+          Episode_Reward/action_rate_l2: -0.2509
+       Episode_Reward/target_pos_coarse: 0.0464
+         Episode_Reward/target_pos_fine: 0.0153
+       Episode_Reward/target_yaw_coarse: 0.0292
+         Episode_Reward/target_yaw_fine: 0.0174
+         Episode_Reward/target_progress: -0.0209
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0233
+               Episode_Reward/overshoot: -0.0029
+             Episode_Reward/ball_struck: -0.0054
+         Episode_Reward/pose_stand_legs: 0.1004
+         Episode_Reward/pose_stand_neck: 0.0867
+            Episode_Reward/height_stand: 0.1073
+         Episode_Reward/self_collisions: -0.0118
+        Episode_Metrics/mean_action_acc: 1.6833
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1020
+            Metrics/twist/final_yaw_err: 0.3226
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 55.2083
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 4.7083
+          Metrics/angular_momentum_mean: 0.0112
+--------------------------------------------------------------------------------
+                         Iteration time: 1.61s
+                           Time elapsed: 00:00:30
+                                    ETA: 00:00:05
+
+################################################################################
+[1m                            Learning iteration 17/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 884736 
+                       Steps per second: 30496 
+                        Collection time: 1.537s 
+                          Learning time: 0.075s 
+                        Mean value loss: 0.0356
+                    Mean surrogate loss: -0.0129
+                      Mean entropy loss: 17.8709
+                            Mean reward: 0.72
+                    Mean episode length: 34.61
+                        Mean action std: 0.86
+                 Episode_Reward/upright: 0.1007
+            Episode_Reward/body_ang_vel: -0.0680
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0007
+          Episode_Reward/action_rate_l2: -0.2517
+       Episode_Reward/target_pos_coarse: 0.0453
+         Episode_Reward/target_pos_fine: 0.0140
+       Episode_Reward/target_yaw_coarse: 0.0293
+         Episode_Reward/target_yaw_fine: 0.0174
+         Episode_Reward/target_progress: -0.0170
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0227
+               Episode_Reward/overshoot: -0.0030
+             Episode_Reward/ball_struck: -0.0064
+         Episode_Reward/pose_stand_legs: 0.1020
+         Episode_Reward/pose_stand_neck: 0.0883
+            Episode_Reward/height_stand: 0.1091
+         Episode_Reward/self_collisions: -0.0110
+        Episode_Metrics/mean_action_acc: 1.6740
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.0997
+            Metrics/twist/final_yaw_err: 0.3258
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.5000
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.6667
+          Metrics/angular_momentum_mean: 0.0111
+--------------------------------------------------------------------------------
+                         Iteration time: 1.61s
+                           Time elapsed: 00:00:31
+                                    ETA: 00:00:03
+
+################################################################################
+[1m                            Learning iteration 18/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 933888 
+                       Steps per second: 30705 
+                        Collection time: 1.524s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0328
+                    Mean surrogate loss: -0.0126
+                      Mean entropy loss: 17.6675
+                            Mean reward: 0.89
+                    Mean episode length: 34.52
+                        Mean action std: 0.85
+                 Episode_Reward/upright: 0.1025
+            Episode_Reward/body_ang_vel: -0.0670
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0007
+          Episode_Reward/action_rate_l2: -0.2458
+       Episode_Reward/target_pos_coarse: 0.0507
+         Episode_Reward/target_pos_fine: 0.0169
+       Episode_Reward/target_yaw_coarse: 0.0297
+         Episode_Reward/target_yaw_fine: 0.0176
+         Episode_Reward/target_progress: -0.0207
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0258
+               Episode_Reward/overshoot: -0.0030
+             Episode_Reward/ball_struck: -0.0062
+         Episode_Reward/pose_stand_legs: 0.1031
+         Episode_Reward/pose_stand_neck: 0.0898
+            Episode_Reward/height_stand: 0.1103
+         Episode_Reward/self_collisions: -0.0102
+        Episode_Metrics/mean_action_acc: 1.6457
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.0987
+            Metrics/twist/final_yaw_err: 0.3147
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 54.0000
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 5.5000
+          Metrics/angular_momentum_mean: 0.0111
+--------------------------------------------------------------------------------
+                         Iteration time: 1.60s
+                           Time elapsed: 00:00:33
+                                    ETA: 00:00:01
+
+################################################################################
+[1m                            Learning iteration 19/20                            [0m 
+
+                               Run name: memprobe2048
+                            Total steps: 983040 
+                       Steps per second: 30708 
+                        Collection time: 1.523s 
+                          Learning time: 0.077s 
+                        Mean value loss: 0.0334
+                    Mean surrogate loss: -0.0132
+                      Mean entropy loss: 17.4684
+                            Mean reward: 1.01
+                    Mean episode length: 34.57
+                        Mean action std: 0.84
+                 Episode_Reward/upright: 0.1031
+            Episode_Reward/body_ang_vel: -0.0671
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0006
+          Episode_Reward/action_rate_l2: -0.2400
+       Episode_Reward/target_pos_coarse: 0.0483
+         Episode_Reward/target_pos_fine: 0.0161
+       Episode_Reward/target_yaw_coarse: 0.0303
+         Episode_Reward/target_yaw_fine: 0.0178
+         Episode_Reward/target_progress: -0.0183
+          Episode_Reward/target_settled: 0.0001
+            Episode_Reward/foot_stagger: -0.0238
+               Episode_Reward/overshoot: -0.0039
+             Episode_Reward/ball_struck: -0.0053
+         Episode_Reward/pose_stand_legs: 0.1033
+         Episode_Reward/pose_stand_neck: 0.0906
+            Episode_Reward/height_stand: 0.1102
+         Episode_Reward/self_collisions: -0.0098
+        Episode_Metrics/mean_action_acc: 1.6238
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+            Metrics/twist/final_pos_err: 0.1010
+            Metrics/twist/final_yaw_err: 0.3055
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 53.1250
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+        Episode_Termination/ball_struck: 4.5000
+          Metrics/angular_momentum_mean: 0.0110
+--------------------------------------------------------------------------------
+                         Iteration time: 1.60s
+                           Time elapsed: 00:00:35
+                                    ETA: 00:00:00
+

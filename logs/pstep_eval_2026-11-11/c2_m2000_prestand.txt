@@ -1,0 +1,13 @@
+== 2026-11-11_16-15-45_chunk2_pose_model_2000.onnx, swapped in after 1.5s of VelStand standing: 50 episodes (46 with a ball)
+  KICK-READY (<= 12 mm, 3 deg, stagger < 10 mm, still, legs within 0.10 rad of HOME, no strike, no fall): 44/50
+  final position error: median 5.2 mm, p90 8.0, worst 10.7
+  final heading error: median 0.68 deg, p90 1.28, worst 2.26
+  front-back foot stagger: median 3.1 mm, p90 7.3, worst 12.8; < 10 mm in 48/50
+  still at the end: 50/50
+  end posture, worst leg joint vs HOME: median 4.2 deg, worst 7.3; within 5.7 deg in 44/50
+  ball struck: 0/46 ball episodes
+  falls: 0/50
+    hold (0)           3 eps: kick-ready 3, median err 1.7 mm, struck 0, falls 0
+    near (<80 mm)     33 eps: kick-ready 30, median err 5.6 mm, struck 0, falls 0
+    far (80-250 mm)   14 eps: kick-ready 11, median err 4.8 mm, struck 0, falls 0
+  (9 s wall)

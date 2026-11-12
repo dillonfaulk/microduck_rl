@@ -89,6 +89,13 @@ PRECISE_TIMEOUT_S = 6.0               # = the training episode length
 PRECISE_MAX_ENTRIES = 2               # (re-)entries after a ball bump, then pulses
 PRECISE_MAX_R = 0.25                  # offset clipped to the training range
 PRECISE_MAX_YAW = math.radians(15)
+# Calibration (2026-11-11, model_3999, seeds 0+1, 60 missions): the step policy parks the
+# trunk on target but the feet end ~5 mm behind HOME, so measured from the kicking foot the
+# ball sat +10.2 mm (median; 0.3-14.2) farther than the kick trained on and rolled a median
+# 1.01 m (the pulse aligner, which parks at +0.7 mm, rolls 1.22 m). The stance target handed
+# to the step policy moves this far forward along the kick line. Precision path only: the
+# pulse fallback keeps its own (foot-relative) target.
+PRECISE_STANCE_SHIFT_M = float(os.environ.get("KICK_STANCE_SHIFT", "0.010"))
 
 
 def clamp_align(vx, vy, wz):
@@ -240,10 +247,14 @@ class Mission:
         self._goto("ALIGN")
         return (0.0, 0.0, 0.0)
 
+    def precise_stance(self, ball_xy):
+        """Stance target for the step policy: the trained stance, PRECISE_STANCE_SHIFT_M further along the kick line."""
+        return self.stance_point(ball_xy) + PRECISE_STANCE_SHIFT_M * np.array([math.cos(self.kh), math.sin(self.kh)])
+
     def precise_offset(self, pose, ball_xy):
         """Option-A command: remaining offset to the stance pose in the trunk yaw frame, clipped to training range."""
         x, y, yaw = pose
-        st = self.stance_point(ball_xy)
+        st = self.precise_stance(ball_xy)
         c, s = math.cos(yaw), math.sin(yaw)
         dx, dy = c * (st[0] - x) + s * (st[1] - y), -s * (st[0] - x) + c * (st[1] - y)
         r = math.hypot(dx, dy)
@@ -500,7 +511,7 @@ def draw_mission(scn, m, sim):
     side = np.array([-k[1], k[0]])
     for s in (1, -1):
         line((*tip, 0.004), (*(tip - 0.06 * k + s * 0.035 * side), 0.004), [1.0, 0.85, 0.1, 0.9], 0.005)
-    st = m.stance_point(b)
+    st = m.precise_stance(b) if m.precision_session is not None else m.stance_point(b)
     add(mujoco.mjtGeom.mjGEOM_CYLINDER, [0.03, 0.002, 0], [*st, 0.002], [0.1, 0.9, 0.2, 0.6])
     if m.state == "NAVIGATE":
         (px, py, _), _, _ = sim.pose()
@@ -624,6 +635,7 @@ def run_headless(args):
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
     os.makedirs(out, exist_ok=True)
     print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
+    print(f"precision stance shift {PRECISE_STANCE_SHIFT_M*1000:+.1f} mm along the kick line")
     rows = []
     for k in range(args.runs):
         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))

@@ -20,6 +20,16 @@ Phases (one control loop at 50 Hz, VelStand driving except during KICK):
             command as in kick training), held KICK_HOLD_S, then swap back.
   SETTLE    VelStand, zero twist. A fall here gets the go-to-point fall rule:
             zero twist until upright 1 s.
+With --precision <onnx> the final approach is the PrecisionStep policy instead:
+  PRECISE_PIVOT  VelStand pivots onto the kick line (|heading err| < 8 deg; the
+                 step policy trained on +-15 deg).
+  PRECISE        hard swap to the step policy; the 3 twist slots carry the
+                 remaining offset to the stance pose [dx, dy, dyaw] in the trunk
+                 yaw frame (option A). On target (+-12 mm, 3 deg) and still for
+                 0.5 s -> KICK directly.
+  The pulse ALIGN stays as the FALLBACK: a 6 s timeout or a fall in PRECISE swaps
+  VelStand back in and hands over to it; a bumped ball re-enters PRECISE at most
+  twice. Every mission records its approach_mode.
 ALIGN uses its own clamps (|vx| <= 0.2, |vy| <= 0.15, pulses <= 20 ticks, only
 within ALIGN_ZONE_M of the stance): go-to-point's forward-only / no-strafe
 clamps can't place the duck to +-15 mm.
@@ -68,6 +78,17 @@ SQUARE_MAX = 3
 SQUARE_MOVE = [((0.0, 0.15, 0.0), 5), ((0.0, -0.15, 0.0), 10)]
 KICK_HOLD_S = 2.0
 SETTLE_S = 2.0
+# Precision-step final approach (--precision <onnx>; Mjlab-PrecisionStep-Flat-MicroDuck).
+# The pulse aligner above stays as the FALLBACK: a precision timeout, a fall, or
+# too many re-entries hands the last stretch back to it.
+PRECISE_PIVOT_TOL = math.radians(8)   # VelStand pivots first: the step policy trained on +-15 deg
+PRECISE_PIVOT_MAX_S = 5.0
+PRECISE_STILL_V = 0.02                # m/s trunk speed counted as "stopped"
+PRECISE_HOLD_TICKS = 25               # 0.5 s on target and still -> kick
+PRECISE_TIMEOUT_S = 6.0               # = the training episode length
+PRECISE_MAX_ENTRIES = 2               # (re-)entries after a ball bump, then pulses
+PRECISE_MAX_R = 0.25                  # offset clipped to the training range
+PRECISE_MAX_YAW = math.radians(15)
 
 
 def clamp_align(vx, vy, wz):
@@ -147,8 +168,11 @@ class Aligner:
 
 
 class Mission:
-    def __init__(self, sim, kick_session, kick_heading, log, foot="right"):
+    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None):
         self.sim, self.kick_session, self.kh = sim, kick_session, kick_heading
+        self.precision_session = precision_session
+        self.precise_entries = 0
+        self.on_ticks = 0
         self.walk_session = sim.policy.ort_session
         self.log = log
         self.aligner = Aligner(foot)
@@ -161,7 +185,7 @@ class Mission:
         self.pulse_left = 0
         self.settle_left = 0
         self.pulse_twist = (0.0, 0.0, 0.0)
-        self.result = {}
+        self.result = {"approach_mode": "precision" if precision_session is not None else "pulse"}
         b, _ = sim.ball()
         self.ball0 = b.copy()
         stance = self.stance_point(b)
@@ -193,12 +217,70 @@ class Mission:
     def _goto(self, state):
         self.state, self.t_state = state, self.sim.t
 
+    def _enter_fine(self, t):
+        """Hand the last stretch to the precision policy if there is one (and entries left), else pulses."""
+        if self.precision_session is not None and self.precise_entries < PRECISE_MAX_ENTRIES:
+            self.settle_left = 20
+            self._goto("PRECISE_PIVOT")
+        else:
+            self.log.event({"t": round(t, 3), "event": "ALIGN_START"})
+            self.settle_left = ALIGN_SETTLE_TICKS
+            self._goto("ALIGN")
+
+    def _precise_fail(self, t, why):
+        """Precision step gave up: VelStand back in, the pulse aligner (fallback) takes over."""
+        self.sim.policy.ort_session = self.walk_session
+        self.result["approach_mode"] = "precision->pulse fallback"
+        self.result["precise_fail"] = why
+        if why == "fall":
+            self.result["falls"] = self.result.get("falls", 0) + 1
+            self.down = True
+        self.log.event({"t": round(t, 3), "event": "PRECISE_FALLBACK", "why": why})
+        self.settle_left = ALIGN_SETTLE_TICKS
+        self._goto("ALIGN")
+        return (0.0, 0.0, 0.0)
+
+    def precise_offset(self, pose, ball_xy):
+        """Option-A command: remaining offset to the stance pose in the trunk yaw frame, clipped to training range."""
+        x, y, yaw = pose
+        st = self.stance_point(ball_xy)
+        c, s = math.cos(yaw), math.sin(yaw)
+        dx, dy = c * (st[0] - x) + s * (st[1] - y), -s * (st[0] - x) + c * (st[1] - y)
+        r = math.hypot(dx, dy)
+        if r > PRECISE_MAX_R:
+            dx, dy = dx * PRECISE_MAX_R / r, dy * PRECISE_MAX_R / r
+        return (dx, dy, float(np.clip(wrap_angle(self.kh - yaw), -PRECISE_MAX_YAW, PRECISE_MAX_YAW)))
+
+    def _swap_kick(self, t, pose, b, tilt, ex, ey, eh, aligned):
+        sim = self.sim
+        foot, lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
+        vb = sim.data.qvel[sim.va:sim.va + 3]
+        self.result.update(foot_vs_home_mm=[round(v, 1) for v in (foot - sim.home_foot) * 1000],
+                           lfoot_vs_home_mm=[round(v, 1) for v in (lfoot - sim.home_lfoot) * 1000],
+                           trunk_speed_mm_s=round(float(np.linalg.norm(vb[:2])) * 1000, 1),
+                           tilt_deg=round(tilt, 1))
+        q = np.array([sim.data.qpos[j] for j in sim.policy.joint_qpos_indices]) - sim.policy.default_pose
+        # the kick only ever started from HOME +-0.05 rad; precision run 1 arrived crouched and never kicked
+        self.result["leg_dev_deg"] = round(math.degrees(float(np.abs(q[[0, 1, 2, 3, 4, 9, 10, 11, 12, 13]]).max())), 1)
+        self.result.update(align_ex_mm=round(ex * 1000, 1), align_ey_mm=round(ey * 1000, 1),
+                           align_eh_deg=round(math.degrees(eh), 2), pulses=self.pulses,
+                           aligned=aligned, t_swap=round(t, 2))
+        self.log.event({"t": round(t, 3), "event": "KICK_SWAP_IN", "aligned": aligned, "pulses": self.pulses,
+                        "mode": self.result["approach_mode"],
+                        "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
+        sim.policy.ort_session = self.kick_session
+        self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
+        self.kick_ball0 = b.copy()
+        self.peak = 0.0
+        self._goto("KICK")
+        return (0.0, 0.0, 0.0)
+
     def tick(self):
         """Returns the twist for this control tick (and swaps sessions as the state changes)."""
         sim, t = self.sim, self.sim.t
         pose, tilt, z = sim.pose()
         b, bv = sim.ball()
-        if self.state in ("NAVIGATE", "ALIGN"):
+        if self.state in ("NAVIGATE", "ALIGN", "PRECISE_PIVOT", "PRECISE"):
             # A bumped ball: stand still until it stops rolling, then re-plan from where
             # it rests (ALIGN re-navigates if the new stance is out of reach). Chasing a
             # rolling ball with pulses never converges.
@@ -207,6 +289,7 @@ class Mission:
                     self.ball_rolling, self.t_bump = True, t
                     self.pulse_left, self.approaching = 0, False
                     self.result["ball_disturbed"] = self.result.get("ball_disturbed", 0) + 1
+                    sim.policy.ort_session = self.walk_session   # (a no-op unless the step policy had it)
                     self.log.event({"t": round(t, 3), "event": "BALL_DISTURBED", "phase": self.state})
                 if np.linalg.norm(bv) > 0.02:
                     if t - self.t_bump < BALL_WAIT_S:
@@ -221,19 +304,49 @@ class Mission:
                 self.log.event({"t": round(t, 3), "event": "BALL_SETTLED",
                                 "moved_m": round(float(np.linalg.norm(b - self.ball0)), 3)})
                 self.ball0 = b.copy()
-                self.settle_left = ALIGN_SETTLE_TICKS
-                self._goto("ALIGN")
+                self._enter_fine(t)
                 return (0.0, 0.0, 0.0)
 
         if self.state == "NAVIGATE":
             self.nav.update(t, pose, tilt, z)
             twist = self.nav.command(t)
             if self.nav.state == "DONE":
-                self.log.event({"t": round(t, 3), "event": "ALIGN_START"})
-                self.settle_left = ALIGN_SETTLE_TICKS
-                self._goto("ALIGN")
+                self._enter_fine(t)
                 return (0.0, 0.0, 0.0)
             return twist
+
+        if self.state == "PRECISE_PIVOT":   # VelStand turns onto the kick line first
+            if tilt > 35 or z < 0.06:
+                return self._precise_fail(t, "fall")
+            eh = wrap_angle(pose[2] - self.kh)
+            if abs(eh) < PRECISE_PIVOT_TOL or t - self.t_state > PRECISE_PIVOT_MAX_S:
+                if self.settle_left > 0:
+                    self.settle_left -= 1
+                    return (0.0, 0.0, 0.0)
+                self.precise_entries += 1
+                self.on_ticks = 0
+                sim.policy.ort_session = self.precision_session
+                self.log.event({"t": round(t, 3), "event": "PRECISE_START", "n": self.precise_entries,
+                                "offset": [round(v, 4) for v in self.precise_offset(pose, b)]})
+                self._goto("PRECISE")
+                return self.precise_offset(pose, b)
+            self.settle_left = 20
+            return (0.0, 0.0, -math.copysign(0.8, eh))
+
+        if self.state == "PRECISE":
+            if tilt > 35 or z < 0.06:
+                return self._precise_fail(t, "fall")
+            off = self.precise_offset(pose, b)
+            vb = sim.data.qvel[sim.va:sim.va + 2]
+            on = math.hypot(off[0], off[1]) < ALIGN_TOL and abs(off[2]) < ALIGN_HEADING_TOL
+            self.on_ticks = self.on_ticks + 1 if on and np.linalg.norm(vb) < PRECISE_STILL_V else 0
+            if self.on_ticks >= PRECISE_HOLD_TICKS:
+                ex, ey, eh, _ = self.aligner.errors(pose, b, self.kh, sim.site_local("right_foot"), sim.home_foot)
+                self.log.event({"t": round(t, 3), "event": "PRECISE_ARRIVED", "after_s": round(t - self.t_state, 2)})
+                return self._swap_kick(t, pose, b, tilt, ex, ey, eh, aligned=True)
+            if t - self.t_state > PRECISE_TIMEOUT_S:
+                return self._precise_fail(t, "timeout")
+            return off
 
         if self.state == "ALIGN":
             if tilt > 35 or z < 0.06:  # zero twist while down; VelStand gets up on its own
@@ -318,23 +431,7 @@ class Mission:
                 self.pulse_left -= 1
                 return clamp_align(*self.pulse_twist)
             if p is None or self.pulses >= ALIGN_MAX_PULSES:
-                foot, lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
-                vb = sim.data.qvel[sim.va:sim.va + 3]
-                self.result.update(foot_vs_home_mm=[round(v, 1) for v in (foot - sim.home_foot) * 1000],
-                                   lfoot_vs_home_mm=[round(v, 1) for v in (lfoot - sim.home_lfoot) * 1000],
-                                   trunk_speed_mm_s=round(float(np.linalg.norm(vb[:2])) * 1000, 1),
-                                   tilt_deg=round(tilt, 1))
-                self.result.update(align_ex_mm=round(ex * 1000, 1), align_ey_mm=round(ey * 1000, 1),
-                                   align_eh_deg=round(math.degrees(eh), 2), pulses=self.pulses,
-                                   aligned=p is None, t_swap=round(t, 2))
-                self.log.event({"t": round(t, 3), "event": "KICK_SWAP_IN", "aligned": p is None, "pulses": self.pulses,
-                                "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
-                sim.policy.ort_session = self.kick_session
-                self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
-                self.kick_ball0 = b.copy()
-                self.peak = 0.0
-                self._goto("KICK")
-                return (0.0, 0.0, 0.0)
+                return self._swap_kick(t, pose, b, tilt, ex, ey, eh, aligned=p is None)
             self.pulse_twist, self.pulse_left, axis = p
             self.pulses += 1
             self.log.event({"t": round(t, 3), "event": "ALIGN_PULSE", "n": self.pulses, "axis": axis, "ticks": self.pulse_left,
@@ -414,7 +511,7 @@ def draw_mission(scn, m, sim):
             prev = (x, y)
 
 
-def new_mission(sim, kick, rng, log, ball=None, kick_heading=None):
+def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None):
     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands."""
     (x, y, _), _, _ = sim.pose()
     if ball is None:
@@ -427,13 +524,14 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None):
     sim.data.qpos[sim.bqa:sim.bqa + 7] = [ball[0], ball[1], 0.035, 1, 0, 0, 0]
     sim.data.qvel[sim.bva:sim.bva + 6] = 0
     mujoco.mj_forward(sim.model, sim.data)
-    return Mission(sim, kick, kh, log)
+    return Mission(sim, kick, kh, log, precision_session=precision)
 
 
 def run_viewer(args):
     import mujoco.viewer
     sim = KickSim(args.velstand, SCENES[args.scene])
     kick = ort.InferenceSession(args.kick)
+    precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     sim.home_foot, sim.home_lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
     rng = np.random.default_rng(args.seed)
@@ -442,7 +540,7 @@ def run_viewer(args):
     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
     log = RunLog(echo=not args.auto)
-    m = new_mission(sim, kick, rng, log, ball, kh)
+    m = new_mission(sim, kick, rng, log, ball, kh, precision)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
 
     def report(m):
@@ -459,7 +557,8 @@ def run_viewer(args):
             tally["missed"] += 1
             outcome = "MISSED"
         tally["falls"] += r.get("falls", 0)
-        print(f"  mission {n + 1:2d}: {outcome:58s} aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
+        mode = {"precision": "step", "precision->pulse fallback": "step->pulse", "pulse": "pulse"}[r["approach_mode"]]
+        print(f"  mission {n + 1:2d}: {outcome:58s} [{mode}] aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
               f"{r.get('align_ey_mm', float('nan')):+.0f}) mm in {r.get('pulses', '-')} pulses   "
               f"[tally: {tally['kicked']} kicked, {tally['missed']} missed, {tally['aborted']} aborted, "
               f"{tally['falls']} falls]", flush=True)
@@ -486,7 +585,7 @@ def run_viewer(args):
                     log.save(f"{out}/mission{n}")
                     n += 1
                     log = RunLog()
-                    m = new_mission(sim, kick, rng, log)
+                    m = new_mission(sim, kick, rng, log, precision=precision)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -501,7 +600,7 @@ def run_viewer(args):
                               f"{tally['aborted']} aborted, {tally['falls']} falls")
                         break
                     log = RunLog(echo=False)
-                    m = new_mission(sim, kick, rng, log)
+                    m = new_mission(sim, kick, rng, log, precision=precision)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)
@@ -516,6 +615,7 @@ def run_viewer(args):
 def run_headless(args):
     sim = KickSim(args.velstand, SCENES[args.scene])
     kick = ort.InferenceSession(args.kick)
+    precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     sim.home_foot = sim.site_local("right_foot")  # kicking foot at HOME, the kick policy's start stance
     sim.home_lfoot = sim.site_local("left_foot")
@@ -523,7 +623,7 @@ def run_headless(args):
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
     os.makedirs(out, exist_ok=True)
-    print(f"velstand={args.velstand}\nkick={args.kick}\nscene={args.scene}  logs -> {out}/")
+    print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
     rows = []
     for k in range(args.runs):
         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))
@@ -534,7 +634,7 @@ def run_headless(args):
         sim.data.qvel[sim.bva:sim.bva + 6] = 0
         mujoco.mj_forward(sim.model, sim.data)
         log = RunLog(echo=args.verbose)
-        m = Mission(sim, kick, kh, log)
+        m = Mission(sim, kick, kh, log, precision_session=precision)
         while m.state != "DONE" and sim.t < args.timeout:
             twist = m.tick()
             sim.set_twist(twist)
@@ -562,6 +662,10 @@ def run_headless(args):
           f"falls: {sum(r.get('falls', 0) for r in rows)}; ball disturbed before kick: "
           f"{sum(r.get('ball_disturbed', 0) > 0 for r in rows)} runs; median mission time "
           f"{np.median([r['t_done'] for r in rows if 't_done' in r]) if any('t_done' in r for r in rows) else float('nan'):.1f} s")
+    modes = {}
+    for r in rows:
+        modes[r["approach_mode"]] = modes.get(r["approach_mode"], 0) + 1
+    print(f"  approach mode: {modes}")
 
 
 def main():
@@ -577,6 +681,8 @@ def main():
     ap.add_argument("--ball", default=None, help='viewer: "x,y" ball position (default: random 1.0-1.8 m away)')
     ap.add_argument("--kick-heading", type=float, default=None, help="viewer: kick direction, deg (default: random)")
     ap.add_argument("--auto", type=int, default=0, help="viewer: run this many missions back to back, with a tally")
+    ap.add_argument("--precision", default=None,
+                    help="PrecisionStep ONNX for the final approach (pulse aligner stays as the fallback)")
     args = ap.parse_args()
     run_viewer(args) if args.viewer else run_headless(args)
 

@@ -43,6 +43,10 @@ from .microduck_ball_kick_env_cfg import (
     make_microduck_ball_kick_env_cfg,
     MicroduckBallKickRlCfg,
 )
+from .microduck_precision_step_env_cfg import (
+    make_microduck_precision_step_env_cfg,
+    MicroduckPrecisionStepRlCfg,
+)
 from .microduck_sitstand_env_cfg import (
     make_microduck_sitstand_env_cfg,
     MicroduckSitStandRlCfg,
@@ -161,6 +165,17 @@ register_mjlab_task(
     env_cfg=make_microduck_ball_kick_env_cfg(),
     play_env_cfg=make_microduck_ball_kick_env_cfg(play=True),
     rl_cfg=MicroduckBallKickRlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+# PrecisionStep task (fork-local) — step to a small target pose next to the
+# ball and stop dead with the feet square; the BallKick mission's final approach.
+# Twist slots carry the remaining target offset [dx, dy, dyaw], not a velocity.
+register_mjlab_task(
+    task_id="Mjlab-PrecisionStep-Flat-MicroDuck",
+    env_cfg=make_microduck_precision_step_env_cfg(),
+    play_env_cfg=make_microduck_precision_step_env_cfg(play=True),
+    rl_cfg=MicroduckPrecisionStepRlCfg,
     runner_cls=MicroduckOnPolicyRunner,
 )
 

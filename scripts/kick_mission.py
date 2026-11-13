@@ -95,7 +95,11 @@ PRECISE_MAX_YAW = math.radians(15)
 # 1.01 m (the pulse aligner, which parks at +0.7 mm, rolls 1.22 m). The stance target handed
 # to the step policy moves this far forward along the kick line. Precision path only: the
 # pulse fallback keeps its own (foot-relative) target.
-# Per kicking foot: each foot's kick checkpoint is its own measurement (left = 0 until measured).
+# Per kicking foot: each foot's kick checkpoint is its own measurement.
+# LEFT (2026-11-12, BallKick left ts0.25 model_1250, seeds 0+1, 60 missions): 0 by decision.
+# Unshifted, the ball sits +9.4 mm far of the kick spot but already rolls 1.19 m (60/60,
+# 0 bumps). +9 mm was tested and REJECTED: 2/60 bumps, the step policy's stepping foot clipped
+# the ball during PRECISE (PrecisionStep trained with the ball on the right side only).
 PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.010")),
                           "left": float(os.environ.get("KICK_STANCE_SHIFT_LEFT", "0.0"))}
 # Aim offset for BallKick v1's (right foot, ts0.25 model_1000) left drift. The duck lines up
@@ -103,9 +107,11 @@ PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.
 # Sign: +yaw is LEFT (CCW, z up), kick_dir_err_deg > 0 means the ball went left, so the offset
 # is NEGATIVE (aim right). Calibrated 2026-11-11 against the +10 mm stance above: drift
 # +17.9 deg median (std 1.7, IQR 16.5..19.1, flat across ball distance), 60 missions, seeds 0+1.
-# Right foot only; a left-foot kick needs its own measurement.
+# LEFT (BallKick left ts0.25 model_1250, 2026-11-12): drifts RIGHT, -11.2 deg median (std 1.3,
+# IQR -12.3..-10.3, flat across ball distance) at the unshifted stance, so the offset is
+# POSITIVE (aim left). 60 missions, seeds 0+1.
 KICK_AIM_OFFSET = {"right": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG", "-17.9"))),
-                   "left": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG_LEFT", "0.0")))}
+                   "left": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG_LEFT", "11.2")))}
 
 
 def clamp_align(vx, vy, wz):

@@ -1,0 +1,26 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [-1.206, 1.183], "kick_heading_deg": -10.1, "aim_heading_deg": -10.1, "foot": "left", "aim_offset_deg": 0.0, "stance_shift_mm": 0.0, "stance": [-1.302, 1.157], "route": [[-1.696, 1.227], [-1.42, 1.178]]}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [-1.6955632448347275, 1.2274196038082317], "pose": [0.0, 0.0, 2.232]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [2.01, 0.585], "heading_err_deg": 16.2, "dist": 2.093, "cmd": [0.2, 0.0, 0.425]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.924, 0.164], "heading_err_deg": 4.9, "dist": 1.931, "cmd": [0.2, 0.0, 0.128]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.72, 0.06], "heading_err_deg": 2.0, "dist": 1.721, "cmd": [0.2, 0.0, 0.052]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.512, 0.022], "heading_err_deg": 0.8, "dist": 1.512, "cmd": [0.2, 0.0, 0.022]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.298, 0.059], "heading_err_deg": 2.6, "dist": 1.299, "cmd": [0.2, 0.0, 0.069]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.085, 0.009], "heading_err_deg": 0.5, "dist": 1.085, "cmd": [0.2, 0.0, 0.013]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.87, 0.037], "heading_err_deg": 2.4, "dist": 0.871, "cmd": [0.2, 0.0, 0.063]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.659, 0.005], "heading_err_deg": 0.4, "dist": 0.659, "cmd": [0.2, 0.0, 0.011]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.446, 0.023], "heading_err_deg": 2.9, "dist": 0.447, "cmd": [0.2, 0.0, 0.076]}
+{"t": 9.1, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.231, 0.003], "heading_err_deg": 0.8, "dist": 0.231, "cmd": [0.2, 0.0, 0.02]}
+{"t": 9.92, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.057, "pose": [-1.646, 1.199, 2.573]}
+{"t": 9.94, "event": "GO_TO_START", "wp": 2, "goal": [-1.4199130744302455, 1.1782567768352024], "pose": [-1.651, 1.2, 2.562]}
+{"t": 10.12, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.215, -0.115], "heading_err_deg": -151.9, "dist": 0.243, "cmd": [0.0, 0.0, -0.8]}
+{"t": 11.14, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.019, -0.251], "heading_err_deg": -94.4, "dist": 0.252, "cmd": [0.0, 0.0, -0.8]}
+{"t": 12.16, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.203, -0.181], "heading_err_deg": -41.7, "dist": 0.272, "cmd": [0.0, 0.0, -0.8]}
+{"t": 13.18, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.177, -0.038], "heading_err_deg": -12.1, "dist": 0.181, "cmd": [0.2, 0.0, -0.318]}
+{"t": 13.76, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.06, "pose": [-1.469, 1.212, -0.28]}
+{"t": 13.76, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 14.18, "event": "PRECISE_START", "n": 1, "offset": [0.1611, -0.0009, 0.1096]}
+{"t": 15.66, "event": "PRECISE_ARRIVED", "after_s": 1.48}
+{"t": 15.66, "event": "KICK_SWAP_IN", "aligned": true, "pulses": 0, "mode": "precision", "err_mm": [7.0, -0.4], "err_heading_deg": -0.78}
+{"t": 15.82, "event": "KICK_FIRE", "after_swap_s": 0.16}
+{"t": 17.68, "event": "KICK_SWAP_OUT", "peak_ball_fwd": 0.404}
+{"t": 19.7, "event": "MISSION_DONE", "approach_mode": "precision", "foot_vs_home_mm": [-3.8, -0.1], "lfoot_vs_home_mm": [-6.2, 1.7], "trunk_speed_mm_s": 0.3, "tilt_deg": 2.0, "leg_dev_deg": 2.9, "align_ex_mm": 7.0, "align_ey_mm": -0.4, "align_eh_deg": -0.78, "pulses": 0, "aligned": true, "t_swap": 15.66, "kick_contact_t": 0.16, "peak_ball_fwd": 0.404, "ball_travel": 1.025, "kick_dir_err_deg": -10.5, "t_done": 19.7}

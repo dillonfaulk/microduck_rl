@@ -1,0 +1,23 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [0.539, -0.897], "kick_heading_deg": -125.9, "aim_heading_deg": -125.9, "foot": "left", "aim_offset_deg": 0.0, "stance_shift_mm": 0.0, "stance": [0.558, -0.8], "route": [[0.792, -0.476], [0.628, -0.703]]}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [0.7924996642628191, -0.4757584975241364], "pose": [0.0, 0.0, 2.366]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.899, -0.216], "heading_err_deg": -166.5, "dist": 0.924, "cmd": [0.0, 0.0, -0.8]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.456, -0.816], "heading_err_deg": -119.2, "dist": 0.934, "cmd": [0.0, 0.0, -0.8]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.354, -0.879], "heading_err_deg": -68.1, "dist": 0.948, "cmd": [0.0, 0.0, -0.8]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.925, -0.271], "heading_err_deg": -16.4, "dist": 0.964, "cmd": [0.2, 0.0, -0.428]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.787, -0.035], "heading_err_deg": -2.6, "dist": 0.787, "cmd": [0.2, 0.0, -0.067]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.567, 0.011], "heading_err_deg": 1.1, "dist": 0.567, "cmd": [0.2, 0.0, 0.03]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.35, 0.015], "heading_err_deg": 2.4, "dist": 0.35, "cmd": [0.2, 0.0, 0.064]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.133, 0.015], "heading_err_deg": 6.5, "dist": 0.134, "cmd": [0.2, 0.0, 0.171]}
+{"t": 7.4, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.06, "pose": [0.736, -0.457, -0.516]}
+{"t": 7.42, "event": "GO_TO_START", "wp": 2, "goal": [0.6283178115462372, -0.7025718993295647], "pose": [0.739, -0.459, -0.515]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.159, -0.229], "heading_err_deg": -55.3, "dist": 0.278, "cmd": [0.0, 0.0, -0.8]}
+{"t": 9.1, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.269, -0.065], "heading_err_deg": -13.5, "dist": 0.277, "cmd": [0.2, 0.0, -0.353]}
+{"t": 10.12, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.056, "pose": [0.656, -0.654, -2.105]}
+{"t": 10.12, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 10.12, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "arrived", "goal_local": [0.056, 0.001], "heading_err_deg": 0.7, "dist": 0.056, "cmd": [0.0, 0.0, 0.0]}
+{"t": 10.54, "event": "PRECISE_START", "n": 1, "offset": [0.1633, -0.0021, 0.0085]}
+{"t": 12.0, "event": "PRECISE_ARRIVED", "after_s": 1.46}
+{"t": 12.0, "event": "KICK_SWAP_IN", "aligned": true, "pulses": 0, "mode": "precision", "err_mm": [7.1, -1.8], "err_heading_deg": -0.41}
+{"t": 12.16, "event": "KICK_FIRE", "after_swap_s": 0.16}
+{"t": 14.02, "event": "KICK_SWAP_OUT", "peak_ball_fwd": 0.406}
+{"t": 16.04, "event": "MISSION_DONE", "approach_mode": "precision", "foot_vs_home_mm": [-3.8, -0.2], "lfoot_vs_home_mm": [-4.7, 1.3], "trunk_speed_mm_s": 1.0, "tilt_deg": 1.8, "leg_dev_deg": 2.5, "align_ex_mm": 7.1, "align_ey_mm": -1.8, "align_eh_deg": -0.41, "pulses": 0, "aligned": true, "t_swap": 12.0, "kick_contact_t": 0.16, "peak_ball_fwd": 0.406, "ball_travel": 1.266, "kick_dir_err_deg": -16.6, "t_done": 16.04}

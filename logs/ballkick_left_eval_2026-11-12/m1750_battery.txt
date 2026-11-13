@@ -1,0 +1,10 @@
+== 2026-11-12_18-13-14_ts0p25_left_chunk1_model_1750.onnx (left foot) on ball, kick policy for the full 5 s: 50 episodes, target 0.25 m/s
+  kicked (ball moved forward): 50/50
+  peak ball speed: median 0.38 m/s (p10 0.28, p90 0.44) = 1.5x target
+  ball travel (forward, 5 s): median 1.28 m (p10 0.88, p90 1.43)
+  direction error |deg|: median 9.3 (p90 28.9, max 35.6)
+  direction error signed (+ = left): median -8.4 deg (p10 -28.9, p90 +5.7)
+  contact time: median 0.20 s after the swap-in
+  duck at end: standing 50/50, not upright (never fell, held a lean) 0, fell-recovered 0, fell 0
+  GOOD KICKS (kicked AND standing at the end, never fell): 50/50
+  (7 s wall)

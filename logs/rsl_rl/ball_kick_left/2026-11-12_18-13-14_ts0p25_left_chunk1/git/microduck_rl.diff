@@ -1,0 +1,66 @@
+--- git commit ---
+27007cd7e4dde4a01c3809c24da859ccd1e981d8
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+	modified:   tests/test_ball_kick_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py b/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+index 225ddf5a..9895b8c6 100644
+--- a/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+@@ -39,7 +39,9 @@ from copy import deepcopy
+ # Flips the ball spawn side and the support-foot (anti-hop) sensor. Everything
+ # else is left/right symmetric (HOME pose has mirrored signs). Train the two
+ # policies as separate runs — wandb experiment/run name follows this flag.
+-KICK_FOOT = "right"
++# Local (fork) change: MICRODUCK_KICK_FOOT overrides the flag so the left-foot
++# policy trains from the same tree as the right. Unset = "right" (upstream).
++KICK_FOOT = os.environ.get("MICRODUCK_KICK_FOOT", "right")
+ assert KICK_FOOT in ("right", "left")
+ 
+ # Symmetry — must stay OFF: the kick task is inherently one-footed.
+diff --git a/tests/test_ball_kick_cfg.py b/tests/test_ball_kick_cfg.py
+index ebf6a6d4..52a82b71 100644
+--- a/tests/test_ball_kick_cfg.py
++++ b/tests/test_ball_kick_cfg.py
+@@ -33,3 +33,26 @@ def test_actor_stays_ball_blind_and_61d():
+     assert list(actor) == ["base_ang_vel", "projected_gravity", "joint_pos", "joint_vel", "actions",
+                            "command", "head_command", "body_command"]
+     assert "ball_position" in cfg.observations["critic"].terms
++
++
++def test_kick_foot_default_is_right(monkeypatch):
++    monkeypatch.delenv("MICRODUCK_KICK_FOOT", raising=False)
++    mod = importlib.reload(bk)
++    assert mod.KICK_FOOT == "right"
++    cfg = mod.make_microduck_ball_kick_env_cfg()
++    assert cfg.events["reset_ball"].params["offset"] == (0.09, -0.042)
++
++
++def test_kick_foot_env_left_mirrors_ball_support_and_experiment(monkeypatch):
++    monkeypatch.setenv("MICRODUCK_KICK_FOOT", "left")
++    try:
++        mod = importlib.reload(bk)
++        assert mod.KICK_FOOT == "left"
++        cfg = mod.make_microduck_ball_kick_env_cfg()
++        assert cfg.events["reset_ball"].params["offset"] == (0.09, 0.042)   # +y = left toe
++        support = [s for s in cfg.scene.sensors if s.name == "support_foot_ground_contact"][0]
++        assert "right_foot_collision" in support.primary.pattern               # right leg supports
++        assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_left"
++    finally:
++        monkeypatch.delenv("MICRODUCK_KICK_FOOT")
++        importlib.reload(bk)

@@ -3,6 +3,11 @@
 Run from the microduck_rl repo root:
   uv run python scripts/step_battery.py <precision_step.onnx> [--episodes 50]
       [--prestand <velstand.onnx>] [--push-at 1.5 --push-v 0.3] [--ball-prob 1.0]
+      [--ball-side right|left|both]
+
+--ball-side (PrecisionStep v2): which foot's kick spot the ball sits at. "right"
+(default) is v1's battery, rng stream unchanged; "both" draws the side 50/50 per
+episode and the summary splits every metric by side.
 
 Each episode mirrors the training reset: standing start (HOME joints +-0.08 rad,
 +-5 deg roll/pitch, trunk z 0.11-0.12, random yaw), a target pose drawn from the
@@ -85,15 +90,21 @@ class StepSim(KickSim):
         p.ort_session = self.kick_session          # the precision policy (KickSim's "kick" slot)
         self.set_goal(rng, ball_prob, target)
 
+    ball_side = "right"   # "right" | "left" | "both" (set by main)
+
     def set_goal(self, rng, ball_prob=1.0, target=None):
         """Target pose relative to the CURRENT pose; ball at the kick spot from it if clear."""
         (x0, y0, yaw0), _, _ = self.pose()
         dx, dy, dyaw = target if target is not None else sample_target(rng)
+        side = self.ball_side
+        if side == "both":
+            side = "left" if rng.random() < 0.5 else "right"
+        self.side = side
         c, s = math.cos(yaw0), math.sin(yaw0)
         self.goal = (x0 + c * dx - s * dy, y0 + s * dx + c * dy, wrap(yaw0 + dyaw))
         self.goal_r = math.hypot(dx, dy)
         ox = BALL_OFFSET[0] + rng.uniform(-BALL_NOISE, BALL_NOISE)
-        oy = BALL_OFFSET[1] + rng.uniform(-BALL_NOISE, BALL_NOISE)
+        oy = (abs(BALL_OFFSET[1]) if side == "left" else BALL_OFFSET[1]) + rng.uniform(-BALL_NOISE, BALL_NOISE)
         gx, gy, gyaw = self.goal
         bx = gx + math.cos(gyaw) * ox - math.sin(gyaw) * oy
         by = gy + math.sin(gyaw) * ox + math.cos(gyaw) * oy
@@ -161,7 +172,8 @@ def run_episode(sim, rng, ball_prob=1.0, prestand=None, prestand_s=1.5, push=Non
     return {"target_r_mm": round(sim.goal_r * 1000, 1), "has_ball": sim.has_ball,
             "pos_err_mm": round(pos_err * 1000, 1), "yaw_err_deg": round(math.degrees(yaw_err), 2),
             "stagger_mm": round(sx * 1000, 1), "width_mm": round(sy * 1000, 1), "still": still, "leg_dev_deg": round(math.degrees(leg_dev), 1),
-            "arrive_t": arrive_t, "struck_t": struck_t, "fell_t": fell_t, "kick_ready": ready}
+            "arrive_t": arrive_t, "struck_t": struck_t, "fell_t": fell_t, "kick_ready": ready,
+            "ball_side": sim.side}
 
 
 def pct(xs, q):
@@ -212,10 +224,12 @@ def main():
     ap.add_argument("--push-at", type=float, default=None)
     ap.add_argument("--push-v", type=float, default=0.3)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--ball-side", choices=("right", "left", "both"), default="right")
     ap.add_argument("--out", default=None, help="csv path for per-episode rows")
     args = ap.parse_args()
 
     sim = StepSim(args.onnx, SCENE)
+    sim.ball_side = args.ball_side
     prestand = ort.InferenceSession(args.prestand) if args.prestand else None
     push = (args.push_at, args.push_v) if args.push_at is not None else None
     rng = np.random.default_rng(args.seed)
@@ -224,7 +238,11 @@ def main():
     label = (f"{os.path.basename(args.onnx)}"
              + (f", swapped in after {args.prestand_s}s of VelStand standing" if prestand else ", training-like start")
              + (f", push {args.push_v} m/s at {args.push_at}s" if push else ""))
+    label += f", ball side {args.ball_side}"
     print(summarize(rows, label))
+    if args.ball_side == "both":
+        for side in ("right", "left"):
+            print(summarize([r for r in rows if r["ball_side"] == side], f"ball on the {side.upper()}"))
     print(f"  ({time.time() - t0:.0f} s wall)")
     if args.out:
         with open(args.out, "w", newline="") as f:

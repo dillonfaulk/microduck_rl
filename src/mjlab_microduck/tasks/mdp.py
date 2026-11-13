@@ -7876,8 +7876,13 @@ def reset_step_target(
     keepout_margin: float = 0.006,
     ball_park_dist: float = 3.0,
     asset_name: str = "ball",
+    ball_left_prob: float = 0.0,
 ):
     """Sample the episode's target pose and place (or park) the ball.
+
+    ``ball_left_prob`` (PrecisionStep v2, fork-local): chance the ball's
+    lateral offset is mirrored to the LEFT foot's kick spot (y sign flipped,
+    same geometry and noise). 0.0 = v1 (ball always on the right).
 
     The ball goes where it would sit if this were a real final approach: at the
     BallKick placement (0.09, -0.042 with the same +-15 mm noise) relative to the
@@ -7915,6 +7920,9 @@ def reset_step_target(
         dist.unsqueeze(1) > 1e-6, dir_w / dist.clamp_min(1e-6).unsqueeze(1), torch.zeros_like(dir_w))
 
     off = torch.tensor(ball_offset, device=env.device, dtype=torch.float).repeat(n, 1)
+    if ball_left_prob > 0.0:
+        left = torch.rand(n, device=env.device) < ball_left_prob
+        off[:, 1] = torch.where(left, off[:, 1].abs(), -off[:, 1].abs())
     off += (torch.rand(n, 2, device=env.device) * 2.0 - 1.0) * ball_noise_xy
     bxy = kick_ball_xy(torch.stack([gx, gy], dim=1), gyaw, off)
     clear = ball_clear_of_footprint(bxy[:, 0] - x0, bxy[:, 1] - y0, yaw0, keepout_x, keepout_y,

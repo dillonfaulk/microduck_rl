@@ -94,3 +94,67 @@ def test_kick_spot_is_clear_of_the_footprint_but_the_feet_are_not():
     assert not clear(0.0, 0.0)
     # same geometry when the duck faces +y
     assert clear(0.042, 0.09, math.pi / 2) and not clear(0.042, 0.05, math.pi / 2)
+
+
+# ── PrecisionStep v2: ball on both sides (fork-local, 2026-11-13) ────────────
+
+def test_ball_sides_default_is_right_only(monkeypatch):
+    import importlib
+    monkeypatch.delenv("MICRODUCK_PSTEP_BALL_SIDES", raising=False)
+    mod = importlib.reload(ps)
+    assert mod.BALL_LEFT_PROB == 0.0
+    cfg = mod.make_microduck_precision_step_env_cfg()
+    assert cfg.events["reset_step_target"].params["ball_left_prob"] == 0.0
+    assert mod.MicroduckPrecisionStepRlCfg.experiment_name == "precision_step"
+
+
+def test_ball_sides_both_env_sets_half_left_and_v2_experiment(monkeypatch):
+    import importlib
+    monkeypatch.setenv("MICRODUCK_PSTEP_BALL_SIDES", "both")
+    try:
+        mod = importlib.reload(ps)
+        cfg = mod.make_microduck_precision_step_env_cfg()
+        assert cfg.events["reset_step_target"].params["ball_left_prob"] == 0.5
+        assert mod.MicroduckPrecisionStepRlCfg.experiment_name == "precision_step_v2"
+    finally:
+        monkeypatch.delenv("MICRODUCK_PSTEP_BALL_SIDES")
+        importlib.reload(ps)
+
+
+def _stub_env(n):
+    from types import SimpleNamespace as NS
+    qpos = torch.zeros(n, 7)
+    qpos[:, 2] = 0.115
+    qpos[:, 3] = 1.0                                   # identity quat (wxyz), facing +x
+    written = {}
+    robot = NS(indexing=NS(free_joint_q_adr=torch.arange(7)))
+    ball = NS(write_root_link_pose_to_sim=lambda p, ids: written.__setitem__("pose", p),
+              write_root_link_velocity_to_sim=lambda v, ids: None)
+    env = NS(device="cpu", num_envs=n, sim=NS(data=NS(qpos=qpos)))
+    env.scene = type("S", (), {"__getitem__": lambda self, k: {"robot": robot, "ball": ball}[k],
+                               "terrain": NS(env_origins=torch.zeros(n, 3))})()
+    return env, written
+
+
+def _ball_side_counts(left_prob, n=4000):
+    torch.manual_seed(0)
+    env, written = _stub_env(n)
+    m.reset_step_target(env, torch.arange(n), ball_prob=1.0, ball_left_prob=left_prob)
+    st = env._pstep
+    goal, bxy, has = st["goal"], st["ball_home"], st["has_ball"]
+    # ball position in the TARGET stance's yaw frame
+    lx, ly = m.world_to_yaw_frame(bxy[:, 0] - goal[:, 0], bxy[:, 1] - goal[:, 1], goal[:, 2])
+    lx, ly = lx[has], ly[has]
+    assert ((lx > 0.09 - 0.0151) & (lx < 0.09 + 0.0151)).all()
+    assert ((ly.abs() > 0.042 - 0.0151) & (ly.abs() < 0.042 + 0.0151)).all()
+    return int((ly > 0).sum()), int((ly < 0).sum())
+
+
+def test_v1_reset_puts_every_ball_on_the_right():
+    left, right = _ball_side_counts(0.0)
+    assert left == 0 and right > 3000
+
+
+def test_v2_reset_mirrors_about_half_the_balls_to_the_left_kick_spot():
+    left, right = _ball_side_counts(0.5)
+    assert 0.45 < left / (left + right) < 0.55

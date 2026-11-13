@@ -28,6 +28,7 @@ Regularizers, DR and obs noise: BallKick parity (itself velocity parity).
 """
 
 import math
+import os
 from copy import deepcopy
 
 # Symmetry: OFF. The ball is placed for the RIGHT-foot kick, so ball episodes
@@ -78,6 +79,12 @@ BALL_PROB          = 0.7
 BALL_RADIUS        = 0.035
 BALL_OFFSET        = (0.09, -0.042)
 BALL_POS_NOISE_XY  = 0.015
+# PrecisionStep v2 (fork-local, 2026-11-13): MICRODUCK_PSTEP_BALL_SIDES=both
+# mirrors the ball to the LEFT foot's kick spot in ~half the ball episodes
+# (same geometry/noise per side). Unset/"right" = v1 (ball always on the right).
+BALL_SIDES = os.environ.get("MICRODUCK_PSTEP_BALL_SIDES", "right")
+assert BALL_SIDES in ("right", "both")
+BALL_LEFT_PROB = 0.5 if BALL_SIDES == "both" else 0.0
 # Duck's HOME collision footprint (trunk yaw frame, geoms within one ball
 # diameter of the soles; measured 2026-11-11). A ball that would overlap it
 # at the START pose (expanded by radius + 6 mm: at +3 mm, 3 in 1262 zero-action
@@ -327,6 +334,7 @@ def make_microduck_precision_step_env_cfg(play: bool = False) -> ManagerBasedRlE
             "zero_prob": TARGET_ZERO_PROB, "ball_prob": BALL_PROB, "ball_offset": BALL_OFFSET,
             "ball_noise_xy": BALL_POS_NOISE_XY, "ball_radius": BALL_RADIUS,
             "keepout_x": FOOTPRINT_X, "keepout_y": FOOTPRINT_Y, "asset_name": "ball",
+            "ball_left_prob": BALL_LEFT_PROB,
         })
 
     if ENABLE_VELOCITY_PUSHES:
@@ -411,8 +419,8 @@ MicroduckPrecisionStepRlCfg = RslRlOnPolicyRunnerCfg(
         symmetry_cfg=SYMMETRY_CFG if ENABLE_SYMMETRY else None,
     ),
     wandb_project="mjlab_microduck",
-    experiment_name="precision_step",
-    run_name="precision_step",
+    experiment_name="precision_step_v2" if BALL_SIDES == "both" else "precision_step",
+    run_name="precision_step_v2" if BALL_SIDES == "both" else "precision_step",
     save_interval=250,
     num_steps_per_env=24,
     max_iterations=4000,

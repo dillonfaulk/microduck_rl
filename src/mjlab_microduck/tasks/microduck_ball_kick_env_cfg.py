@@ -39,7 +39,9 @@ from copy import deepcopy
 # Flips the ball spawn side and the support-foot (anti-hop) sensor. Everything
 # else is left/right symmetric (HOME pose has mirrored signs). Train the two
 # policies as separate runs — wandb experiment/run name follows this flag.
-KICK_FOOT = "right"
+# Local (fork) change: MICRODUCK_KICK_FOOT overrides the flag so the left-foot
+# policy trains from the same tree as the right. Unset = "right" (upstream).
+KICK_FOOT = os.environ.get("MICRODUCK_KICK_FOOT", "right")
 assert KICK_FOOT in ("right", "left")
 
 # Symmetry — must stay OFF: the kick task is inherently one-footed.

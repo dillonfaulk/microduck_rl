@@ -87,8 +87,8 @@ class KickSim(DuckSim):
 
 
 def run_episode(sim, rng, handoff=None, handoff_at=2.0, push=None, prestand=None, prestand_s=1.5,
-                reset_last_action=False):
-    sim.reset_episode(rng)
+                reset_last_action=False, foot="right"):
+    sim.reset_episode(rng, foot=foot)
     if prestand is not None:
         # Mission-style start: VelStand holds the stand first, then the ball goes
         # down at the trained offset (+ noise) in the settled yaw frame and the
@@ -97,7 +97,7 @@ def run_episode(sim, rng, handoff=None, handoff_at=2.0, push=None, prestand=None
         while sim.t < prestand_s - 1e-9:
             sim.step()
         (_, _, yaw), _, _ = sim.pose()
-        oy = -BALL_OFFSET_ABS_Y
+        oy = -BALL_OFFSET_ABS_Y if foot == "right" else BALL_OFFSET_ABS_Y
         sim.place_ball((BALL_OFFSET_X + rng.uniform(-BALL_NOISE, BALL_NOISE), oy + rng.uniform(-BALL_NOISE, BALL_NOISE)), yaw)
         sim.heading = yaw
         sim.policy.ort_session = sim.kick_session
@@ -151,7 +151,8 @@ def summarize(rows, target, label):
     kicked = [r for r in rows if r["contact_t"] is not None and r["peak_fwd"] > 0.05]
     pk = [r["peak_fwd"] for r in kicked]
     tr = [r["travel_fwd"] for r in kicked]
-    de = [abs(r["dir_err_deg"]) for r in kicked if r["dir_err_deg"] is not None]
+    ds = [r["dir_err_deg"] for r in kicked if r["dir_err_deg"] is not None]
+    de = [abs(v) for v in ds]
     ends = {k: sum(r["end"] == k for r in rows) for k in ("standing", "not-upright", "fell-recovered", "fell")}
     nu = [r["end_tilt_deg"] for r in rows if r["end"] == "not-upright"]
     good = sum(r in kicked and r["end"] == "standing" for r in rows)
@@ -161,6 +162,7 @@ def summarize(rows, target, label):
              f"= {pct(pk, 50) / target:.1f}x target",
              f"  ball travel (forward, 5 s): median {pct(tr, 50):.2f} m (p10 {pct(tr, 10):.2f}, p90 {pct(tr, 90):.2f})",
              f"  direction error |deg|: median {pct(de, 50):.1f} (p90 {pct(de, 90):.1f}, max {max(de) if de else float('nan'):.1f})",
+             f"  direction error signed (+ = left): median {pct(ds, 50):+.1f} deg (p10 {pct(ds, 10):+.1f}, p90 {pct(ds, 90):+.1f})",
              f"  contact time: median {pct([r['contact_t'] for r in kicked], 50):.2f} s after the swap-in",
              f"  duck at end: standing {ends['standing']}/{n}, not upright (never fell, held a lean"
              f"{', median end tilt %.0f deg' % pct(nu, 50) if nu else ''}) {ends['not-upright']}, "
@@ -183,6 +185,7 @@ def main():
     ap.add_argument("--prestand-s", type=float, default=1.5)
     ap.add_argument("--reset-last-action", action="store_true", help="zero the last-action obs at the swap-in")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--foot", choices=("right", "left"), default="right", help="kicking foot the policy trained for")
     ap.add_argument("--out", default=None, help="csv path for per-episode rows")
     args = ap.parse_args()
 
@@ -192,9 +195,9 @@ def main():
     push = (args.push_at, args.push_v) if args.push_at is not None else None
     t0 = time.time()
     prestand = ort.InferenceSession(args.prestand) if args.prestand else None
-    rows = [run_episode(sim, rng, handoff, args.handoff_at, push, prestand, args.prestand_s, args.reset_last_action)
+    rows = [run_episode(sim, rng, handoff, args.handoff_at, push, prestand, args.prestand_s, args.reset_last_action, args.foot)
             for _ in range(args.episodes)]
-    label = (f"{os.path.basename(args.onnx)} on {args.scene}"
+    label = (f"{os.path.basename(args.onnx)} ({args.foot} foot) on {args.scene}"
              + (f", swapped in after {args.prestand_s}s of VelStand standing" if prestand else "")
              + (", last action zeroed at swap-in" if args.reset_last_action else "")
              + (f", VelStand handoff at {args.handoff_at}s" if handoff else ", kick policy for the full 5 s")

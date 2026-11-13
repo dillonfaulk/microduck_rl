@@ -95,14 +95,17 @@ PRECISE_MAX_YAW = math.radians(15)
 # 1.01 m (the pulse aligner, which parks at +0.7 mm, rolls 1.22 m). The stance target handed
 # to the step policy moves this far forward along the kick line. Precision path only: the
 # pulse fallback keeps its own (foot-relative) target.
-PRECISE_STANCE_SHIFT_M = float(os.environ.get("KICK_STANCE_SHIFT", "0.010"))
+# Per kicking foot: each foot's kick checkpoint is its own measurement (left = 0 until measured).
+PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.010")),
+                          "left": float(os.environ.get("KICK_STANCE_SHIFT_LEFT", "0.0"))}
 # Aim offset for BallKick v1's (right foot, ts0.25 model_1000) left drift. The duck lines up
 # facing kick_heading + KICK_AIM_OFFSET; the ball result is still measured against kick_heading.
 # Sign: +yaw is LEFT (CCW, z up), kick_dir_err_deg > 0 means the ball went left, so the offset
 # is NEGATIVE (aim right). Calibrated 2026-11-11 against the +10 mm stance above: drift
 # +17.9 deg median (std 1.7, IQR 16.5..19.1, flat across ball distance), 60 missions, seeds 0+1.
 # Right foot only; a left-foot kick needs its own measurement.
-KICK_AIM_OFFSET = math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG", "-17.9")))
+KICK_AIM_OFFSET = {"right": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG", "-17.9"))),
+                   "left": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG_LEFT", "0.0")))}
 
 
 def clamp_align(vx, vy, wz):
@@ -185,7 +188,8 @@ class Mission:
     def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None):
         self.sim, self.kick_session = sim, kick_session
         self.kh_goal = kick_heading                              # where the ball should go
-        self.kh = wrap_angle(kick_heading + KICK_AIM_OFFSET)     # where the duck faces (aim-corrected)
+        self.foot = foot
+        self.kh = wrap_angle(kick_heading + KICK_AIM_OFFSET[foot])  # where the duck faces (aim-corrected)
         self.precision_session = precision_session
         self.precise_entries = 0
         self.on_ticks = 0
@@ -217,8 +221,8 @@ class Mission:
         log.event({"t": 0.0, "event": "MISSION_START", "ball": [round(v, 3) for v in b],
                    "kick_heading_deg": round(math.degrees(kick_heading), 1),
                    "aim_heading_deg": round(math.degrees(self.kh), 1),
-                   "aim_offset_deg": round(math.degrees(KICK_AIM_OFFSET), 1),
-                   "stance_shift_mm": round(PRECISE_STANCE_SHIFT_M * 1000, 1),
+                   "foot": foot, "aim_offset_deg": round(math.degrees(KICK_AIM_OFFSET[foot]), 1),
+                   "stance_shift_mm": round(PRECISE_STANCE_SHIFT_M[foot] * 1000, 1),
                    "stance": [round(v, 3) for v in stance], "route": [[round(v, 3) for v in p] for p in route]})
 
     def stance_point(self, ball_xy):
@@ -261,7 +265,7 @@ class Mission:
 
     def precise_stance(self, ball_xy):
         """Stance target for the step policy: the trained stance, PRECISE_STANCE_SHIFT_M further along the kick line."""
-        return self.stance_point(ball_xy) + PRECISE_STANCE_SHIFT_M * np.array([math.cos(self.kh), math.sin(self.kh)])
+        return self.stance_point(ball_xy) + PRECISE_STANCE_SHIFT_M[self.foot] * np.array([math.cos(self.kh), math.sin(self.kh)])
 
     def precise_offset(self, pose, ball_xy):
         """Option-A command: remaining offset to the stance pose in the trunk yaw frame, clipped to training range."""
@@ -276,7 +280,7 @@ class Mission:
 
     def _swap_kick(self, t, pose, b, tilt, ex, ey, eh, aligned):
         sim = self.sim
-        foot, lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
+        foot, lfoot = sim.site_local(sim.kick_site), sim.site_local(sim.support_site)
         vb = sim.data.qvel[sim.va:sim.va + 3]
         self.result.update(foot_vs_home_mm=[round(v, 1) for v in (foot - sim.home_foot) * 1000],
                            lfoot_vs_home_mm=[round(v, 1) for v in (lfoot - sim.home_lfoot) * 1000],
@@ -364,7 +368,7 @@ class Mission:
             on = math.hypot(off[0], off[1]) < ALIGN_TOL and abs(off[2]) < ALIGN_HEADING_TOL
             self.on_ticks = self.on_ticks + 1 if on and np.linalg.norm(vb) < PRECISE_STILL_V else 0
             if self.on_ticks >= PRECISE_HOLD_TICKS:
-                ex, ey, eh, _ = self.aligner.errors(pose, b, self.kh, sim.site_local("right_foot"), sim.home_foot)
+                ex, ey, eh, _ = self.aligner.errors(pose, b, self.kh, sim.site_local(sim.kick_site), sim.home_foot)
                 self.log.event({"t": round(t, 3), "event": "PRECISE_ARRIVED", "after_s": round(t - self.t_state, 2)})
                 return self._swap_kick(t, pose, b, tilt, ex, ey, eh, aligned=True)
             if t - self.t_state > PRECISE_TIMEOUT_S:
@@ -414,7 +418,7 @@ class Mission:
                 self.pulse_twist, self.pulse_left = self.pulse_queue.pop(0)
                 self.pulse_left -= 1
                 return clamp_align(*self.pulse_twist)
-            ex, ey, eh, local = self.aligner.errors(pose, b, self.kh, sim.site_local("right_foot"), sim.home_foot)
+            ex, ey, eh, local = self.aligner.errors(pose, b, self.kh, sim.site_local(sim.kick_site), sim.home_foot)
             if ex > APPROACH_FROM and abs(eh) < math.radians(10) and abs(ey) < 0.03:
                 self.approaching, self.t_approach = True, t
                 self.log.event({"t": round(t, 3), "event": "ALIGN_APPROACH", "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)]})
@@ -436,8 +440,8 @@ class Mission:
                 return (0.0, 0.0, 0.0)
             if p is not None and p[2] == "backoff":
                 p = None  # out of pulses: kick from here
-            stagger = (sim.site_local("right_foot") - sim.home_foot)[0]
-            support = (sim.site_local("left_foot") - sim.home_lfoot)[0]
+            stagger = (sim.site_local(sim.kick_site) - sim.home_foot)[0]
+            support = (sim.site_local(sim.support_site) - sim.home_lfoot)[0]
             if (p is None and (abs(stagger) > SQUARE_TOL or abs(support) > SUPPORT_TOL)
                     and self.squares < SQUARE_MAX and self.pulses < ALIGN_MAX_PULSES):
                 # Ball placement is fine but a foot sits too far from its HOME spot: the
@@ -534,7 +538,7 @@ def draw_mission(scn, m, sim):
             prev = (x, y)
 
 
-def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None):
+def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right"):
     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands."""
     (x, y, _), _, _ = sim.pose()
     if ball is None:
@@ -547,7 +551,13 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=Non
     sim.data.qpos[sim.bqa:sim.bqa + 7] = [ball[0], ball[1], 0.035, 1, 0, 0, 0]
     sim.data.qvel[sim.bva:sim.bva + 6] = 0
     mujoco.mj_forward(sim.model, sim.data)
-    return Mission(sim, kick, kh, log, precision_session=precision)
+    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision)
+
+
+def set_feet(sim, foot):
+    """Kicking/support foot sites and their HOME positions (trunk yaw frame), read at the reset stand."""
+    sim.kick_site, sim.support_site = f"{foot}_foot", ("left_foot" if foot == "right" else "right_foot")
+    sim.home_foot, sim.home_lfoot = sim.site_local(sim.kick_site), sim.site_local(sim.support_site)
 
 
 def run_viewer(args):
@@ -556,14 +566,14 @@ def run_viewer(args):
     kick = ort.InferenceSession(args.kick)
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
-    sim.home_foot, sim.home_lfoot = sim.site_local("right_foot"), sim.site_local("left_foot")
+    set_feet(sim, args.foot)
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}_viewer"
     os.makedirs(out, exist_ok=True)
     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
     log = RunLog(echo=not args.auto)
-    m = new_mission(sim, kick, rng, log, ball, kh, precision)
+    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
 
     def report(m):
@@ -608,7 +618,7 @@ def run_viewer(args):
                     log.save(f"{out}/mission{n}")
                     n += 1
                     log = RunLog()
-                    m = new_mission(sim, kick, rng, log, precision=precision)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -623,7 +633,7 @@ def run_viewer(args):
                               f"{tally['aborted']} aborted, {tally['falls']} falls")
                         break
                     log = RunLog(echo=False)
-                    m = new_mission(sim, kick, rng, log, precision=precision)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)
@@ -640,15 +650,14 @@ def run_headless(args):
     kick = ort.InferenceSession(args.kick)
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
-    sim.home_foot = sim.site_local("right_foot")  # kicking foot at HOME, the kick policy's start stance
-    sim.home_lfoot = sim.site_local("left_foot")
-    print(f"right foot at HOME, trunk yaw frame: ({sim.home_foot[0]*1000:.1f}, {sim.home_foot[1]*1000:.1f}) mm")
+    set_feet(sim, args.foot)
+    print(f"{args.foot} (kicking) foot at HOME, trunk yaw frame: ({sim.home_foot[0]*1000:.1f}, {sim.home_foot[1]*1000:.1f}) mm")
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
     os.makedirs(out, exist_ok=True)
     print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
-    print(f"precision stance shift {PRECISE_STANCE_SHIFT_M*1000:+.1f} mm along the kick line; "
-          f"aim offset {math.degrees(KICK_AIM_OFFSET):+.1f} deg (+ = left)")
+    print(f"kicking foot {args.foot}: precision stance shift {PRECISE_STANCE_SHIFT_M[args.foot]*1000:+.1f} mm along the kick line; "
+          f"aim offset {math.degrees(KICK_AIM_OFFSET[args.foot]):+.1f} deg (+ = left)")
     rows = []
     for k in range(args.runs):
         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))
@@ -659,7 +668,7 @@ def run_headless(args):
         sim.data.qvel[sim.bva:sim.bva + 6] = 0
         mujoco.mj_forward(sim.model, sim.data)
         log = RunLog(echo=args.verbose)
-        m = Mission(sim, kick, kh, log, precision_session=precision)
+        m = Mission(sim, kick, kh, log, foot=args.foot, precision_session=precision)
         while m.state != "DONE" and sim.t < args.timeout:
             twist = m.tick()
             sim.set_twist(twist)
@@ -706,6 +715,8 @@ def main():
     ap.add_argument("--ball", default=None, help='viewer: "x,y" ball position (default: random 1.0-1.8 m away)')
     ap.add_argument("--kick-heading", type=float, default=None, help="viewer: kick direction, deg (default: random)")
     ap.add_argument("--auto", type=int, default=0, help="viewer: run this many missions back to back, with a tally")
+    ap.add_argument("--foot", choices=("right", "left"), default="right",
+                    help="kicking foot of the kick ONNX (sets the stance side and that foot's calibrations)")
     ap.add_argument("--precision", default=None,
                     help="PrecisionStep ONNX for the final approach (pulse aligner stays as the fallback)")
     args = ap.parse_args()

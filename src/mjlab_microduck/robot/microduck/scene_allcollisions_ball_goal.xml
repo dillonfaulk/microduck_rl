@@ -6,6 +6,13 @@
     <include file="ball.xml" />
     <include file="goal.xml" />
 
+    <!-- Pin the render statistics to scene_allcollisions_ball.xml's computed values. Without
+         this the goals parked at +-50 m make the model extent 100 m instead of 0.415 m; MuJoCo
+         scales the shadow map and the near/far clip by the extent, which gave blocky shadows
+         under the duck/ball and black z-fighting lines at the horizon (Dillon's viewer,
+         2026-11-14). Render-only: physics never reads these. A 2v2 field scene needs the same. -->
+    <statistic extent="0.415" center="0.128 0 0.162" />
+
     <visual>
         <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
         <rgba haze="0.15 0.25 0.35 1" />

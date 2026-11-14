@@ -404,8 +404,8 @@ POLLEN_ANCHOR_YAW_REMAP = {
     ),
 }
 # Local (2026-10-31): OUR walk anchor (velocity model_4750) measured in the training sim
-# (logs/warp_cmd_response.py → logs/anchor_cmd_response_4750.txt, built by
-# logs/build_anchor_remap.py): x dead below fed 0.1 and ~0.6× above, y ~0.25× (max ~0.1 m/s),
+# (logs/tools/warp_cmd_response.py → logs/evals/velstand/anchor_cmd_response_4750.txt, built by
+# logs/tools/build_anchor_remap.py): x dead below fed 0.1 and ~0.6× above, y ~0.25× (max ~0.1 m/s),
 # in-place yaw dead below 0.5 rad/s, 0 falls up to fed x ±0.6 / y ±0.45 / wz ±1.6. VelStand
 # model_3000 copied that curve. So the anchor is fed x, y AND yaw (distill.remap_anchor_twist);
 # fed caps x +0.5 / −0.4 (more back-drift beyond), y 0.4, wz 1.3. Targets past the anchor's
@@ -429,7 +429,7 @@ LOCAL_ANCHOR_TWIST_REMAP = {
             (0.15, 0.3, 0.38, 0.461, 0.552, 0.653, 0.796, 0.942, 1.041, 1.13)),
 }
 # Round 3: walk v2 (velocity walkv2_chunk2/model_7998) measured the same way
-# (logs/walkv2_7998_response.txt, `build_anchor_remap.py --wide`): ~identity from 0.15 m/s /
+# (logs/evals/velocity_walk/walkv2_7998_response.txt, `build_anchor_remap.py --wide`): ~identity from 0.15 m/s /
 # 0.2 rad/s walking, so only the slow end moves (x ≤ 0.1 and in-place |wz| < 0.4 dead). Knots
 # reach x 0.4 / y 0.15 because targets past the last knot get the last fed value.
 WALKV2_ANCHOR_TWIST_REMAP = {

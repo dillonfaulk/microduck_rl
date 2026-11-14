@@ -1,6 +1,6 @@
 """Roll a StandUp checkpoint for one episode in the TRAINING simulator (MuJoCo Warp) and score get-ups.
 
-Run from repo root: python logs/warp_standup_eval.py <model_N.pt> [num_envs]
+Run from repo root: python logs/tools/warp_standup_eval.py <model_N.pt> [num_envs]
 """
 import sys
 from dataclasses import asdict

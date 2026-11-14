@@ -4,7 +4,7 @@ Every env holds one fixed command (no resampling, no heading control, no pushes,
 HOME spawn) for 8 s; achieved body-frame (vx, vy, wz) is averaged over 3-8 s on envs that
 never tilted past 60 deg. Use it on the walk anchor (model_4750) and on VelStand students.
 
-Run from repo root: python logs/warp_cmd_response.py <model_N.pt> [reps] > table.txt
+Run from repo root: python logs/tools/warp_cmd_response.py <model_N.pt> [reps] > table.txt
 """
 import sys
 from dataclasses import asdict

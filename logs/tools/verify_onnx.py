@@ -1,6 +1,6 @@
 """Check an exported actor ONNX against the PyTorch checkpoint it came from.
 
-usage: python logs/verify_onnx.py <model_N.pt> <exported.onnx> [n_samples]
+usage: python logs/tools/verify_onnx.py <model_N.pt> <exported.onnx> [n_samples]
 Rebuilds the actor (empirical normalizer (x - mean) / (std + 1e-2), ELU MLP) from
 actor_state_dict and compares deterministic actions on random observations
 (normalizer-scaled around the training mean). Prints the max abs difference.

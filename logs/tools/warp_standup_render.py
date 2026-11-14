@@ -1,6 +1,6 @@
 """Render a StandUp checkpoint from a forced spawn type in the training sim; saves PNG frames.
 
-Run from repo root: python logs/warp_standup_render.py <model_N.pt> <face_up|face_down|sitting> <out_dir>
+Run from repo root: python logs/tools/warp_standup_render.py <model_N.pt> <face_up|face_down|sitting> <out_dir>
 """
 import sys
 from dataclasses import asdict

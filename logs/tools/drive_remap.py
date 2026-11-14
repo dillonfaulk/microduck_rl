@@ -2,9 +2,9 @@
 
 The keyboard keeps setting TARGET speeds; only the twist slot the walking policy sees is
 replaced by the FED command that produces that speed (inverse of the CPU BAM response
-measured by logs/cmd_calibrate.py, 2026-10-30). Fed commands stay inside the trained
+measured by logs/tools/cmd_calibrate.py, 2026-10-30). Fed commands stay inside the trained
 ranges (x ±0.4, y ±0.3, wz ±1.0). Use exactly like infer_policy.py:
-  python logs/drive_remap.py --new-cmd-obs --scene <scene_allcollisions.xml> --walking <onnx>
+  python logs/tools/drive_remap.py --new-cmd-obs --scene <scene_allcollisions.xml> --walking <onnx>
 """
 import sys
 
@@ -54,5 +54,5 @@ def _update_command(self):
 ip.PolicyInference._update_command = _update_command
 
 if __name__ == "__main__":
-    print("[drive_remap] velocity command remap ON (see logs/drive_remap.py)")
+    print("[drive_remap] velocity command remap ON (see logs/tools/drive_remap.py)")
     ip.main()

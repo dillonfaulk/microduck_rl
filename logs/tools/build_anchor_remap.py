@@ -2,7 +2,7 @@
 
 Monotone inverse (running max) of the anchor's measured fed -> achieved response, per axis
 and sign, capped at FED_CAP. Prints a dict literal for the velstand cfg.
-Run: python logs/build_anchor_remap.py logs/anchor_cmd_response_4750.txt
+Run: python logs/tools/build_anchor_remap.py logs/evals/velstand/anchor_cmd_response_4750.txt
 """
 import re
 import sys

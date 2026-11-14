@@ -8,7 +8,7 @@ Live (MuJoCo viewer, keys typed in the terminal: P push, SPACE e-stop, Q quit):
 Headless acceptance suite (writes logs/goto/<stamp>_<suite>/):
   uv run python scripts/goto_point.py <onnx> --suite all
 
-Sim settings match logs/headless_rehearsal.py's fixed harness: BAM actuator,
+Sim settings match logs/tools/headless_rehearsal.py's fixed harness: BAM actuator,
 1-step action delay, training solver, all-collisions scene, projected gravity.
 """
 import argparse

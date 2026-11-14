@@ -1,7 +1,7 @@
 """Compare the 61-D actor observation the TRAINING sim (warp) and the CPU viewer
 (infer_policy.PolicyInference) produce for the SAME robot state.
 
-Run from repo root: python logs/obs_compare.py
+Run from repo root: python logs/tools/obs_compare.py
 """
 import sys
 

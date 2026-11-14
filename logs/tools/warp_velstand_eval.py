@@ -6,7 +6,7 @@ episode under the training command mix, and reports per start pose:
   recovered = tilt < 25° and z > 90 mm held 1 s, before any reset;
   for the standing control, also how many fell (tilt > 60°) and got back up.
 
-Run from repo root: python logs/warp_velstand_eval.py <model_N.pt> [num_envs]
+Run from repo root: python logs/tools/warp_velstand_eval.py <model_N.pt> [num_envs]
 """
 import math
 import sys

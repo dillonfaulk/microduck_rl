@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: logs/export_ckpt.sh <run_dir> <iteration> [env vars...]: export model_<it>.pt -> <run_dir>/<run>_model_<it>.onnx
+# usage: logs/tools/export_ckpt.sh <run_dir> <iteration> [env vars...]: export model_<it>.pt -> <run_dir>/<run>_model_<it>.onnx
 set -e
 d=$1; it=$2; name=$(basename $d)
 tmp=$(mktemp -d); cd ~/microduck_rl

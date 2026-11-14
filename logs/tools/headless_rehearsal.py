@@ -1,7 +1,7 @@
 """Headless CPU rehearsal of an exported microduck ONNX using infer_policy.py's own code paths.
 
 Run from the microduck_rl repo root:
-  python logs/headless_rehearsal.py <onnx> [--kind walking|standing] [--suite walk|fallen|all]
+  python logs/tools/headless_rehearsal.py <onnx> [--kind walking|standing] [--suite walk|fallen|all]
                                           [--trials N] [--no-bam]
 """
 import argparse

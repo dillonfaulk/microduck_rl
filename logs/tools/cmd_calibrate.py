@@ -1,10 +1,10 @@
 """Measure achieved velocity vs FED command per axis on the CPU BAM harness (projected gravity,
-delay 1, training solver, all-collisions scene). Run: python logs/cmd_calibrate.py <onnx>"""
+delay 1, training solver, all-collisions scene). Run: python logs/tools/cmd_calibrate.py <onnx>"""
 import sys
 import numpy as np
 sys.argv = [sys.argv[0], sys.argv[1], "--suite", "walk", "--delay", "1", "--train-solver",
             "--scene", "src/mjlab_microduck/robot/microduck/scene_allcollisions.xml"]
-src = open("logs/headless_rehearsal.py").read().split('print(f"onnx={args.onnx}')[0]
+src = open("logs/tools/headless_rehearsal.py").read().split('print(f"onnx={args.onnx}')[0]
 exec(compile(src, "headless_rehearsal.py", "exec"))
 
 

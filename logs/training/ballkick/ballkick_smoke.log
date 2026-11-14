@@ -1,0 +1,483 @@
+/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/tyro/_parsers.py:353: UserWarning: The field `env.scene.entities.robot.collisions.0.geom-names-expr` is annotated with type `tuple[str, ...]`, but the default value `['.*_collision']` has type `<class 'list'>`. We'll try to handle this gracefully, but it may cause unexpected behavior.
+  warnings.warn(message)
+/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mjlab/entity/entity.py:149: UserWarning: Actuator config matched 14 joint(s) but the same expressions also match 7 site(s): imu, left_foot, head_camera, tof, head_imu, mouth_tip, right_foot. Add a separate config with transmission_type=TransmissionType.SITE if those should be actuated too.
+  self._add_actuators()
+[mdp] Patches 1-2 active: NaN-safe reward/advantage
+[mdp] Patch 4 active: ONNX export filters passive_* joints
+[mdp] Patch 5 active: MICRODUCK_WARM_START=1 restarts curricula after checkpoint load
+[INFO] Training with: device=cuda:0, seed=42, rank=0
+[INFO] Logging experiment in directory: logs/rsl_rl/ball_kick_right/2026-11-09_12-54-32_smoke
+Setting seed: 42
+Warp 1.12.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5060 Ti" (15 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/n3z/.cache/warp/1.12.0
+Warp DeprecationWarning: The symbol `warp.context.runtime` will soon be removed from the public API. It can still be accessed from `warp._src.context.runtime` but might be changed or removed without notice.
+Module mujoco_warp._src.smooth 95a0b8b load on device 'cuda:0' took 968.44 ms  (cached)
+Module mujoco_warp._src.collision_driver 88f7770 load on device 'cuda:0' took 20.22 ms  (cached)
+Module _nxn_broadphase__locals__kernel_e73b1315 e73b131 load on device 'cuda:0' took 20.39 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_c1d0c893 c1d0c89 load on device 'cuda:0' took 8778.36 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_079dfa94 079dfa9 load on device 'cuda:0' took 1176.66 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_02484c54 02484c5 load on device 'cuda:0' took 588.17 ms  (compiled)
+Module mujoco_warp._src.constraint 27c5750 load on device 'cuda:0' took 474.69 ms  (cached)
+Module _efc_contact_init__locals__kernel_fda71e14 fda71e1 load on device 'cuda:0' took 39.11 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_7974b597 cc0fc30 load on device 'cuda:0' took 29.23 ms  (cached)
+Module _efc_contact_update__locals__kernel_90315d53 90315d5 load on device 'cuda:0' took 40.57 ms  (cached)
+Module mujoco_warp._src.sensor 7fc0378 load on device 'cuda:0' took 618.29 ms  (cached)
+Module mujoco_warp._src.forward f60f76d load on device 'cuda:0' took 391.78 ms  (cached)
+Module mujoco_warp._src.passive 1a5e55c load on device 'cuda:0' took 191.44 ms  (cached)
+Module mujoco_warp._src.forward 8ebfcb1 load on device 'cuda:0' took 391.67 ms  (cached)
+Module mujoco_warp._src.support dd3f924 load on device 'cuda:0' took 38.60 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_37ca3f47 b319ac8 load on device 'cuda:0' took 1678.84 ms  (compiled)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_b16bf393 b7e5d5f load on device 'cuda:0' took 330.55 ms  (cached)
+Module mujoco_warp._src.solver b116efb load on device 'cuda:0' took 454.72 ms  (cached)
+Module solve_init_jaref__locals__kernel_af106063 af10606 load on device 'cuda:0' took 93.55 ms  (compiled)
+Module mul_m_dense__locals___mul_m_dense_19197cab 19197ca load on device 'cuda:0' took 91.23 ms  (compiled)
+Module update_constraint_efc__locals__kernel_32935e9d 32935e9 load on device 'cuda:0' took 31.06 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f02e74ab f02e74a load on device 'cuda:0' took 120.93 ms  (compiled)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_73f22f8d 0469885 load on device 'cuda:0' took 354.03 ms  (compiled)
+Module update_gradient_cholesky__locals__kernel_a458a9b8 e47f115 load on device 'cuda:0' took 1700.64 ms  (compiled)
+Module linesearch_jv_fused__locals__kernel_d54ab32b d54ab32 load on device 'cuda:0' took 92.28 ms  (compiled)
+Module linesearch_prepare_gauss__locals__kernel_32809bfd 32809bf load on device 'cuda:0' took 124.97 ms  (compiled)
+Module update_constraint_efc__locals__kernel_3c1a9816 3c1a981 load on device 'cuda:0' took 29.83 ms  (cached)
+Module _contact_sort__locals__contact_sort_304c86df 6c97b35 load on device 'cuda:0' took 19.83 ms  (cached)
+Module mujoco_warp._src.derivative d0e2fd7 load on device 'cuda:0' took 168.29 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_e7898c5c e7898c5 load on device 'cuda:0' took 18.16 ms  (cached)
+Module reset_data__locals__reset_qM_10d3c793 10d3c79 load on device 'cuda:0' took 16.63 ms  (cached)
+Module reset_data__locals__reset_mocap_ff71f630 ff71f63 load on device 'cuda:0' took 26.87 ms  (cached)
+Module reset_data__locals__reset_contact_df686d47 df686d4 load on device 'cuda:0' took 18.03 ms  (cached)
+Module reset_data__locals__reset_nworld_6e0d904e 6e0d904 load on device 'cuda:0' took 78.92 ms  (cached)
+[BamActuator] model='m6' joints=14 kt=0.3660 R=2.8114 vin=range=(6.5, 8.2) drop_gain_range=(0.0, 0.2) force_limit=±1.07Nm friction_base=0.0048 friction_viscous=0.0054 envs=64 device=cuda:0
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 64     |
+| Environment device     | cuda:0 |
+| Environment seed       | 42     |
+| Physics step-size      | 0.005  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 3 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | reset_base                  |
+|   1   | reset_robot_joints          |
+|   2   | reset_action_history        |
+|   3   | set_ground_state            |
+|   4   | reset_ball                  |
+|   5   | randomize_com               |
+|   6   | randomize_head_com          |
+|   7   | randomize_armature          |
+|   8   | randomize_joint_friction    |
++-------+-----------------------------+
++----------------------------------------------+
+|    Active Event Terms in Mode: 'interval'    |
++-------+------------+-------------------------+
+| Index | Name       | Interval time range (s) |
++-------+------------+-------------------------+
+|   0   | push_robot |        (3.0, 6.0)       |
++-------+------------+-------------------------+
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++-------+-------------------------------+
+| Index | Name                          |
++-------+-------------------------------+
+|   0   | foot_friction                 |
+|   1   | encoder_bias                  |
+|   2   | base_com                      |
+|   3   | expand_bam_friction_fields    |
+|   4   | randomize_mass_inertia        |
++-------+-------------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | geom_friction       |
+|   1   | body_ipos           |
+|   2   | body_subtreemass    |
+|   3   | dof_invweight0      |
+|   4   | body_invweight0     |
+|   5   | tendon_length0      |
+|   6   | tendon_invweight0   |
+|   7   | dof_frictionloss    |
+|   8   | dof_damping         |
+|   9   | dof_armature        |
+|   10  | body_mass           |
+|   11  | body_inertia        |
+|   12  | body_iquat          |
++-------+---------------------+
+
+Module repeat_array_kernel_39317a34 b712927 load on device 'cuda:0' took 20.32 ms  (cached)
+Module repeat_array_kernel_39317a34 18fcc7e load on device 'cuda:0' took 32.31 ms  (cached)
+Module repeat_array_kernel_39317a34 5cde7e8 load on device 'cuda:0' took 43.64 ms  (cached)
+Module repeat_array_kernel_39317a34 0fe3117 load on device 'cuda:0' took 58.30 ms  (cached)
+[INFO] <CommandManager> contains 1 active terms.
++--------------------------------------------+
+|            Active Command Terms            |
++-------+-------+----------------------------+
+| Index | Name  |            Type            |
++-------+-------+----------------------------+
+|   0   | twist | VelocityCommandCommandOnly |
++-------+-------+----------------------------+
+
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 14) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          14 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 2 groups.
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'actor' (shape: (61,)) |
++-----------+----------------------------------+------------+
+|   Index   | Name                             |   Shape    |
++-----------+----------------------------------+------------+
+|     0     | base_ang_vel                     |    (3,)    |
+|     1     | projected_gravity                |    (3,)    |
+|     2     | joint_pos                        |   (14,)    |
+|     3     | joint_vel                        |   (14,)    |
+|     4     | actions                          |   (14,)    |
+|     5     | command                          |    (3,)    |
+|     6     | head_command                     |    (4,)    |
+|     7     | body_command                     |    (6,)    |
++-----------+----------------------------------+------------+
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (80,)) |
++----------+------------------------------------+------------+
+|  Index   | Name                               |   Shape    |
++----------+------------------------------------+------------+
+|    0     | base_lin_vel                       |    (3,)    |
+|    1     | base_ang_vel                       |    (3,)    |
+|    2     | projected_gravity                  |    (3,)    |
+|    3     | joint_pos                          |   (14,)    |
+|    4     | joint_vel                          |   (14,)    |
+|    5     | actions                            |   (14,)    |
+|    6     | command                            |    (3,)    |
+|    7     | foot_air_time                      |    (2,)    |
+|    8     | foot_contact                       |    (2,)    |
+|    9     | foot_contact_forces                |    (6,)    |
+|    10    | head_command                       |    (4,)    |
+|    11    | body_command                       |    (6,)    |
+|    12    | ball_position                      |    (3,)    |
+|    13    | ball_velocity                      |    (3,)    |
++----------+------------------------------------+------------+
+
+[INFO] <TerminationManager> contains 4 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | fell_over             |  False   |
+|   2   | out_of_terrain_bounds |   True   |
+|   3   | nan_state             |  False   |
++-------+-----------------------+----------+
+
+[INFO] <RewardManager> contains 12 active terms.
++----------------------------------------+
+|          Active Reward Terms           |
++-------+-----------------------+--------+
+| Index | Name                  | Weight |
++-------+-----------------------+--------+
+|   0   | upright               |    2.0 |
+|   1   | body_ang_vel          |  -0.05 |
+|   2   | angular_momentum      |  -0.02 |
+|   3   | dof_pos_limits        |   -1.0 |
+|   4   | action_rate_l2        |   -0.1 |
+|   5   | ball_forward_velocity |   12.0 |
+|   6   | ball_speed_overshoot  |   -4.0 |
+|   7   | support_foot_grounded |    2.0 |
+|   8   | pose_stand_legs       |    2.0 |
+|   9   | pose_stand_neck       |    1.0 |
+|   10  | height_stand          |    1.0 |
+|   11  | self_collisions       |   -1.0 |
++-------+-----------------------+--------+
+
+[INFO] <CurriculumManager> contains 4 active terms.
++----------------------------+
+|  Active Curriculum Terms   |
++-------+--------------------+
+| Index | Name               |
++-------+--------------------+
+|   0   | action_rate_weight |
+|   1   | com_range          |
+|   2   | head_com_range     |
+|   3   | push_magnitude     |
++-------+--------------------+
+
+[INFO] <MetricsManager> contains 1 active terms.
++-------------------------+
+|   Active Metrics Terms  |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | mean_action_acc |
++-------+-----------------+
+
+[INFO] <NullRecorderManager> (inactive)
+Module mujoco_warp._src.io 4b387a0 load on device 'cuda:0' took 496.96 ms  (cached)
+Module _tile_cholesky_factorize__locals__cholesky_factorize_68698e2e e5a5250 load on device 'cuda:0' took 537.63 ms  (compiled)
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 201.06 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8f106300 2c9154f load on device 'cuda:0' took 525.98 ms  (compiled)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 171.76 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=61, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=14, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (mlp): MLP(
+    (0): Linear(in_features=80, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+Storing git diff for 'microduck_rl' in: logs/rsl_rl/ball_kick_right/2026-11-09_12-54-32_smoke/git/microduck_rl.diff
+################################################################################
+[1m                             Learning iteration 0/5                             [0m 
+
+                               Run name: smoke
+                            Total steps: 1536 
+                       Steps per second: 1093 
+                        Collection time: 1.269s 
+                          Learning time: 0.136s 
+                        Mean value loss: 0.1530
+                    Mean surrogate loss: -0.0151
+                      Mean entropy loss: 19.8596
+                            Mean reward: 0.97
+                    Mean episode length: 20.28
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.0390
+            Episode_Reward/body_ang_vel: -0.0146
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0006
+          Episode_Reward/action_rate_l2: -0.1041
+   Episode_Reward/ball_forward_velocity: 0.0181
+    Episode_Reward/ball_speed_overshoot: 0.0000
+   Episode_Reward/support_foot_grounded: 0.0443
+         Episode_Reward/pose_stand_legs: 0.0615
+         Episode_Reward/pose_stand_neck: 0.0275
+            Episode_Reward/height_stand: 0.0343
+         Episode_Reward/self_collisions: -0.0013
+        Episode_Metrics/mean_action_acc: 0.9667
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+             Metrics/twist/error_vel_xy: 0.0045
+            Metrics/twist/error_vel_yaw: 0.0329
+           Episode_Termination/time_out: 0.5833
+          Episode_Termination/fell_over: 0.3750
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+          Metrics/angular_momentum_mean: 0.0103
+--------------------------------------------------------------------------------
+                         Iteration time: 1.40s
+                           Time elapsed: 00:00:01
+                                    ETA: 00:00:05
+
+################################################################################
+[1m                             Learning iteration 1/5                             [0m 
+
+                               Run name: smoke
+                            Total steps: 3072 
+                       Steps per second: 1865 
+                        Collection time: 0.769s 
+                          Learning time: 0.054s 
+                        Mean value loss: 0.1094
+                    Mean surrogate loss: -0.0409
+                      Mean entropy loss: 19.8593
+                            Mean reward: 1.22
+                    Mean episode length: 28.91
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.0904
+            Episode_Reward/body_ang_vel: -0.0890
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0027
+          Episode_Reward/action_rate_l2: -0.3559
+   Episode_Reward/ball_forward_velocity: 0.0616
+    Episode_Reward/ball_speed_overshoot: 0.0000
+   Episode_Reward/support_foot_grounded: 0.1346
+         Episode_Reward/pose_stand_legs: 0.2161
+         Episode_Reward/pose_stand_neck: 0.0864
+            Episode_Reward/height_stand: 0.1160
+         Episode_Reward/self_collisions: -0.0049
+        Episode_Metrics/mean_action_acc: 1.9153
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+             Metrics/twist/error_vel_xy: 0.0169
+            Metrics/twist/error_vel_yaw: 0.1255
+           Episode_Termination/time_out: 0.2500
+          Episode_Termination/fell_over: 2.4583
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+          Metrics/angular_momentum_mean: 0.0110
+--------------------------------------------------------------------------------
+                         Iteration time: 0.82s
+                           Time elapsed: 00:00:02
+                                    ETA: 00:00:03
+
+################################################################################
+[1m                             Learning iteration 2/5                             [0m 
+
+                               Run name: smoke
+                            Total steps: 4608 
+                       Steps per second: 1944 
+                        Collection time: 0.734s 
+                          Learning time: 0.055s 
+                        Mean value loss: 0.1225
+                    Mean surrogate loss: -0.0455
+                      Mean entropy loss: 19.8577
+                            Mean reward: 1.25
+                    Mean episode length: 32.37
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.0946
+            Episode_Reward/body_ang_vel: -0.0985
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0024
+          Episode_Reward/action_rate_l2: -0.3626
+   Episode_Reward/ball_forward_velocity: 0.0489
+    Episode_Reward/ball_speed_overshoot: 0.0000
+   Episode_Reward/support_foot_grounded: 0.1354
+         Episode_Reward/pose_stand_legs: 0.2187
+         Episode_Reward/pose_stand_neck: 0.0879
+            Episode_Reward/height_stand: 0.1161
+         Episode_Reward/self_collisions: -0.0019
+        Episode_Metrics/mean_action_acc: 1.9128
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+             Metrics/twist/error_vel_xy: 0.0186
+            Metrics/twist/error_vel_yaw: 0.1281
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 2.3750
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+          Metrics/angular_momentum_mean: 0.0122
+--------------------------------------------------------------------------------
+                         Iteration time: 0.79s
+                           Time elapsed: 00:00:03
+                                    ETA: 00:00:02
+
+################################################################################
+[1m                             Learning iteration 3/5                             [0m 
+
+                               Run name: smoke
+                            Total steps: 6144 
+                       Steps per second: 1867 
+                        Collection time: 0.767s 
+                          Learning time: 0.055s 
+                        Mean value loss: 0.1899
+                    Mean surrogate loss: -0.0396
+                      Mean entropy loss: 19.8572
+                            Mean reward: 1.27
+                    Mean episode length: 33.74
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.0801
+            Episode_Reward/body_ang_vel: -0.0918
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0022
+          Episode_Reward/action_rate_l2: -0.3549
+   Episode_Reward/ball_forward_velocity: 0.0770
+    Episode_Reward/ball_speed_overshoot: 0.0000
+   Episode_Reward/support_foot_grounded: 0.1300
+         Episode_Reward/pose_stand_legs: 0.2157
+         Episode_Reward/pose_stand_neck: 0.0871
+            Episode_Reward/height_stand: 0.1133
+         Episode_Reward/self_collisions: -0.0027
+        Episode_Metrics/mean_action_acc: 1.9137
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+             Metrics/twist/error_vel_xy: 0.0165
+            Metrics/twist/error_vel_yaw: 0.1206
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 2.0417
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+          Metrics/angular_momentum_mean: 0.0121
+--------------------------------------------------------------------------------
+                         Iteration time: 0.82s
+                           Time elapsed: 00:00:03
+                                    ETA: 00:00:00
+
+################################################################################
+[1m                             Learning iteration 4/5                             [0m 
+
+                               Run name: smoke
+                            Total steps: 7680 
+                       Steps per second: 1851 
+                        Collection time: 0.774s 
+                          Learning time: 0.056s 
+                        Mean value loss: 0.2028
+                    Mean surrogate loss: -0.0381
+                      Mean entropy loss: 19.8548
+                            Mean reward: 1.44
+                    Mean episode length: 34.56
+                        Mean action std: 1.00
+                 Episode_Reward/upright: 0.1305
+            Episode_Reward/body_ang_vel: -0.1062
+        Episode_Reward/angular_momentum: -0.0000
+          Episode_Reward/dof_pos_limits: -0.0025
+          Episode_Reward/action_rate_l2: -0.4241
+   Episode_Reward/ball_forward_velocity: 0.0899
+    Episode_Reward/ball_speed_overshoot: 0.0000
+   Episode_Reward/support_foot_grounded: 0.1561
+         Episode_Reward/pose_stand_legs: 0.2569
+         Episode_Reward/pose_stand_neck: 0.0995
+            Episode_Reward/height_stand: 0.1361
+         Episode_Reward/self_collisions: -0.0068
+        Episode_Metrics/mean_action_acc: 1.9101
+          Curriculum/action_rate_weight: -0.1000
+                   Curriculum/com_range: 0.0030
+              Curriculum/head_com_range: 0.0030
+              Curriculum/push_magnitude: 0.0000
+             Metrics/twist/error_vel_xy: 0.0201
+            Metrics/twist/error_vel_yaw: 0.1555
+           Episode_Termination/time_out: 0.0000
+          Episode_Termination/fell_over: 2.1667
+Episode_Termination/out_of_terrain_bounds: 0.0000
+          Episode_Termination/nan_state: 0.0000
+          Metrics/angular_momentum_mean: 0.0120
+--------------------------------------------------------------------------------
+                         Iteration time: 0.83s
+                           Time elapsed: 00:00:04
+                                    ETA: 00:00:00
+

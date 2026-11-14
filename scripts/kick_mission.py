@@ -640,6 +640,11 @@ def setup_goal(sim, name="goal_a"):
     ball_body = m.geom_bodyid[sim.ball_geom]
     sim.robot_geoms = {g for g in range(m.ngeom)
                        if m.body_rootid[m.geom_bodyid[g]] not in (0, ball_body) and m.body_mocapid[m.geom_bodyid[g]] < 0}
+    # Render statistics: BAM's MujocoController calls mj_setConst, which recomputes extent/center
+    # from the parked goals (+-50 m -> extent 100 m: blocky shadows, black horizon lines). Restore
+    # the scene file's pinned <statistic>. extent/center are render-only (the solver uses meaninertia).
+    spec = mujoco.MjSpec.from_file(SCENES["allcollisions_ball_goal"])
+    m.stat.extent, m.stat.center[:] = spec.stat.extent, spec.stat.center
 
 
 def place_goal(sim, centre, into_yaw):

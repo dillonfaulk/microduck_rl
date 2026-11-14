@@ -1,0 +1,90 @@
+BallKick v2 (both feet) -- evaluation summary, 2026-11-13/14
+================================================================
+Brief: microduck-ballkick-v2-training-brief.md, Phase 2. Sim only.
+
+Changes vs v1 (approved by Dillon, MICRODUCK_BALLKICK_V2=1; unset = v1):
+  ball_speed_overshoot weight  -4 -> -8
+  start-stance joint noise     +-0.05 -> +-0.08 rad (PrecisionStep's own value)
+  sweep: 1500 iterations per foot, from scratch, 4096 envs, GPU0 only
+Runs (confirmed in params/env.yaml: overshoot -8.0, position_range +-0.08):
+  right logs/rsl_rl/ball_kick_v2_right/2026-11-13_18-51-32_v2_right_chunk1  (56 min, 2.2 s/it)
+  left  logs/rsl_rl/ball_kick_v2_left/2026-11-13_19-50-52_v2_left_chunk1    (57 min, 2.2 s/it)
+  both: 12 reward terms, no penalty term changed sign on any readout, nan_state 0 throughout.
+
+Missions = kick_mission.py 2 x 30 (seeds 0, 1), VelStand round3 3999 + PrecisionStep v2 2500.
+Columns: kicked/60 | direction median, std, [range], by ball-distance thirds | peak ball
+speed median, max, missions > 0.40 m/s (1.6x) | roll median.
++ = ball went LEFT of the intended line. Target speed 0.25 m/s (1.3x = 0.325).
+
+1. UNCALIBRATED SWEEP (aim offset 0, stance 0)
+right 500   60/60  +9.0  std 2.6 [+2.2,+13.7]  +9.9/+8.8/+8.8   | 0.467 0.509 60/60 | 1.04 m
+right 750   60/60  +7.2  std 3.0 [+1.5,+13.5]  +7.5/+6.8/+7.3   | 0.433 0.491 56/60 | 1.13 m
+right 1000  60/60  +6.2  std 3.0 [+0.3,+12.7]  +6.2/+6.2/+6.6   | 0.436 0.465 54/60 | 1.07 m
+right 1250  60/60  +6.7  std 3.1 [-0.7,+11.3]  +6.8/+6.8/+6.3   | 0.370 0.410  3/60 | 0.86 m   <- WINNER
+right 1499  60/60 +14.3  std 2.2 [+10.6,+19.7] +14.5/+14.2/+14.4| 0.408 0.460 42/60 | 1.00 m
+left  500   60/60 -12.2  std 2.8 [-15.9,-4.2]  -12.8/-12.2/-11.3| 0.361 0.406  4/60 | 0.81 m   <- WINNER
+left  750   60/60 -15.4  std 2.4 [-21.6,-11.7] -15.1/-15.9/-15.6| 0.398 0.436 27/60 | 0.99 m
+left  1000  60/60 -16.7  std 2.0 [-21.9,-12.6] -16.9/-16.2/-16.7| 0.424 0.450 52/60 | 1.04 m
+left  1250  60/60 -18.6  std 2.5 [-23.4,-11.9] -17.9/-18.6/-18.0| 0.432 0.460 55/60 | 1.12 m
+left  1499  60/60 -18.7  std 2.6 [-25.0,-12.4] -18.4/-18.9/-19.2| 0.414 0.456 45/60 | 1.07 m
+=> No overfitting on either foot (v1 fell to 42/60 by 1999). Drift flat across distance.
+   Winners = softest kick on each foot (Dillon's picks): right 1250, left 500.
+
+2. STANCE / AIM CALIBRATION (each foot measured on its own checkpoint)
+right 1250 stance +7 mm, aim 0      60/60 +11.8 std 2.8 | 0.405 0.454 36/60 | 0.99 m
+right 1250 stance +7, aim -11.8     60/60  -0.6 std 2.6 [-5.0,+7.0] | 0.403 0.445 31/60 | 1.00 m
+right 1250 stance 0, aim -6.7       60/60  -0.1 std 3.2 [-9.3,+4.9] | 0.365 0.413  1/60 | 0.87 m  <- CHOSEN
+left  500  stance +9 mm, aim 0      60/60 -14.6 std 2.0 | 0.432 0.478 56/60 | 1.01 m
+left  1000 stance +9 mm, aim 0      60/60 -17.6 std 2.4 | 0.451 0.480 60/60 | 1.16 m
+left  500  stance +9, aim +14.6     60/60  +0.5 std 1.8 [-4.0,+5.6] | 0.440 0.495 57/60 | 1.00 m
+left  500  stance 0, aim +12.2      60/60  -0.1 std 2.4 [-3.4,+6.8] | 0.365 0.422  4/60 | 0.81 m  <- CHOSEN
+=> A closer stance is faster, tighter and rolls further, but puts almost every kick over
+   1.6x. Dillon chose stance 0 on both feet (speed over spread):
+   kick_mission.py --calib v2 = right (0 m, -6.7 deg), left (0 m, +12.2 deg).
+
+3. BATTERIES (50 episodes each; GOOD = kicked and standing at the end, never fell)
+                standing  handoff  push@1.0s  push@3.5s
+right 500        50/50     50/50
+right 750        49/50     50/50
+right 1000       45/50     49/50
+right 1250       46/50     49/50     49/50      49/50     <- winner
+right 1499       50/50     49/50
+left  500        50/50     50/50     50/50      50/50     <- winner
+left  750        47/50     50/50
+left  1000       49/50     50/50     50/50      50/50
+left  1250       50/50     50/50
+left  1499       47/50     50/50
+No falls in any battery (standing 50/50 at the end everywhere); the misses are kicks that
+did not happen within the window. Right 1250 standing battery 46/50 is its weakest number.
+
+4. DILLON'S LIVE VIEWER, 30 missions back to back, --calib v2
+right 1250 (logs/kick_mission/2026-11-14_13-29-20_viewer)
+  30/30 kicked, 0 missed, 0 aborted, 0 falls
+  direction -1.0 median, std 3.2, [-8,+6], 26/30 within 5 deg
+  peak 0.35 m/s median (1.40x), max 0.40, 0 over 0.40; roll 0.84 m
+left 500 (logs/kick_mission/2026-11-14_13-47-44_viewer)
+  30/30 kicked, 0 missed, 0 aborted, 0 falls
+  direction 0.0 median, std 2.8, [-4,+7], 28/30 within 5 deg
+  peak 0.36 m/s median (1.44x), max 0.41, 1 over 0.40; roll 0.78 m
+Both reruns (14-16-39 right, 14-04-49 left) reproduce these byte for byte (deterministic).
+Clips: logs/kick_mission/ballkick_v2_{right,left}_viewer_60s.mp4 (+ left take2).
+
+5. AGAINST THE BRIEF'S BARS
+  viewer 30/30 per foot, median within +-2 deg ......... MET (right -1.0, left 0.0)
+  no overfitting (missions hold to the last checkpoint)  MET (60/60 at every checkpoint)
+  speed: median <= 1.3x, none over 1.6x ................ MISSED (right 1.46x / left 1.46x
+                                                         headless; viewer 1.40x / 1.44x;
+                                                         1 + 4 headless and 0 + 1 viewer
+                                                         kicks over 1.6x). Dillon accepted
+                                                         ("option 1").
+  spread tighter than v1 ............................... MISSED. Calibrated std right 3.2
+                                                         vs v1 1.6, left 2.4 vs v1 1.9
+                                                         (v1 kicks through the same
+                                                         PrecisionStep v2). Spread tracks
+                                                         lateral placement (corr ~+0.55).
+  right push/handoff ................................... 49/50 each (1 non-kick, 0 falls)
+Speed vs v1 (missions, same PrecisionStep): right 0.468 -> 0.365, left 0.422 -> 0.365 m/s;
+roll right 1.21 -> 0.87 m, left 1.17 -> 0.81 m.
+
+ONNX (scripts/export.py, [1,61] -> [1,14], normalizer baked in), max abs diff vs PyTorch:
+  right model_1250 1.91e-6, left model_500 3.34e-6.

@@ -1,0 +1,862 @@
+--- git commit ---
+21d67d6e2a1e0397996541bb6c22485a180d8b30
+
+
+--- git status ---
+On branch local/velstand-own-teachers
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   logs/training/precision_step/precision_step_memprobe_gpu.txt
+	modified:   src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+	modified:   tests/test_ball_kick_cfg.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tensorboard.log
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/logs/training/precision_step/precision_step_memprobe_gpu.txt b/logs/training/precision_step/precision_step_memprobe_gpu.txt
+index 2c0c4982..b7cce110 100644
+--- a/logs/training/precision_step/precision_step_memprobe_gpu.txt
++++ b/logs/training/precision_step/precision_step_memprobe_gpu.txt
+@@ -179114,3 +179114,750 @@
+ 1030
+ 1030
+ 1001
++1081
++1081
++1054
++1088
++1087
++1099
++1072
++1071
++1031
++998
++996
++996
++996
++996
++996
++996
++996
++996
++996
++996
++996
++1000
++1000
++1000
++1058
++1053
++1056
++1053
++1009
++1002
++1068
++1040
++1039
++1056
++1055
++1047
++1035
++1035
++1011
++997
++997
++997
++997
++1036
++1056
++1037
++1033
++1027
++1002
++970
++970
++970
++986
++986
++986
++976
++975
++983
++1056
++1037
++1025
++1024
++1020
++1008
++996
++996
++1030
++1030
++1016
++1016
++1008
++1014
++1014
++1018
++1016
++1015
++995
++971
++970
++970
++970
++970
++970
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++968
++968
++968
++968
++967
++967
++967
++967
++967
++967
++971
++971
++971
++971
++971
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++968
++968
++968
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++967
++946
++946
++946
++947
++947
++947
++947
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++947
++947
++947
++947
++947
++947
++947
++947
++947
++946
++946
++946
++946
++946
++946
++946
++946
++946
++950
++951
++951
++950
++950
++950
++946
++946
++946
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++943
++943
++943
++942
++943
++939
++938
++938
++947
++947
++947
++946
++947
++942
++942
++942
++948
++947
++947
++947
++947
++947
++947
++947
++947
++951
++951
++951
++951
++951
++946
++946
++946
++947
++947
++951
++951
++951
++951
++951
++951
++951
++951
++951
++951
++946
++946
++947
++947
++947
++947
++947
++946
++947
++947
++947
++947
++947
++947
++947
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++946
++947
++947
++951
++951
++951
++951
++951
++951
++951
++956
++955
++955
++977
++1020
++1021
++1022
++1021
++1020
++999
++984
++980
++976
++976
++971
++971
++971
++971
++971
++971
++971
++971
++971
++971
++971
++971
++980
++983
++984
++984
++984
++984
++982
++977
++968
++976
++976
++976
++974
++971
++978
++978
++977
++973
++969
++968
++960
++957
++957
++974
++966
++969
++973
++964
++972
++970
++968
++968
++960
++957
++957
++957
++957
++957
++957
++970
++965
++975
++979
++979
++975
++973
++978
++978
++1014
++1013
++1007
++1001
++1001
++1002
++1002
++986
++999
++999
++985
++993
++990
++1001
++999
++996
++1002
++1002
++994
++996
++989
++989
++987
++992
++990
++989
++974
++989
++989
++989
++990
++976
++987
++985
++986
++996
++996
++999
++1001
++992
++976
++976
++976
++989
++989
++982
++974
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++973
++974
++973
++973
++973
++973
++973
++973
++973
++973
++973
++987
++987
++987
++987
++993
++1033
++1027
++1025
++1013
++1013
++992
++972
++972
++972
++972
++972
++972
++972
++967
++967
++967
++967
++967
++967
++967
++972
++972
++972
++972
++972
++967
++967
++967
++967
++967
++967
++967
++967
++962
++967
++967
++967
++967
++967
++997
++983
++983
++1006
++995
++1036
++1027
++1026
++1028
++1047
++1046
++1033
++1032
++1032
++978
++978
++978
++978
++978
++978
++978
++969
++969
++969
++969
++1052
++1055
++1028
++1022
++1022
++966
++958
++958
++1029
++1015
++1014
++1014
++1014
++985
++981
++981
++1012
++1012
++1001
++1001
++1002
++977
++973
++973
++1039
++1033
++1015
++1013
++1005
++959
++958
++1027
++1027
++1013
++1012
++1012
++1176
++1176
++1176
++1176
++1178
++1178
++1180
++1182
++1218
++1222
++1296
++1312
++1312
++1312
++992
++992
++986
++1040
++1021
++1024
++1029
++1033
++1019
++1020
++1046
++1006
++1005
++1003
++995
++961
++960
++961
++1021
++1007
++1006
++1031
++1031
++1175
++2163
++2988
++2960
++2950
++2950
++3025
++3025
++3013
++3040
++3408
++3386
+diff --git a/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py b/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+index 9895b8c6..8b51816f 100644
+--- a/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
++++ b/src/mjlab_microduck/tasks/microduck_ball_kick_env_cfg.py
+@@ -102,6 +102,18 @@ BALL_POS_NOISE_XY = 0.015
+ # byte-identical to upstream behavior.
+ BALL_TARGET_SPEED = float(os.environ.get("MICRODUCK_BALL_TARGET_SPEED", "1.0"))
+ 
++# BallKick v2 (fork-local, Dillon 2026-11-13): MICRODUCK_BALLKICK_V2=1 applies the
++# two named v2 changes; unset = v1 recipe.
++#   1. Overshoot weight -4 -> -8. With +12/(m/s) below target and only -4 above,
++#      the best response under kick-to-kick noise puts ~75% of kicks over the
++#      target (12/(12+4)) -> the measured 1.4-1.8x. At -8 that is ~60%; kicking
++#      still beats not kicking up to 0.625 m/s (2.5x) at a 0.25 target.
++#   2. Start-stance joint noise +-0.05 -> +-0.08 rad (PrecisionStep's own value;
++#      both v1 feet overfit the +-0.05 start stance after ~1000-1500 its).
++BALLKICK_V2 = os.environ.get("MICRODUCK_BALLKICK_V2", "0") == "1"
++OVERSHOOT_WEIGHT = -8.0 if BALLKICK_V2 else -4.0
++START_JOINT_NOISE = 0.08 if BALLKICK_V2 else 0.05
++
+ # Trunk standing height (measured natural equilibrium at HOME — see standup env).
+ STAND_Z = 0.115
+ 
+@@ -250,7 +262,7 @@ def make_microduck_ball_kick_env_cfg(
+     )
+     cfg.rewards["ball_speed_overshoot"] = RewardTermCfg(
+         func=microduck_mdp.ball_speed_overshoot_penalty,
+-        weight=-4.0,
++        weight=OVERSHOOT_WEIGHT,
+         params={"asset_name": "ball", "target_speed": BALL_TARGET_SPEED},
+     )
+ 
+@@ -438,7 +450,7 @@ def make_microduck_ball_kick_env_cfg(
+ 
+     # Joint noise on the standing start: deployment hands off from the walk /
+     # velstand policy, whose settled stand won't match HOME exactly.
+-    cfg.events["reset_robot_joints"].params["position_range"] = (-0.05, 0.05)
++    cfg.events["reset_robot_joints"].params["position_range"] = (-START_JOINT_NOISE, START_JOINT_NOISE)
+ 
+     # Standing-only start (reuses the standup env's ground-state machinery for
+     # the noisy upright spawn: random yaw ± tilt noise, z near equilibrium).
+@@ -661,8 +673,8 @@ MicroduckBallKickRlCfg = RslRlOnPolicyRunnerCfg(
+         symmetry_cfg=SYMMETRY_CFG if ENABLE_SYMMETRY else None,
+     ),
+     wandb_project="mjlab_microduck",
+-    experiment_name=f"ball_kick_{KICK_FOOT}",
+-    run_name=f"ball_kick_{KICK_FOOT}",
++    experiment_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
++    run_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
+     save_interval=250,
+     num_steps_per_env=24,
+     max_iterations=10_000,
+diff --git a/tests/test_ball_kick_cfg.py b/tests/test_ball_kick_cfg.py
+index 52a82b71..deca780b 100644
+--- a/tests/test_ball_kick_cfg.py
++++ b/tests/test_ball_kick_cfg.py
+@@ -56,3 +56,29 @@ def test_kick_foot_env_left_mirrors_ball_support_and_experiment(monkeypatch):
+     finally:
+         monkeypatch.delenv("MICRODUCK_KICK_FOOT")
+         importlib.reload(bk)
++
++
++def test_v2_default_off_keeps_v1_recipe(monkeypatch):
++    monkeypatch.delenv("MICRODUCK_BALLKICK_V2", raising=False)
++    mod = importlib.reload(bk)
++    cfg = mod.make_microduck_ball_kick_env_cfg()
++    assert cfg.rewards["ball_speed_overshoot"].weight == -4.0
++    assert cfg.events["reset_robot_joints"].params["position_range"] == (-0.05, 0.05)
++    assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_right"
++
++
++def test_v2_env_sets_overshoot_start_noise_and_experiment(monkeypatch):
++    monkeypatch.setenv("MICRODUCK_BALLKICK_V2", "1")
++    monkeypatch.setenv("MICRODUCK_KICK_FOOT", "left")
++    try:
++        mod = importlib.reload(bk)
++        cfg = mod.make_microduck_ball_kick_env_cfg()
++        w = cfg.rewards["ball_speed_overshoot"].weight
++        assert w == -8.0 and abs(w) < cfg.rewards["ball_forward_velocity"].weight   # kicking still pays
++        assert cfg.events["reset_robot_joints"].params["position_range"] == (-0.08, 0.08)
++        assert cfg.events["reset_ball"].params["offset"] == (0.09, 0.042)
++        assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_v2_left"
++    finally:
++        monkeypatch.delenv("MICRODUCK_BALLKICK_V2")
++        monkeypatch.delenv("MICRODUCK_KICK_FOOT")
++        importlib.reload(bk)

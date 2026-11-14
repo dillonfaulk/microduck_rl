@@ -108,9 +108,13 @@ PRECISE_MAX_YAW = math.radians(15)
 #   +7.4 mm far; +7 mm put it on the spot and rolled 0.87 -> 0.99 m but raised the peak ball speed
 #   0.37 -> 0.41 m/s (31/60 over 0.40), against v2's overshoot goal. Drift at 0 mm: +6.7 deg
 #   median (std 3.1, flat across distance: +6.8/+6.8/+6.3) -> aim -6.7 -> -0.1 deg median.
+#   LEFT (ball_kick_v2_left model_500): stance 0 by decision (Dillon). Unshifted the ball sits
+#   +10.5 mm far; +9 mm (bump-free under PrecisionStep v2) tightened the spread (std 2.4 -> 1.8)
+#   and rolled 0.81 -> 1.00 m but raised the peak 0.365 -> 0.44 m/s (57/60 over 0.40). Drift at
+#   0 mm: -12.2 deg (RIGHT; std 2.8, flat: -12.8/-12.2/-11.3) -> aim +12.2 -> -0.1 deg median.
 CALIBRATIONS = {  # (stance shift m, aim offset deg) per kicking foot
     "v1": {"right": (0.010, -17.9), "left": (0.0, 11.2)},
-    "v2": {"right": (0.0, -6.7), "left": (0.0, 0.0)},   # left v2: NOT YET CALIBRATED
+    "v2": {"right": (0.0, -6.7), "left": (0.0, 12.2)},
 }
 PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.010")),
                           "left": float(os.environ.get("KICK_STANCE_SHIFT_LEFT", "0.0"))}

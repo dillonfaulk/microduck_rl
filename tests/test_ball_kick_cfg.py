@@ -56,3 +56,29 @@ def test_kick_foot_env_left_mirrors_ball_support_and_experiment(monkeypatch):
     finally:
         monkeypatch.delenv("MICRODUCK_KICK_FOOT")
         importlib.reload(bk)
+
+
+def test_v2_default_off_keeps_v1_recipe(monkeypatch):
+    monkeypatch.delenv("MICRODUCK_BALLKICK_V2", raising=False)
+    mod = importlib.reload(bk)
+    cfg = mod.make_microduck_ball_kick_env_cfg()
+    assert cfg.rewards["ball_speed_overshoot"].weight == -4.0
+    assert cfg.events["reset_robot_joints"].params["position_range"] == (-0.05, 0.05)
+    assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_right"
+
+
+def test_v2_env_sets_overshoot_start_noise_and_experiment(monkeypatch):
+    monkeypatch.setenv("MICRODUCK_BALLKICK_V2", "1")
+    monkeypatch.setenv("MICRODUCK_KICK_FOOT", "left")
+    try:
+        mod = importlib.reload(bk)
+        cfg = mod.make_microduck_ball_kick_env_cfg()
+        w = cfg.rewards["ball_speed_overshoot"].weight
+        assert w == -8.0 and abs(w) < cfg.rewards["ball_forward_velocity"].weight   # kicking still pays
+        assert cfg.events["reset_robot_joints"].params["position_range"] == (-0.08, 0.08)
+        assert cfg.events["reset_ball"].params["offset"] == (0.09, 0.042)
+        assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_v2_left"
+    finally:
+        monkeypatch.delenv("MICRODUCK_BALLKICK_V2")
+        monkeypatch.delenv("MICRODUCK_KICK_FOOT")
+        importlib.reload(bk)

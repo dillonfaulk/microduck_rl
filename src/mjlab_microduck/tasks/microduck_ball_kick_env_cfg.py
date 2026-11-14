@@ -102,6 +102,18 @@ BALL_POS_NOISE_XY = 0.015
 # byte-identical to upstream behavior.
 BALL_TARGET_SPEED = float(os.environ.get("MICRODUCK_BALL_TARGET_SPEED", "1.0"))
 
+# BallKick v2 (fork-local, Dillon 2026-11-13): MICRODUCK_BALLKICK_V2=1 applies the
+# two named v2 changes; unset = v1 recipe.
+#   1. Overshoot weight -4 -> -8. With +12/(m/s) below target and only -4 above,
+#      the best response under kick-to-kick noise puts ~75% of kicks over the
+#      target (12/(12+4)) -> the measured 1.4-1.8x. At -8 that is ~60%; kicking
+#      still beats not kicking up to 0.625 m/s (2.5x) at a 0.25 target.
+#   2. Start-stance joint noise +-0.05 -> +-0.08 rad (PrecisionStep's own value;
+#      both v1 feet overfit the +-0.05 start stance after ~1000-1500 its).
+BALLKICK_V2 = os.environ.get("MICRODUCK_BALLKICK_V2", "0") == "1"
+OVERSHOOT_WEIGHT = -8.0 if BALLKICK_V2 else -4.0
+START_JOINT_NOISE = 0.08 if BALLKICK_V2 else 0.05
+
 # Trunk standing height (measured natural equilibrium at HOME — see standup env).
 STAND_Z = 0.115
 
@@ -250,7 +262,7 @@ def make_microduck_ball_kick_env_cfg(
     )
     cfg.rewards["ball_speed_overshoot"] = RewardTermCfg(
         func=microduck_mdp.ball_speed_overshoot_penalty,
-        weight=-4.0,
+        weight=OVERSHOOT_WEIGHT,
         params={"asset_name": "ball", "target_speed": BALL_TARGET_SPEED},
     )
 
@@ -438,7 +450,7 @@ def make_microduck_ball_kick_env_cfg(
 
     # Joint noise on the standing start: deployment hands off from the walk /
     # velstand policy, whose settled stand won't match HOME exactly.
-    cfg.events["reset_robot_joints"].params["position_range"] = (-0.05, 0.05)
+    cfg.events["reset_robot_joints"].params["position_range"] = (-START_JOINT_NOISE, START_JOINT_NOISE)
 
     # Standing-only start (reuses the standup env's ground-state machinery for
     # the noisy upright spawn: random yaw ± tilt noise, z near equilibrium).
@@ -661,8 +673,8 @@ MicroduckBallKickRlCfg = RslRlOnPolicyRunnerCfg(
         symmetry_cfg=SYMMETRY_CFG if ENABLE_SYMMETRY else None,
     ),
     wandb_project="mjlab_microduck",
-    experiment_name=f"ball_kick_{KICK_FOOT}",
-    run_name=f"ball_kick_{KICK_FOOT}",
+    experiment_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
+    run_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
     save_interval=250,
     num_steps_per_env=24,
     max_iterations=10_000,

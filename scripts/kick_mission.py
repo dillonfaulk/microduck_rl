@@ -100,6 +100,18 @@ PRECISE_MAX_YAW = math.radians(15)
 # Unshifted, the ball sits +9.4 mm far of the kick spot but already rolls 1.19 m (60/60,
 # 0 bumps). +9 mm was tested and REJECTED: 2/60 bumps, the step policy's stepping foot clipped
 # the ball during PRECISE (PrecisionStep trained with the ball on the right side only).
+#
+# Calibrations are properties of a kick CHECKPOINT, so each kick generation has its own table
+# (--calib v1|v2, default v1). Env vars still override any table value.
+# v2 (BallKick v2, 2026-11-13, through PrecisionStep v2 model_2500, seeds 0+1, 60 missions):
+#   RIGHT (ball_kick_v2_right model_1250): stance 0 by decision (Dillon). Unshifted the ball sits
+#   +7.4 mm far; +7 mm put it on the spot and rolled 0.87 -> 0.99 m but raised the peak ball speed
+#   0.37 -> 0.41 m/s (31/60 over 0.40), against v2's overshoot goal. Drift at 0 mm: +6.7 deg
+#   median (std 3.1, flat across distance: +6.8/+6.8/+6.3) -> aim -6.7 -> -0.1 deg median.
+CALIBRATIONS = {  # (stance shift m, aim offset deg) per kicking foot
+    "v1": {"right": (0.010, -17.9), "left": (0.0, 11.2)},
+    "v2": {"right": (0.0, -6.7), "left": (0.0, 0.0)},   # left v2: NOT YET CALIBRATED
+}
 PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.010")),
                           "left": float(os.environ.get("KICK_STANCE_SHIFT_LEFT", "0.0"))}
 # Aim offset for BallKick v1's (right foot, ts0.25 model_1000) left drift. The duck lines up
@@ -112,6 +124,16 @@ PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.
 # POSITIVE (aim left). 60 missions, seeds 0+1.
 KICK_AIM_OFFSET = {"right": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG", "-17.9"))),
                    "left": math.radians(float(os.environ.get("KICK_AIM_OFFSET_DEG_LEFT", "11.2")))}
+_CALIB_ENV = {"right": ("KICK_STANCE_SHIFT", "KICK_AIM_OFFSET_DEG"),
+              "left": ("KICK_STANCE_SHIFT_LEFT", "KICK_AIM_OFFSET_DEG_LEFT")}
+
+
+def apply_calibration(calib):
+    """Load one kick generation's table into the per-foot dicts (env vars still win)."""
+    for foot, (shift, aim) in CALIBRATIONS[calib].items():
+        env_s, env_a = _CALIB_ENV[foot]
+        PRECISE_STANCE_SHIFT_M[foot] = float(os.environ.get(env_s, shift))
+        KICK_AIM_OFFSET[foot] = math.radians(float(os.environ.get(env_a, aim)))
 
 
 def clamp_align(vx, vy, wz):
@@ -725,7 +747,10 @@ def main():
                     help="kicking foot of the kick ONNX (sets the stance side and that foot's calibrations)")
     ap.add_argument("--precision", default=None,
                     help="PrecisionStep ONNX for the final approach (pulse aligner stays as the fallback)")
+    ap.add_argument("--calib", choices=tuple(CALIBRATIONS), default="v1",
+                    help="which kick generation's stance/aim calibrations to use (v1 = BallKick v1 winners)")
     args = ap.parse_args()
+    apply_calibration(args.calib)
     run_viewer(args) if args.viewer else run_headless(args)
 
 

@@ -28,7 +28,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from goto_point import CONTROL_DT, DuckSim  # noqa: E402
 
 SCENES = {"ball": "src/mjlab_microduck/robot/microduck/scene_ball.xml",
-          "allcollisions_ball": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball.xml"}
+          "allcollisions_ball": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball.xml",
+          "allcollisions_ball_goal": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball_goal.xml"}
 # microduck_ball_kick_env_cfg
 BALL_OFFSET_X, BALL_OFFSET_ABS_Y, BALL_RADIUS, BALL_NOISE = 0.09, 0.042, 0.035, 0.015
 EPISODE_S = 5.0

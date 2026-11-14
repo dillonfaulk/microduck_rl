@@ -1,0 +1,31 @@
+<mujoco model="microduck_goals">
+    <!-- Two small-sided goals (fork-local, GoalKick rung 5; sized for the 70 mm kick ball).
+         THE single definition of goal geometry: scripts/soccer_referee.py reads the opening,
+         post radius and goal frame back from the compiled model, nothing is hand-copied.
+
+         Each goal is a mocap body, so a mission (or a future 2v2 match) places it per episode
+         by writing data.mocap_pos / mocap_quat. Goal frame: origin = centre of the goal line,
+         +x = INTO the goal (away from the field), +y = left when facing into the goal.
+
+         Opening 210 mm clear between the posts' inner faces = 3 ball widths (Dillon,
+         2026-11-14). Posts: 20 mm diameter, 120 mm tall, full collision with the ball and the
+         ducks (contype/conaffinity 1, like the robot and ball). No crossbar: the ball stays on
+         the floor. post centre y = +-(0.105 + 0.010) = +-0.115. -->
+    <default>
+        <default class="goal_post">
+            <geom type="cylinder" size="0.010 0.060" contype="1" conaffinity="1" friction="0.5 0.005 0.0001"
+                  rgba="0.95 0.95 0.95 1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <body name="goal_a" mocap="true" pos="50 0 0">
+            <geom name="goal_a_post_left" class="goal_post" pos="0 0.115 0.060"/>
+            <geom name="goal_a_post_right" class="goal_post" pos="0 -0.115 0.060"/>
+        </body>
+        <body name="goal_b" mocap="true" pos="-50 0 0" euler="0 0 3.14159265">
+            <geom name="goal_b_post_left" class="goal_post" pos="0 0.115 0.060"/>
+            <geom name="goal_b_post_right" class="goal_post" pos="0 -0.115 0.060"/>
+        </body>
+    </worldbody>
+</mujoco>

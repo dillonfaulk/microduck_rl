@@ -49,6 +49,14 @@ import infer_policy as ip  # noqa: E402
 from goto_point import CONTROL_DT, RunLog  # noqa: E402
 from goto_supervisor import GotoConfig, GotoSupervisor, wrap_angle  # noqa: E402
 from kick_battery import BALL_OFFSET_ABS_Y, BALL_OFFSET_X, SCENES, KickSim  # noqa: E402
+from soccer_referee import Goal, GoalReferee  # noqa: E402
+
+# GoalKick v0 (rung 5, Option A: frozen policies, the goal is a mission feature). With
+# --goal-dist D a goal (scene_allcollisions_ball_goal.xml, 210 mm opening) stands D m past
+# the ball on the kick line; the duck kicks along the ball->goal line with the per-foot
+# --calib aim, and soccer_referee.GoalReferee scores goal / post / miss / no_cross.
+GOAL_TIMEOUT_S = 10.0   # from the kick swap-in; the frictionless ball rolls ~0.17-0.25 m/s after a kick
+GOAL_APPROACH_DEG = (0, 45, -45, 90, -90)   # duck walk-in vs ball->goal line; never from behind the goal
 
 ARENA = (-2.5, 2.5, -2.5, 2.5)
 PRE_STANCE_M = 0.12        # approach point this far behind the stance spot, on the kick line
@@ -217,8 +225,11 @@ class Aligner:
 
 
 class Mission:
-    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None):
+    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None, goal=None):
         self.sim, self.kick_session = sim, kick_session
+        self.goal = goal              # soccer_referee.Goal, or None for a plain kick mission
+        self.referee = None
+        self.measured = False
         self.kh_goal = kick_heading                              # where the ball should go
         self.foot = foot
         self.kh = wrap_angle(kick_heading + KICK_AIM_OFFSET[foot])  # where the duck faces (aim-corrected)
@@ -256,6 +267,10 @@ class Mission:
                    "foot": foot, "aim_offset_deg": round(math.degrees(KICK_AIM_OFFSET[foot]), 1),
                    "stance_shift_mm": round(PRECISE_STANCE_SHIFT_M[foot] * 1000, 1),
                    "stance": [round(v, 3) for v in stance], "route": [[round(v, 3) for v in p] for p in route]})
+        if goal is not None:
+            log.event({"t": 0.0, "event": "GOAL_PLACED", "centre": [round(goal.cx, 3), round(goal.cy, 3)],
+                       "into_deg": round(math.degrees(goal.yaw), 1), "opening_mm": round(goal.opening * 1000, 1),
+                       "ball_to_goal_m": round(float(math.hypot(goal.cx - b[0], goal.cy - b[1])), 3)})
 
     def stance_point(self, ball_xy):
         """Duck position that puts the ball at the trained offset when facing the kick heading."""
@@ -328,6 +343,8 @@ class Mission:
                         "mode": self.result["approach_mode"],
                         "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
         sim.policy.ort_session = self.kick_session
+        if self.goal is not None:
+            self.referee = GoalReferee(self.goal, GOAL_TIMEOUT_S)
         self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
         self.kick_ball0 = b.copy()
         self.peak = 0.0
@@ -339,6 +356,15 @@ class Mission:
         sim, t = self.sim, self.sim.t
         pose, tilt, z = sim.pose()
         b, bv = sim.ball()
+        ball_post = False
+        if self.goal is not None:
+            ball_post, duck_post = goal_contacts(sim)
+            if duck_post and not self.result.get("duck_post_contact"):
+                self.result["duck_post_contact"] = True
+                self.log.event({"t": round(t, 3), "event": "DUCK_POST_CONTACT", "phase": self.state})
+            if self.referee is not None and not self.referee.done:
+                if self.referee.update(t, float(b[0]), float(b[1]), ball_post) is not None:
+                    self.log.event({"t": round(t, 3), "event": "GOAL_DECIDED", **self.referee.result})
         if self.state in ("NAVIGATE", "ALIGN", "PRECISE_PIVOT", "PRECISE"):
             # A bumped ball: stand still until it stops rolling, then re-plan from where
             # it rests (ALIGN re-navigates if the new stance is out of reach). Chasing a
@@ -522,11 +548,17 @@ class Mission:
             if self.fell and up and not self.result.get("recovered"):
                 self.result["recovered"] = True
                 self.log.event({"t": round(t, 3), "event": "RECOVERED"})
-            if t - self.t_state >= SETTLE_S and up:
+            if t - self.t_state >= SETTLE_S and up and not self.measured:
+                # measured at the same moment as every earlier kick mission (comparable numbers);
+                # ball_travel is the distance at that moment, NOT a rest distance (frictionless ball)
                 d = b - self.kick_ball0
+                self.measured = True
                 self.result.update(peak_ball_fwd=round(self.peak, 3), ball_travel=round(float(np.linalg.norm(d)), 3),
                                    kick_dir_err_deg=round(math.degrees(wrap_angle(math.atan2(d[1], d[0]) - self.kh_goal)), 1)
                                    if np.linalg.norm(d) > 0.02 else None, t_done=round(t, 2))
+            if self.measured and (self.referee is None or self.referee.done):
+                if self.referee is not None:   # GoalKick: wait for the ball to reach the goal line
+                    self.result.update(self.referee.result, t_done=round(t, 2))
                 self.log.event({"t": round(t, 3), "event": "MISSION_DONE", **self.result})
                 self._goto("DONE")
         return (0.0, 0.0, 0.0)
@@ -550,6 +582,11 @@ def draw_mission(scn, m, sim):
         if g is not None:
             mujoco.mjv_connector(g, mujoco.mjtGeom.mjGEOM_CAPSULE, width, np.asarray(a, float), np.asarray(b, float))
 
+    if m.goal is not None:   # the goal line between the posts (the posts themselves are real geoms)
+        g = m.goal
+        c, s = math.cos(g.yaw), math.sin(g.yaw)
+        h = g.half_opening + g.post_radius
+        line((g.cx - s * h, g.cy + c * h, 0.002), (g.cx + s * h, g.cy - c * h, 0.002), [1, 1, 1, 0.9], 0.003)
     if m.state == "DONE":
         return
     b, _ = sim.ball()
@@ -570,8 +607,10 @@ def draw_mission(scn, m, sim):
             prev = (x, y)
 
 
-def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right"):
-    """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands."""
+def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right", goal_dist=None):
+    """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands.
+    With goal_dist, the kick heading is the duck's walk-in bearing turned by an approach angle drawn
+    from GOAL_APPROACH_DEG, and the goal stands goal_dist m past the ball on that line."""
     (x, y, _), _, _ = sim.pose()
     if ball is None:
         for _ in range(100):
@@ -580,10 +619,52 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=Non
             if ARENA[0] + 0.6 < ball[0] < ARENA[1] - 0.6 and ARENA[2] + 0.6 < ball[1] < ARENA[3] - 0.6:
                 break
     kh = rng.uniform(-math.pi, math.pi) if kick_heading is None else kick_heading
+    goal = None
+    if goal_dist is not None:
+        if kick_heading is None:
+            kh = wrap_angle(math.atan2(ball[1] - y, ball[0] - x) + math.radians(float(rng.choice(GOAL_APPROACH_DEG))))
+        goal = place_goal(sim, (ball[0] + goal_dist * math.cos(kh), ball[1] + goal_dist * math.sin(kh)), kh)
     sim.data.qpos[sim.bqa:sim.bqa + 7] = [ball[0], ball[1], 0.035, 1, 0, 0, 0]
     sim.data.qvel[sim.bva:sim.bva + 6] = 0
     mujoco.mj_forward(sim.model, sim.data)
-    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision)
+    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal)
+
+
+def setup_goal(sim, name="goal_a"):
+    """Cache the goal's mocap slot and the geom sets goal_contacts() needs (goal scene only)."""
+    m = sim.model
+    body = m.body(name).id
+    sim.goal_name, sim.goal_mocap = name, int(m.body_mocapid[body])
+    sim.post_geoms = {m.geom(f"{name}_post_left").id, m.geom(f"{name}_post_right").id}
+    sim.ball_geom = m.geom("ball_geom").id
+    ball_body = m.geom_bodyid[sim.ball_geom]
+    sim.robot_geoms = {g for g in range(m.ngeom)
+                       if m.body_rootid[m.geom_bodyid[g]] not in (0, ball_body) and m.body_mocapid[m.geom_bodyid[g]] < 0}
+
+
+def place_goal(sim, centre, into_yaw):
+    """Move the goal so its goal-line centre is at `centre`, facing `into_yaw`; returns the Goal
+    as the compiled model reports it (opening/post radius are read back, never hand-copied)."""
+    m, d = sim.model, sim.data
+    d.mocap_pos[sim.goal_mocap] = [centre[0], centre[1], 0.0]
+    d.mocap_quat[sim.goal_mocap] = [math.cos(into_yaw / 2), 0.0, 0.0, math.sin(into_yaw / 2)]
+    mujoco.mj_forward(m, d)
+    lp = d.geom_xpos[m.geom(f"{sim.goal_name}_post_left").id]
+    rp = d.geom_xpos[m.geom(f"{sim.goal_name}_post_right").id]
+    r = float(m.geom_size[m.geom(f"{sim.goal_name}_post_left").id][0])
+    return Goal.from_posts(lp[:2], rp[:2], r, into_yaw)
+
+
+def goal_contacts(sim):
+    """(ball touching a post, duck touching a post) this step."""
+    d, ball_post, duck_post = sim.data, False, False
+    for i in range(d.ncon):
+        g1, g2 = int(d.contact[i].geom1), int(d.contact[i].geom2)
+        if g1 in sim.post_geoms or g2 in sim.post_geoms:
+            other = g2 if g1 in sim.post_geoms else g1
+            ball_post |= other == sim.ball_geom
+            duck_post |= other in sim.robot_geoms
+    return ball_post, duck_post
 
 
 def set_feet(sim, foot):
@@ -599,14 +680,17 @@ def run_viewer(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
+    if args.goal_dist is not None:
+        setup_goal(sim)
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}_viewer"
     os.makedirs(out, exist_ok=True)
     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
     log = RunLog(echo=not args.auto)
-    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot)
+    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
+    goals = {"goal": 0, "post": 0, "miss": 0, "no_cross": 0}
 
     def report(m):
         r = m.result
@@ -616,17 +700,27 @@ def run_viewer(args):
         elif (r.get("peak_ball_fwd") or 0) > 0.05:
             tally["kicked"] += 1
             de = r.get("kick_dir_err_deg")
-            outcome = (f"KICKED  ball {r['peak_ball_fwd']:.2f} m/s, rolled {r.get('ball_travel', 0):.2f} m"
-                       + (f", {de:+.0f} deg off the arrow" if de is not None else ""))
+            if m.goal is not None:
+                outcome = (f"{r['goal_outcome'].upper():8s} ball {r['peak_ball_fwd']:.2f} m/s"
+                           + (f", {r['goal_lateral_mm']:+4.0f} mm at the line in {r['goal_t_line_s']:.1f} s"
+                              if r.get("goal_lateral_mm") is not None else "")
+                           + (" (post, in)" if r["goal_outcome"] == "post" and r.get("goal_went_in") else ""))
+            else:
+                outcome = (f"KICKED  ball {r['peak_ball_fwd']:.2f} m/s, rolled {r.get('ball_travel', 0):.2f} m"
+                           + (f", {de:+.0f} deg off the arrow" if de is not None else ""))
         else:
             tally["missed"] += 1
-            outcome = "MISSED"
+            outcome = "MISSED (no kick)"
+        if m.goal is not None and r.get("goal_outcome") and not r.get("aborted"):
+            goals[r["goal_outcome"]] += 1
         tally["falls"] += r.get("falls", 0)
         mode = {"precision": "step", "precision->pulse fallback": "step->pulse", "pulse": "pulse"}[r["approach_mode"]]
+        tail = (f"[goals {goals['goal']}, posts {goals['post']}, misses {goals['miss']}, short {goals['no_cross']}, "
+                f"falls {tally['falls']}]" if m.goal is not None else
+                f"[tally: {tally['kicked']} kicked, {tally['missed']} missed, {tally['aborted']} aborted, "
+                f"{tally['falls']} falls]")
         print(f"  mission {n + 1:2d}: {outcome:58s} [{mode}] aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
-              f"{r.get('align_ey_mm', float('nan')):+.0f}) mm in {r.get('pulses', '-')} pulses   "
-              f"[tally: {tally['kicked']} kicked, {tally['missed']} missed, {tally['aborted']} aborted, "
-              f"{tally['falls']} falls]", flush=True)
+              f"{r.get('align_ey_mm', float('nan')):+.0f}) mm in {r.get('pulses', '-')} pulses   {tail}", flush=True)
 
     print("\nKeys (type in THIS terminal): N = new mission (ball re-placed), P = push, Q = quit"
           + (f"\nAuto mode: {args.auto} missions back to back\n" if args.auto else "\n"))
@@ -650,7 +744,7 @@ def run_viewer(args):
                     log.save(f"{out}/mission{n}")
                     n += 1
                     log = RunLog()
-                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -663,9 +757,12 @@ def run_viewer(args):
                     if n >= args.auto:
                         print(f"\n  {args.auto} missions: {tally['kicked']} kicked, {tally['missed']} missed, "
                               f"{tally['aborted']} aborted, {tally['falls']} falls")
+                        if args.goal_dist is not None:
+                            print(f"  goal at {args.goal_dist:.2f} m: {goals['goal']} goals, {goals['post']} post hits, "
+                                  f"{goals['miss']} misses, {goals['no_cross']} short")
                         break
                     log = RunLog(echo=False)
-                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)
@@ -683,6 +780,8 @@ def run_headless(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
+    if args.goal_dist is not None:
+        setup_goal(sim)
     print(f"{args.foot} (kicking) foot at HOME, trunk yaw frame: ({sim.home_foot[0]*1000:.1f}, {sim.home_foot[1]*1000:.1f}) mm")
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
@@ -694,13 +793,19 @@ def run_headless(args):
     for k in range(args.runs):
         sim.reset(0.0, 0.0, rng.uniform(-math.pi, math.pi))
         bd, bb = rng.uniform(1.0, 1.8), rng.uniform(-math.pi, math.pi)
-        kh = rng.uniform(-math.pi, math.pi)
+        kh = rng.uniform(-math.pi, math.pi)   # drawn in every mode, so the default rng stream is unchanged
         ball = (bd * math.cos(bb), bd * math.sin(bb))
+        goal, approach = None, None
+        if args.goal_dist is not None:
+            # stratified approach angle (duck walk-in bearing vs ball->goal line), cycled per run
+            approach = GOAL_APPROACH_DEG[k % len(GOAL_APPROACH_DEG)]
+            kh = wrap_angle(bb + math.radians(approach))
+            goal = place_goal(sim, (ball[0] + args.goal_dist * math.cos(kh), ball[1] + args.goal_dist * math.sin(kh)), kh)
         sim.data.qpos[sim.bqa:sim.bqa + 7] = [*ball, 0.035, 1, 0, 0, 0]
         sim.data.qvel[sim.bva:sim.bva + 6] = 0
         mujoco.mj_forward(sim.model, sim.data)
         log = RunLog(echo=args.verbose)
-        m = Mission(sim, kick, kh, log, foot=args.foot, precision_session=precision)
+        m = Mission(sim, kick, kh, log, foot=args.foot, precision_session=precision, goal=goal)
         while m.state != "DONE" and sim.t < args.timeout:
             twist = m.tick()
             sim.set_twist(twist)
@@ -718,6 +823,8 @@ def run_headless(args):
             sim.policy.ort_session = m.walk_session
             m.result["timeout_in"] = m.state
         r = {"run": k, "ball_dist_m": round(bd, 2), **m.result}
+        if approach is not None:
+            r["approach_deg"] = approach
         rows.append(r)
         log.save(f"{out}/run{k}")
         print(f"  run {k}: ball {bd:.2f} m away, kick heading {math.degrees(kh):+4.0f}deg -> " +
@@ -732,6 +839,35 @@ def run_headless(args):
     for r in rows:
         modes[r["approach_mode"]] = modes.get(r["approach_mode"], 0) + 1
     print(f"  approach mode: {modes}")
+    if args.goal_dist is not None:
+        print_goal_summary(rows, args.goal_dist, args.foot)
+
+
+def print_goal_summary(rows, goal_dist, foot):
+    """The GoalKick brief's per-foot lines: goals, post hits, miss distance, kicks not taken, bumps, falls."""
+    def line(rs, label):
+        kicked = [r for r in rs if (r.get("peak_ball_fwd") or 0) > 0.05 and not r.get("aborted")]
+        oc = {o: sum(r.get("goal_outcome") == o for r in kicked) for o in ("goal", "post", "miss", "no_cross")}
+        post_in = sum(r.get("goal_outcome") == "post" and r.get("goal_went_in") for r in kicked)
+        lat = [r["goal_lateral_mm"] for r in kicked if r.get("goal_lateral_mm") is not None]
+        mb = [r["goal_miss_by_mm"] for r in kicked if r.get("goal_outcome") == "miss"]
+        tl = [r["goal_t_line_s"] for r in kicked if r.get("goal_t_line_s") is not None]
+        worst = max(lat, key=abs) if lat else float("nan")
+        print(f"  {label:14s} n={len(rs):3d}  GOALS {oc['goal']:3d}  posts {oc['post']:2d} ({post_in} in)  "
+              f"misses {oc['miss']:2d}  short {oc['no_cross']:2d} | lateral at line median "
+              f"{np.median(lat) if lat else float('nan'):+5.0f} mm, worst {worst:+5.0f}"
+              + (f", misses outside the post by median {np.median(mb):.0f} mm (max {max(mb):.0f})" if mb else "")
+              + f" | time to line {np.median(tl) if tl else float('nan'):.1f} s"
+              f" | no kick {sum(1 for r in rs if (r.get('peak_ball_fwd') or 0) <= 0.05 and not r.get('aborted'))}"
+              f", aborted {sum(1 for r in rs if r.get('aborted') or r.get('timeout_in'))}"
+              f", bumped {sum(r.get('ball_disturbed', 0) > 0 for r in rs)}, falls {sum(r.get('falls', 0) for r in rs)}"
+              f", duck hit post {sum(bool(r.get('duck_post_contact')) for r in rs)}")
+    print(f"\n  GOAL SUMMARY ({foot} foot, goal {goal_dist:.2f} m past the ball, 210 mm opening):")
+    line(rows, "all")
+    for a in GOAL_APPROACH_DEG:
+        rs = [r for r in rows if r.get("approach_deg") == a]
+        if rs:
+            line(rs, f"approach {a:+d}")
 
 
 def main():
@@ -753,7 +889,12 @@ def main():
                     help="PrecisionStep ONNX for the final approach (pulse aligner stays as the fallback)")
     ap.add_argument("--calib", choices=tuple(CALIBRATIONS), default="v1",
                     help="which kick generation's stance/aim calibrations to use (v1 = BallKick v1 winners)")
+    ap.add_argument("--goal-dist", type=float, default=None,
+                    help="GoalKick: a 210 mm goal this many m past the ball on the kick line (switches to the goal "
+                         "scene); headless cycles approach angles over GOAL_APPROACH_DEG")
     args = ap.parse_args()
+    if args.goal_dist is not None:
+        args.scene = "allcollisions_ball_goal"
     apply_calibration(args.calib)
     run_viewer(args) if args.viewer else run_headless(args)
 

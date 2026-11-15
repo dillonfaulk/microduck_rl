@@ -1,0 +1,352 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [-1.661, -0.104], "kick_heading_deg": 138.6, "aim_heading_deg": 150.8, "foot": "left", "aim_offset_deg": 12.2, "stance_shift_mm": 0.0, "stance": [-1.562, -0.111], "route": [[-1.212, -0.307], [-1.457, -0.17]]}
+{"t": 0.0, "event": "GOAL_PLACED", "centre": [-2.261, 0.425], "into_deg": 138.6, "opening_mm": 210.0, "ball_to_goal_m": 0.8}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [-1.2124256108071862, -0.30651594544438143], "pose": [0.0, 0.0, -0.532]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.89, -0.879], "heading_err_deg": -135.4, "dist": 1.251, "cmd": [0.0, 0.0, -0.8]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.021, -1.267], "heading_err_deg": -89.1, "dist": 1.267, "cmd": [0.0, 0.0, -0.8]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [1.022, -0.783], "heading_err_deg": -37.5, "dist": 1.288, "cmd": [0.0, 0.0, -0.8]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.169, -0.196], "heading_err_deg": -9.5, "dist": 1.185, "cmd": [0.2, 0.0, -0.249]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.981, 0.005], "heading_err_deg": 0.3, "dist": 0.981, "cmd": [0.2, 0.0, 0.008]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.768, 0.015], "heading_err_deg": 1.1, "dist": 0.768, "cmd": [0.2, 0.0, 0.03]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.556, 0.022], "heading_err_deg": 2.3, "dist": 0.556, "cmd": [0.2, 0.0, 0.06]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.345, 0.004], "heading_err_deg": 0.7, "dist": 0.345, "cmd": [0.2, 0.0, 0.018]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.133, 0.004], "heading_err_deg": 1.5, "dist": 0.133, "cmd": [0.2, 0.0, 0.04]}
+{"t": 8.44, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.058, "pose": [-1.155, -0.3, -2.949]}
+{"t": 8.46, "event": "GO_TO_START", "wp": 2, "goal": [-1.4568047825888477, -0.16984546436192816], "pose": [-1.16, -0.299, -2.955]}
+{"t": 9.1, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.256, -0.075], "heading_err_deg": -16.4, "dist": 0.267, "cmd": [0.2, 0.0, -0.429]}
+{"t": 10.12, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.067, -0.021], "heading_err_deg": -17.6, "dist": 0.07, "cmd": [0.2, 0.0, -0.461]}
+{"t": 10.2, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.056, "pose": [-1.433, -0.22, 2.36]}
+{"t": 10.2, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 10.86, "event": "PRECISE_START", "n": 1, "offset": [0.1577, -0.007, 0.0783]}
+{"t": 11.66, "event": "BALL_DISTURBED", "phase": "PRECISE"}
+{"t": 12.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 12.76, "event": "PRECISE_START", "n": 2, "offset": [0.0216, -0.0035, -0.0139]}
+{"t": 13.04, "event": "BALL_DISTURBED", "phase": "PRECISE"}
+{"t": 13.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 13.04, "event": "ALIGN_START"}
+{"t": 13.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 13.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 13.74, "event": "ALIGN_START"}
+{"t": 14.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 14.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 14.44, "event": "ALIGN_START"}
+{"t": 15.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 15.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 15.14, "event": "ALIGN_START"}
+{"t": 15.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 15.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 15.84, "event": "ALIGN_START"}
+{"t": 16.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 16.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 16.54, "event": "ALIGN_START"}
+{"t": 17.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 17.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 17.24, "event": "ALIGN_START"}
+{"t": 17.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 17.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 17.94, "event": "ALIGN_START"}
+{"t": 18.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 18.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 18.64, "event": "ALIGN_START"}
+{"t": 19.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 19.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 19.34, "event": "ALIGN_START"}
+{"t": 20.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 20.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 20.04, "event": "ALIGN_START"}
+{"t": 20.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 20.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 20.74, "event": "ALIGN_START"}
+{"t": 21.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 21.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 21.44, "event": "ALIGN_START"}
+{"t": 22.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 22.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 22.14, "event": "ALIGN_START"}
+{"t": 22.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 22.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 22.84, "event": "ALIGN_START"}
+{"t": 23.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 23.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 23.54, "event": "ALIGN_START"}
+{"t": 24.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 24.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 24.24, "event": "ALIGN_START"}
+{"t": 24.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 24.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 24.94, "event": "ALIGN_START"}
+{"t": 25.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 25.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 25.64, "event": "ALIGN_START"}
+{"t": 26.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 26.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 26.34, "event": "ALIGN_START"}
+{"t": 27.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 27.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 27.04, "event": "ALIGN_START"}
+{"t": 27.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 27.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 27.74, "event": "ALIGN_START"}
+{"t": 28.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 28.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 28.44, "event": "ALIGN_START"}
+{"t": 29.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 29.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 29.14, "event": "ALIGN_START"}
+{"t": 29.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 29.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 29.84, "event": "ALIGN_START"}
+{"t": 30.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 30.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 30.54, "event": "ALIGN_START"}
+{"t": 31.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 31.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 31.24, "event": "ALIGN_START"}
+{"t": 31.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 31.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 31.94, "event": "ALIGN_START"}
+{"t": 32.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 32.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 32.64, "event": "ALIGN_START"}
+{"t": 33.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 33.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 33.34, "event": "ALIGN_START"}
+{"t": 34.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 34.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 34.04, "event": "ALIGN_START"}
+{"t": 34.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 34.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 34.74, "event": "ALIGN_START"}
+{"t": 35.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 35.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 35.44, "event": "ALIGN_START"}
+{"t": 36.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 36.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 36.14, "event": "ALIGN_START"}
+{"t": 36.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 36.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 36.84, "event": "ALIGN_START"}
+{"t": 37.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 37.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 37.54, "event": "ALIGN_START"}
+{"t": 38.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 38.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 38.24, "event": "ALIGN_START"}
+{"t": 38.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 38.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 38.94, "event": "ALIGN_START"}
+{"t": 39.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 39.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 39.64, "event": "ALIGN_START"}
+{"t": 40.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 40.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 40.34, "event": "ALIGN_START"}
+{"t": 41.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 41.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 41.04, "event": "ALIGN_START"}
+{"t": 41.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 41.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 41.74, "event": "ALIGN_START"}
+{"t": 42.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 42.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 42.44, "event": "ALIGN_START"}
+{"t": 43.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 43.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 43.14, "event": "ALIGN_START"}
+{"t": 43.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 43.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 43.84, "event": "ALIGN_START"}
+{"t": 44.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 44.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 44.54, "event": "ALIGN_START"}
+{"t": 45.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 45.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 45.24, "event": "ALIGN_START"}
+{"t": 45.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 45.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 45.94, "event": "ALIGN_START"}
+{"t": 46.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 46.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 46.64, "event": "ALIGN_START"}
+{"t": 47.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 47.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 47.34, "event": "ALIGN_START"}
+{"t": 48.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 48.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 48.04, "event": "ALIGN_START"}
+{"t": 48.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 48.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 48.74, "event": "ALIGN_START"}
+{"t": 49.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 49.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 49.44, "event": "ALIGN_START"}
+{"t": 50.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 50.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 50.14, "event": "ALIGN_START"}
+{"t": 50.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 50.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 50.84, "event": "ALIGN_START"}
+{"t": 51.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 51.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 51.54, "event": "ALIGN_START"}
+{"t": 52.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 52.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 52.24, "event": "ALIGN_START"}
+{"t": 52.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 52.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 52.94, "event": "ALIGN_START"}
+{"t": 53.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 53.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 53.64, "event": "ALIGN_START"}
+{"t": 54.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 54.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 54.34, "event": "ALIGN_START"}
+{"t": 55.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 55.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 55.04, "event": "ALIGN_START"}
+{"t": 55.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 55.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 55.74, "event": "ALIGN_START"}
+{"t": 56.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 56.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 56.44, "event": "ALIGN_START"}
+{"t": 57.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 57.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 57.14, "event": "ALIGN_START"}
+{"t": 57.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 57.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 57.84, "event": "ALIGN_START"}
+{"t": 58.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 58.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 58.54, "event": "ALIGN_START"}
+{"t": 59.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 59.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 59.24, "event": "ALIGN_START"}
+{"t": 59.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 59.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 59.94, "event": "ALIGN_START"}
+{"t": 60.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 60.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 60.64, "event": "ALIGN_START"}
+{"t": 61.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 61.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 61.34, "event": "ALIGN_START"}
+{"t": 62.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 62.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 62.04, "event": "ALIGN_START"}
+{"t": 62.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 62.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 62.74, "event": "ALIGN_START"}
+{"t": 63.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 63.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 63.44, "event": "ALIGN_START"}
+{"t": 64.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 64.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 64.14, "event": "ALIGN_START"}
+{"t": 64.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 64.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 64.84, "event": "ALIGN_START"}
+{"t": 65.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 65.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 65.54, "event": "ALIGN_START"}
+{"t": 66.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 66.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 66.24, "event": "ALIGN_START"}
+{"t": 66.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 66.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 66.94, "event": "ALIGN_START"}
+{"t": 67.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 67.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 67.64, "event": "ALIGN_START"}
+{"t": 68.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 68.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 68.34, "event": "ALIGN_START"}
+{"t": 69.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 69.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 69.04, "event": "ALIGN_START"}
+{"t": 69.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 69.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 69.74, "event": "ALIGN_START"}
+{"t": 70.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 70.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 70.44, "event": "ALIGN_START"}
+{"t": 71.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 71.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 71.14, "event": "ALIGN_START"}
+{"t": 71.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 71.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 71.84, "event": "ALIGN_START"}
+{"t": 72.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 72.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 72.54, "event": "ALIGN_START"}
+{"t": 73.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 73.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 73.24, "event": "ALIGN_START"}
+{"t": 73.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 73.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 73.94, "event": "ALIGN_START"}
+{"t": 74.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 74.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 74.64, "event": "ALIGN_START"}
+{"t": 75.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 75.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 75.34, "event": "ALIGN_START"}
+{"t": 76.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 76.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 76.04, "event": "ALIGN_START"}
+{"t": 76.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 76.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 76.74, "event": "ALIGN_START"}
+{"t": 77.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 77.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 77.44, "event": "ALIGN_START"}
+{"t": 78.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 78.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 78.14, "event": "ALIGN_START"}
+{"t": 78.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 78.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 78.84, "event": "ALIGN_START"}
+{"t": 79.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 79.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 79.54, "event": "ALIGN_START"}
+{"t": 80.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 80.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 80.24, "event": "ALIGN_START"}
+{"t": 80.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 80.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 80.94, "event": "ALIGN_START"}
+{"t": 81.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 81.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 81.64, "event": "ALIGN_START"}
+{"t": 82.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 82.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 82.34, "event": "ALIGN_START"}
+{"t": 83.04, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 83.04, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 83.04, "event": "ALIGN_START"}
+{"t": 83.74, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 83.74, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 83.74, "event": "ALIGN_START"}
+{"t": 84.44, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 84.44, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 84.44, "event": "ALIGN_START"}
+{"t": 85.14, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 85.14, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 85.14, "event": "ALIGN_START"}
+{"t": 85.84, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 85.84, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 85.84, "event": "ALIGN_START"}
+{"t": 86.54, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 86.54, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 86.54, "event": "ALIGN_START"}
+{"t": 87.24, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 87.24, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 87.24, "event": "ALIGN_START"}
+{"t": 87.94, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 87.94, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 87.94, "event": "ALIGN_START"}
+{"t": 88.64, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 88.64, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 88.64, "event": "ALIGN_START"}
+{"t": 89.34, "event": "BALL_DISTURBED", "phase": "ALIGN"}
+{"t": 89.34, "event": "BALL_SETTLED", "moved_m": 0.01}
+{"t": 89.34, "event": "ALIGN_START"}

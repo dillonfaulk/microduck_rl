@@ -1,0 +1,9 @@
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [0.3451484137697698, 0.49861896682137474], "pose": [-0.649, 0.726, 0.261]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.902, -0.476], "heading_err_deg": -27.8, "dist": 1.02, "cmd": [0.2, 0.0, -0.729]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.843, -0.08], "heading_err_deg": -5.4, "dist": 0.847, "cmd": [0.2, 0.0, -0.142]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.638, 0.012], "heading_err_deg": 1.1, "dist": 0.638, "cmd": [0.2, 0.0, 0.028]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.429, 0.016], "heading_err_deg": 2.1, "dist": 0.429, "cmd": [0.2, 0.0, 0.055]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.222, 0.007], "heading_err_deg": 1.8, "dist": 0.222, "cmd": [0.2, 0.0, 0.046]}
+{"t": 4.34, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.148, "pose": [0.202, 0.538, -0.284]}
+{"t": 4.34, "event": "GO_TO_DONE", "arrived": [1], "rejected": [], "falls": 0}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}

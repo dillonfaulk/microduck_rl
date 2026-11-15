@@ -1,0 +1,7 @@
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [2.0, 0.0], "pose": [0.0, 0.0, 0.0]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [2.0, 0.0], "heading_err_deg": 0.0, "dist": 2.0, "cmd": [0.2, 0.0, 0.0]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.83, 0.014], "heading_err_deg": 0.4, "dist": 1.83, "cmd": [0.2, 0.0, 0.012]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.62, 0.032], "heading_err_deg": 1.1, "dist": 1.62, "cmd": [0.2, 0.0, 0.03]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.414, -0.008], "heading_err_deg": -0.3, "dist": 1.414, "cmd": [0.2, 0.0, -0.009]}
+{"t": 3.08, "event": "POSE_LOST", "lost": "stale"}
+{"t": 8.1, "event": "POSE_LOST_ABORT", "after_s": 5.02}

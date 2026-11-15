@@ -1,0 +1,92 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+onnx=logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+logs -> logs/goto/2026-11-14_20-48-49_all/
+pose source: odom (IMU yaw error on)
+
+== single point: 10 trials, random start pose + heading, goal 0.6-2.0 m any bearing ==
+  trial 0: start (+0.27,-0.46, -165deg) goal (+0.65,-0.95) dist 0.62 m, bearing +113deg -> ARRIVED 4.7s  falls 0 | TRUE dist to goal at arrival 14.1 cm (radius 15), estimate off by 1.5 cm, final true dist 12.1 cm
+  trial 1: start (+0.83,+0.21,  +83deg) goal (+0.13,-0.96) dist 1.36 m, bearing +157deg -> ARRIVED 9.3s  falls 0 | TRUE dist to goal at arrival 12.6 cm (radius 15), estimate off by 2.4 cm, final true dist 11.2 cm
+  trial 2: start (+0.63,-0.99, +129deg) goal (+0.08,-1.33) dist 0.65 m, bearing  +83deg -> ARRIVED 4.1s  falls 0 | TRUE dist to goal at arrival 14.0 cm (radius 15), estimate off by 0.9 cm, final true dist 12.3 cm
+  trial 3: start (-0.65,+0.73,  +15deg) goal (+0.35,+0.50) dist 1.02 m, bearing  -28deg -> ARRIVED 4.3s  falls 0 | TRUE dist to goal at arrival 13.0 cm (radius 15), estimate off by 1.9 cm, final true dist 11.9 cm
+  trial 4: start (-0.94,-0.75,  +61deg) goal (-1.28,+0.72) dist 1.51 m, bearing  +42deg -> ARRIVED 6.8s  falls 0 | TRUE dist to goal at arrival 11.9 cm (radius 15), estimate off by 3.4 cm, final true dist 9.8 cm
+  trial 5: start (-0.23,+0.99, +173deg) goal (-1.29,-0.15) dist 1.56 m, bearing  +54deg -> ARRIVED 7.1s  falls 0 | TRUE dist to goal at arrival 12.5 cm (radius 15), estimate off by 3.3 cm, final true dist 11.6 cm
+  trial 6: start (+0.38,-0.22, -131deg) goal (-0.48,-1.58) dist 1.61 m, bearing   +9deg -> ARRIVED 7.3s  falls 0 | TRUE dist to goal at arrival 11.6 cm (radius 15), estimate off by 4.5 cm, final true dist 10.3 cm
+  trial 7: start (-0.38,-0.03, +140deg) goal (-0.35,+1.88) dist 1.91 m, bearing  -51deg -> ARRIVED 8.7s  falls 0 | TRUE dist to goal at arrival 12.0 cm (radius 15), estimate off by 3.5 cm, final true dist 9.7 cm
+  trial 8: start (+0.14,-0.36,  +34deg) goal (+1.21,-0.45) dist 1.07 m, bearing  -39deg -> ARRIVED 4.6s  falls 0 | TRUE dist to goal at arrival 13.0 cm (radius 15), estimate off by 1.8 cm, final true dist 10.9 cm
+  trial 9: start (+0.78,-0.55,  +44deg) goal (+0.09,-0.35) dist 0.72 m, bearing +120deg -> ARRIVED 5.3s  falls 0 | TRUE dist to goal at arrival 13.5 cm (radius 15), estimate off by 1.3 cm, final true dist 12.2 cm
+  single point: 10/10 arrivals with no unrecovered falls
+  true distance to goal at arrival: median 12.8 cm, max 14.1 cm; estimate error at arrival: median 2.1 cm, max 4.5 cm; truly inside the 15 cm radius 10/10
+
+== chain: [(1.2, 0.0), (1.2, 1.0), (2.2, 1.3), (0.0, 0.0)] from (0,0) facing +x ==
+  [  0.00s] GO_TO_START  wp=1 goal=[1.2, 0.0] pose=[0.0, 0.0, 0.0]
+  [  5.24s] GO_TO_ARRIVE wp=1 dist=0.149 pose=[1.051, -0.007, 0.004]
+  [  5.26s] GO_TO_START  wp=2 goal=[1.2, 1.0] pose=[1.055, -0.008, 0.013]
+  [ 11.42s] GO_TO_ARRIVE wp=2 dist=0.15 pose=[1.199, 0.85, 1.565]
+  [ 11.44s] GO_TO_START  wp=3 goal=[2.2, 1.3] pose=[1.197, 0.854, 1.556]
+  [ 17.22s] GO_TO_ARRIVE wp=3 dist=0.149 pose=[2.063, 1.242, 0.347]
+  [ 17.24s] GO_TO_START  wp=4 goal=[0.0, 0.0] pose=[2.068, 1.243, 0.355]
+  [ 31.50s] GO_TO_ARRIVE wp=4 dist=0.147 pose=[0.125, 0.078, -2.582]
+  [ 31.50s] GO_TO_DONE   arrived=[1, 2, 3, 4] rejected=[] falls=0
+  marker queue over time: [1, 2, 3, 4] -> [2, 3, 4] -> [3, 4] -> [4] -> []
+    wp 1 arc left          1.6s  cmd vx +0.20 wz +0.07  ->  achieved vx +0.21 wz +0.11
+    wp 1 arc right         0.2s  cmd vx +0.20 wz -0.09  ->  achieved vx +0.11 wz +0.02
+    wp 1 arc straight      3.5s  cmd vx +0.20 wz +0.02  ->  achieved vx +0.21 wz -0.04
+    wp 2 arc left          3.3s  cmd vx +0.20 wz +0.20  ->  achieved vx +0.20 wz +0.16
+    wp 2 arc straight      1.2s  cmd vx +0.20 wz +0.02  ->  achieved vx +0.21 wz -0.07
+    wp 2 pivot left        1.7s  cmd vx +0.00 wz +0.80  ->  achieved vx +0.02 wz +0.67
+    wp 3 arc left          1.0s  cmd vx +0.20 wz +0.07  ->  achieved vx +0.21 wz +0.07
+    wp 3 arc right         1.1s  cmd vx +0.20 wz -0.24  ->  achieved vx +0.17 wz -0.31
+    wp 3 arc straight      2.6s  cmd vx +0.20 wz +0.02  ->  achieved vx +0.21 wz -0.06
+    wp 3 pivot right       1.0s  cmd vx +0.00 wz -0.80  ->  achieved vx +0.01 wz -0.82
+    wp 4 arc left          4.4s  cmd vx +0.20 wz +0.07  ->  achieved vx +0.21 wz +0.07
+    wp 4 arc right         1.0s  cmd vx +0.20 wz -0.24  ->  achieved vx +0.18 wz -0.34
+    wp 4 arc straight      6.0s  cmd vx +0.20 wz +0.02  ->  achieved vx +0.21 wz -0.04
+    wp 4 pivot right       2.9s  cmd vx +0.00 wz -0.80  ->  achieved vx -0.00 wz -0.88
+  wp 1: TRUE dist to goal at arrival 12.7 cm, estimate off by 3.3 cm
+  wp 2: TRUE dist to goal at arrival 10.0 cm, estimate off by 5.3 cm
+  wp 3: TRUE dist to goal at arrival 11.1 cm, estimate off by 6.6 cm
+  wp 4: TRUE dist to goal at arrival 16.2 cm, estimate off by 5.5 cm
+  chain: arrived [1, 2, 3, 4] in 32.5s, falls 0 -> PASS
+
+== mid-route fall: route (0,0) -> (2.0, 0) -> (2.0, 1.0), lateral push at x > 0.8 m ==
+  [  0.00s] GO_TO_START  wp=1 goal=[2.0, 0.0] pose=[0.0, 0.0, 0.0]
+  [  3.96s] PUSH         v=[0.0, 1.6]
+  [  4.08s] FALL         wp=1 tilt_deg=35.5 trunk_z=0.12 pose=[0.79, 0.107, -0.348]
+  [  6.12s] RECOVERED    wp=1 pose=[0.859, 0.147, 2.019]
+  [ 13.36s] GO_TO_ARRIVE wp=1 dist=0.148 pose=[1.854, 0.023, -0.145]
+  [ 13.38s] GO_TO_START  wp=2 goal=[2.0, 1.0] pose=[1.858, 0.023, -0.143]
+  [ 19.04s] GO_TO_ARRIVE wp=2 dist=0.15 pose=[1.993, 0.85, 1.505]
+  [ 19.04s] GO_TO_DONE   arrived=[1, 2] rejected=[] falls=1
+  fall: falls 1, zero twist while down True, FALL->RECOVERED 2.04s, arrived [1, 2] -> PASS
+
+== geofence: arena x/y in [-2.5, 2.5], waypoints [(1.0, 0.0), (4.0, 0.0), (1.0, 1.0)] (#2 is outside) ==
+  [  0.00s] GO_TO_REJECT wp=2 goal=[4.0, 0.0] reason=outside arena x[-2.5, 2.5] y[-2.5, 2.5]
+  [  0.00s] GO_TO_START  wp=1 goal=[1.0, 0.0] pose=[0.0, 0.0, 0.0]
+  [  4.30s] GO_TO_ARRIVE wp=1 dist=0.148 pose=[0.852, -0.002, 0.004]
+  [  4.32s] GO_TO_START  wp=3 goal=[1.0, 1.0] pose=[0.856, -0.002, 0.004]
+  [  9.80s] GO_TO_ARRIVE wp=3 dist=0.146 pose=[0.996, 0.854, 1.475]
+  [  9.80s] GO_TO_DONE   arrived=[1, 3] rejected=[2] falls=0
+  geofence: rejected [2] before motion True, arrived [1, 3] -> PASS
+
+== dropout: route (0,0) -> (2.0, 0) -> (2.0, 1.0); pose link down at t = 3 s ==
+  2 s outage: POSE_LOST at 3.08 s, zero twist while held False (97 ticks), trunk moved 5.4 cm while held, resumed after 1.94 s, arrived [1, 2], falls 0 -> FAIL
+  permanent: POSE_LOST at 3.08 s, zero twist while held False (302 ticks), trunk moved 5.5 cm while held, ended pose_lost at 9.1 s, arrived [], falls 0 -> FAIL
+
+== summary: single PASS, chain PASS, fall PASS, geofence PASS, dropout FAIL

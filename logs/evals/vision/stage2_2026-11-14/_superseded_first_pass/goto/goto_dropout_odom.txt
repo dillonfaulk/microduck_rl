@@ -1,0 +1,27 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+onnx=logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+logs -> logs/goto/2026-11-14_20-51-37_dropout/
+pose source: odom (IMU yaw error on)
+
+== dropout: route (0,0) -> (2.0, 0) -> (2.0, 1.0); pose link down at t = 3 s ==
+  2 s outage: POSE_LOST at 3.08 s, zero twist while held True (97 ticks), trunk moved 1.9 cm while held, resumed after 1.94 s, arrived [1, 2], falls 0 -> PASS
+  permanent: POSE_LOST at 3.08 s, zero twist while held True (302 ticks), trunk moved 1.9 cm while held, ended pose_lost at 9.1 s, arrived [], falls 0 -> PASS
+
+== summary: dropout PASS

@@ -1,0 +1,25 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [-1.307, 0.023], "kick_heading_deg": -136.0, "aim_heading_deg": -123.8, "foot": "left", "aim_offset_deg": 12.2, "stance_shift_mm": 0.0, "stance": [-1.292, 0.121], "route": [[-1.069, 0.453], [-1.225, 0.221]]}
+{"t": 0.0, "event": "GOAL_PLACED", "centre": [-1.882, -0.533], "into_deg": -136.0, "opening_mm": 210.0, "ball_to_goal_m": 0.8}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [-1.0690244845807448, 0.4534386173611207], "pose": [0.0, 0.0, 0.725]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.499, 1.048], "heading_err_deg": 115.5, "dist": 1.161, "cmd": [0.0, 0.0, 0.8]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.309, 1.134], "heading_err_deg": 74.8, "dist": 1.176, "cmd": [0.0, 0.0, 0.8]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [1.026, 0.559], "heading_err_deg": 28.6, "dist": 1.168, "cmd": [0.0, 0.0, 0.8]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.035, 0.053], "heading_err_deg": 2.9, "dist": 1.037, "cmd": [0.2, 0.0, 0.076]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.825, 0.052], "heading_err_deg": 3.6, "dist": 0.826, "cmd": [0.2, 0.0, 0.095]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.614, 0.014], "heading_err_deg": 1.3, "dist": 0.614, "cmd": [0.2, 0.0, 0.034]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.402, 0.025], "heading_err_deg": 3.5, "dist": 0.402, "cmd": [0.2, 0.0, 0.093]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.188, 0.007], "heading_err_deg": 2.2, "dist": 0.189, "cmd": [0.2, 0.0, 0.057]}
+{"t": 7.7, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.057, "pose": [-1.012, 0.447, 2.805]}
+{"t": 7.72, "event": "GO_TO_START", "wp": 2, "goal": [-1.224805218536576, 0.22077499122204722], "pose": [-1.016, 0.448, 2.806]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.169, 0.247], "heading_err_deg": 55.6, "dist": 0.299, "cmd": [0.0, 0.0, 0.8]}
+{"t": 9.1, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.287, 0.069], "heading_err_deg": 13.6, "dist": 0.296, "cmd": [0.2, 0.0, 0.356]}
+{"t": 10.12, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.096, 0.013], "heading_err_deg": 7.5, "dist": 0.096, "cmd": [0.2, 0.0, 0.197]}
+{"t": 10.3, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.059, "pose": [-1.192, 0.27, -2.168]}
+{"t": 10.3, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 10.72, "event": "PRECISE_START", "n": 1, "offset": [0.1612, -0.0021, -0.044]}
+{"t": 12.2, "event": "PRECISE_ARRIVED", "after_s": 1.48}
+{"t": 12.2, "event": "KICK_SWAP_IN", "aligned": true, "pulses": 0, "mode": "precision", "err_mm": [12.8, -4.3], "err_heading_deg": 1.8}
+{"t": 12.34, "event": "KICK_FIRE", "after_swap_s": 0.14}
+{"t": 14.22, "event": "KICK_SWAP_OUT", "peak_ball_fwd": 0.497}
+{"t": 15.04, "event": "GOAL_DECIDED", "goal_outcome": "miss", "goal_lateral_mm": 280.6, "goal_miss_by_mm": 175.6, "goal_t_line_s": 2.81, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 0.0}
+{"t": 16.24, "event": "MISSION_DONE", "approach_mode": "precision", "foot_vs_home_mm": [-8.8, -0.7], "lfoot_vs_home_mm": [-3.2, -0.1], "trunk_speed_mm_s": 2.3, "tilt_deg": 1.9, "leg_dev_deg": 4.5, "align_ex_mm": 12.8, "align_ey_mm": -4.3, "align_eh_deg": 1.8, "pulses": 0, "aligned": true, "t_swap": 12.2, "pose_err_mm": 32.7, "pose_err_yaw_deg": -0.0, "true_align_ex_mm": -9.0, "true_align_ey_mm": 20.0, "true_align_eh_deg": 1.8, "kick_contact_t": 0.14, "peak_ball_fwd": 0.497, "ball_travel": 1.219, "kick_dir_err_deg": 19.4, "t_done": 16.24, "goal_outcome": "miss", "goal_lateral_mm": 280.6, "goal_miss_by_mm": 175.6, "goal_t_line_s": 2.81, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 0.0}

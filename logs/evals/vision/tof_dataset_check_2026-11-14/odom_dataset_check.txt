@@ -1,0 +1,31 @@
+== s2: 8 walking stretches, 7 20 s windows
+   t0   16.8 s   55.1 s  walked  4.99 m  turned  1247 deg  yaw err  +0.15 deg  xy err   2.2 cm  per m 0.004
+   t0   72.3 s   16.4 s  walked  0.90 m  turned   235 deg  yaw err  -1.82 deg  xy err   5.3 cm  per m 0.058
+   t0   89.2 s   49.0 s  walked  4.61 m  turned  1319 deg  yaw err  -1.75 deg  xy err   5.3 cm  per m 0.012
+   t0  146.2 s    8.1 s  walked  0.07 m  turned    13 deg  yaw err  -0.38 deg  xy err   0.7 cm  per m None
+   t0  154.7 s   41.1 s  walked  3.65 m  turned  1052 deg  yaw err  +0.89 deg  xy err   6.3 cm  per m 0.017
+   t0  198.1 s   20.9 s  walked  1.39 m  turned   366 deg  yaw err  -0.36 deg  xy err  12.8 cm  per m 0.092
+   t0  221.2 s   11.4 s  walked  0.42 m  turned   102 deg  yaw err  +1.00 deg  xy err   4.5 cm  per m 0.107
+   t0  233.0 s   13.5 s  walked  1.16 m  turned   334 deg  yaw err  -2.43 deg  xy err   5.8 cm  per m 0.05
+== s3: 15 walking stretches, 12 20 s windows
+   t0   14.6 s   20.5 s  walked  1.07 m  turned   299 deg  yaw err  +0.35 deg  xy err   8.0 cm  per m 0.075
+   t0   35.6 s   28.8 s  walked  2.62 m  turned   745 deg  yaw err  +1.56 deg  xy err   5.9 cm  per m 0.022
+   t0   64.9 s   52.7 s  walked  4.09 m  turned  1198 deg  yaw err  +2.84 deg  xy err  11.0 cm  per m 0.027
+   t0  118.3 s   25.6 s  walked  2.12 m  turned   610 deg  yaw err  -5.85 deg  xy err   3.3 cm  per m 0.015
+   t0  144.4 s   18.9 s  walked  1.36 m  turned   385 deg  yaw err  -0.84 deg  xy err   2.5 cm  per m 0.018
+   t0  163.8 s   65.7 s  walked  5.42 m  turned  1555 deg  yaw err  +3.17 deg  xy err   4.9 cm  per m 0.009
+   t0  231.9 s   28.2 s  walked  1.53 m  turned   419 deg  yaw err  +0.34 deg  xy err   3.0 cm  per m 0.02
+   t0  269.0 s   30.6 s  walked  2.99 m  turned   753 deg  yaw err  +4.57 deg  xy err  12.5 cm  per m 0.042
+   t0  301.0 s    8.0 s  walked  0.35 m  turned   119 deg  yaw err  +5.32 deg  xy err   7.1 cm  per m 0.203
+   t0  310.7 s   10.3 s  walked  0.80 m  turned   198 deg  yaw err  +1.28 deg  xy err   4.6 cm  per m 0.057
+   t0  321.5 s   13.8 s  walked  1.16 m  turned   292 deg  yaw err  +3.77 deg  xy err   2.2 cm  per m 0.019
+   t0  335.8 s   12.2 s  walked  1.17 m  turned   299 deg  yaw err  -0.05 deg  xy err   3.7 cm  per m 0.031
+   t0  348.4 s    8.8 s  walked  0.86 m  turned   240 deg  yaw err  +1.51 deg  xy err   5.3 cm  per m 0.062
+   t0  365.9 s   33.1 s  walked  3.46 m  turned   867 deg  yaw err  +2.93 deg  xy err   4.9 cm  per m 0.014
+   t0  409.1 s   33.3 s  walked  3.39 m  turned  1000 deg  yaw err  +0.85 deg  xy err   6.6 cm  per m 0.02
+
+== heading error over 20 s windows of walking (both sessions)
+   |yaw err| rate: median 3.28 deg/min, p90 8.98 deg/min
+   signed fit: bias +2.02 deg/min + scale -0.0032 x net turn  (residual std 2.14 deg per window)
+   |yaw err| per rad turned: median 0.14 deg/rad
+   xy err per m walked (20 s windows, >0.3 m): median 2.1%, p90 4.7%

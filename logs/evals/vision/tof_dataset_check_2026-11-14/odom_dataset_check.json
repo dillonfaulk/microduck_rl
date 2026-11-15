@@ -1,0 +1,235 @@
+{
+ "s2": {
+  "stretches": [
+   {
+    "t0_s": 16.8,
+    "dur_s": 55.1,
+    "walked_m": 4.99,
+    "turned_deg": 1247.0,
+    "yaw_err_deg": 0.15,
+    "xy_err_cm": 2.2,
+    "xy_err_per_m": 0.004
+   },
+   {
+    "t0_s": 72.3,
+    "dur_s": 16.4,
+    "walked_m": 0.9,
+    "turned_deg": 235.0,
+    "yaw_err_deg": -1.82,
+    "xy_err_cm": 5.3,
+    "xy_err_per_m": 0.058
+   },
+   {
+    "t0_s": 89.2,
+    "dur_s": 49.0,
+    "walked_m": 4.61,
+    "turned_deg": 1319.0,
+    "yaw_err_deg": -1.75,
+    "xy_err_cm": 5.3,
+    "xy_err_per_m": 0.012
+   },
+   {
+    "t0_s": 146.2,
+    "dur_s": 8.1,
+    "walked_m": 0.07,
+    "turned_deg": 13.0,
+    "yaw_err_deg": -0.38,
+    "xy_err_cm": 0.7,
+    "xy_err_per_m": null
+   },
+   {
+    "t0_s": 154.7,
+    "dur_s": 41.1,
+    "walked_m": 3.65,
+    "turned_deg": 1052.0,
+    "yaw_err_deg": 0.89,
+    "xy_err_cm": 6.3,
+    "xy_err_per_m": 0.017
+   },
+   {
+    "t0_s": 198.1,
+    "dur_s": 20.9,
+    "walked_m": 1.39,
+    "turned_deg": 366.0,
+    "yaw_err_deg": -0.36,
+    "xy_err_cm": 12.8,
+    "xy_err_per_m": 0.092
+   },
+   {
+    "t0_s": 221.2,
+    "dur_s": 11.4,
+    "walked_m": 0.42,
+    "turned_deg": 102.0,
+    "yaw_err_deg": 1.0,
+    "xy_err_cm": 4.5,
+    "xy_err_per_m": 0.107
+   },
+   {
+    "t0_s": 233.0,
+    "dur_s": 13.5,
+    "walked_m": 1.16,
+    "turned_deg": 334.0,
+    "yaw_err_deg": -2.43,
+    "xy_err_cm": 5.8,
+    "xy_err_per_m": 0.05
+   }
+  ]
+ },
+ "s3": {
+  "stretches": [
+   {
+    "t0_s": 14.6,
+    "dur_s": 20.5,
+    "walked_m": 1.07,
+    "turned_deg": 299.0,
+    "yaw_err_deg": 0.35,
+    "xy_err_cm": 8.0,
+    "xy_err_per_m": 0.075
+   },
+   {
+    "t0_s": 35.6,
+    "dur_s": 28.8,
+    "walked_m": 2.62,
+    "turned_deg": 745.0,
+    "yaw_err_deg": 1.56,
+    "xy_err_cm": 5.9,
+    "xy_err_per_m": 0.022
+   },
+   {
+    "t0_s": 64.9,
+    "dur_s": 52.7,
+    "walked_m": 4.09,
+    "turned_deg": 1198.0,
+    "yaw_err_deg": 2.84,
+    "xy_err_cm": 11.0,
+    "xy_err_per_m": 0.027
+   },
+   {
+    "t0_s": 118.3,
+    "dur_s": 25.6,
+    "walked_m": 2.12,
+    "turned_deg": 610.0,
+    "yaw_err_deg": -5.85,
+    "xy_err_cm": 3.3,
+    "xy_err_per_m": 0.015
+   },
+   {
+    "t0_s": 144.4,
+    "dur_s": 18.9,
+    "walked_m": 1.36,
+    "turned_deg": 385.0,
+    "yaw_err_deg": -0.84,
+    "xy_err_cm": 2.5,
+    "xy_err_per_m": 0.018
+   },
+   {
+    "t0_s": 163.8,
+    "dur_s": 65.7,
+    "walked_m": 5.42,
+    "turned_deg": 1555.0,
+    "yaw_err_deg": 3.17,
+    "xy_err_cm": 4.9,
+    "xy_err_per_m": 0.009
+   },
+   {
+    "t0_s": 231.9,
+    "dur_s": 28.2,
+    "walked_m": 1.53,
+    "turned_deg": 419.0,
+    "yaw_err_deg": 0.34,
+    "xy_err_cm": 3.0,
+    "xy_err_per_m": 0.02
+   },
+   {
+    "t0_s": 269.0,
+    "dur_s": 30.6,
+    "walked_m": 2.99,
+    "turned_deg": 753.0,
+    "yaw_err_deg": 4.57,
+    "xy_err_cm": 12.5,
+    "xy_err_per_m": 0.042
+   },
+   {
+    "t0_s": 301.0,
+    "dur_s": 8.0,
+    "walked_m": 0.35,
+    "turned_deg": 119.0,
+    "yaw_err_deg": 5.32,
+    "xy_err_cm": 7.1,
+    "xy_err_per_m": 0.203
+   },
+   {
+    "t0_s": 310.7,
+    "dur_s": 10.3,
+    "walked_m": 0.8,
+    "turned_deg": 198.0,
+    "yaw_err_deg": 1.28,
+    "xy_err_cm": 4.6,
+    "xy_err_per_m": 0.057
+   },
+   {
+    "t0_s": 321.5,
+    "dur_s": 13.8,
+    "walked_m": 1.16,
+    "turned_deg": 292.0,
+    "yaw_err_deg": 3.77,
+    "xy_err_cm": 2.2,
+    "xy_err_per_m": 0.019
+   },
+   {
+    "t0_s": 335.8,
+    "dur_s": 12.2,
+    "walked_m": 1.17,
+    "turned_deg": 299.0,
+    "yaw_err_deg": -0.05,
+    "xy_err_cm": 3.7,
+    "xy_err_per_m": 0.031
+   },
+   {
+    "t0_s": 348.4,
+    "dur_s": 8.8,
+    "walked_m": 0.86,
+    "turned_deg": 240.0,
+    "yaw_err_deg": 1.51,
+    "xy_err_cm": 5.3,
+    "xy_err_per_m": 0.062
+   },
+   {
+    "t0_s": 365.9,
+    "dur_s": 33.1,
+    "walked_m": 3.46,
+    "turned_deg": 867.0,
+    "yaw_err_deg": 2.93,
+    "xy_err_cm": 4.9,
+    "xy_err_per_m": 0.014
+   },
+   {
+    "t0_s": 409.1,
+    "dur_s": 33.3,
+    "walked_m": 3.39,
+    "turned_deg": 1000.0,
+    "yaw_err_deg": 0.85,
+    "xy_err_cm": 6.6,
+    "xy_err_per_m": 0.02
+   }
+  ]
+ },
+ "fit": {
+  "windows": 19,
+  "window_s": 20.0,
+  "abs_yaw_err_deg_per_min": {
+   "median": 3.28,
+   "p90": 8.98
+  },
+  "fit_bias_deg_per_min": 2.02,
+  "fit_scale_frac_of_net_turn": -0.0032,
+  "fit_residual_std_deg_per_window": 2.14,
+  "abs_yaw_err_per_rad_turned": {
+   "median": 0.14
+  },
+  "xy_err_per_m_walked": {
+   "median": 0.021,
+   "p90": 0.047
+  }
+ }
+}

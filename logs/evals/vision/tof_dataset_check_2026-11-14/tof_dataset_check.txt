@@ -1,0 +1,55 @@
+room: grid (170, 309) @ 0.025 m; cloud 549760 pts -> voxels (384, 211, 133) @ 0.02 m
+
+== s2: 3774 ToF frames, 12195 state samples, 2584 truth poses
+  Part A (Pollen's metric: real returns, true pose, land within 5 cm of an obstacle cell)
+    as first configured (slant, 0 ms, 0 deg)         n= 44070  <=5cm 57.5%  <=10cm 66.7%  median 3.5 cm
+    axial                                            n= 38505  <=5cm 69.0%  <=10cm 74.4%  median 0.0 cm
+    axial + 60 ms                                    n= 35502  <=5cm 77.9%  <=10cm 81.9%  median 0.0 cm
+    axial + 60 ms + 3 deg down (upstream defaults)   n= 32097  <=5cm 80.6%  <=10cm 84.7%  median 0.0 cm
+    slant + 60 ms + 3 deg (axial off)                n= 33121  <=5cm 74.4%  <=10cm 83.0%  median 2.5 cm
+  Part B (sim model ray-cast into the scanned room vs the measured range, status 5/9 zones)
+    as first configured (slant, 0 ms, 0 deg)         n= 82026  |err|<=5cm 41.5%  <=10cm 69.5%  median err  -50.6 mm  corner  -62.1  centre  -49.0
+    axial                                            n= 82026  |err|<=5cm 55.7%  <=10cm 76.6%  median err  -15.2 mm  corner   -5.7  centre  -16.5
+    axial + 60 ms                                    n= 82179  |err|<=5cm 64.6%  <=10cm 84.2%  median err  -10.3 mm  corner   -3.5  centre  -11.2
+    axial + 60 ms + 3 deg down (upstream defaults)   n= 83388  |err|<=5cm 69.7%  <=10cm 85.2%  median err  +21.7 mm  corner  +23.5  centre  +21.5
+    slant + 60 ms + 3 deg (axial off)                n= 83388  |err|<=5cm 69.8%  <=10cm 84.7%  median err   -8.8 mm  corner  -27.3  centre   -6.9
+  status counts: {0: 56193, 2: 6, 3: 29, 4: 4881, 5: 86180, 9: 1764, 10: 10114, 13: 1}
+  valid (5/9) fraction by row (row 0 = top): 0.40 0.51 0.53 0.36 0.33 0.59 0.79 0.91
+  valid fraction by predicted range [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0]: [0.992, 0.954, 0.633, 0.393, 0.31, 0.195, 0.224, 0.411, 0.434]
+    row 0: [None, 0.848, 0.699, 0.573, 0.277, 0.068, 0.055, 0.15, 0.371]
+    row 1: [None, 0.887, 0.815, 0.704, 0.398, 0.137, 0.195, 0.439, 0.485]
+    row 2: [None, 0.829, 0.816, 0.676, 0.415, 0.321, 0.363, 0.525, 0.554]
+    row 3: [None, 0.805, 0.586, 0.331, 0.266, 0.187, 0.243, 0.312, 0.477]
+    row 4: [None, 0.821, 0.409, 0.221, 0.2, 0.215, 0.253, 0.403, 0.442]
+    row 5: [None, 0.953, 0.635, 0.226, 0.271, 0.338, 0.135, None, None]
+    row 6: [0.98, 0.978, 0.667, 0.238, 0.275, 0.225, None, None, None]
+    row 7: [1.0, 0.987, 0.671, 0.218, 0.175, None, None, None, None]
+  inlier range noise: [0.0, 0.5]: 22.6 mm (n=34975), [0.5, 1.0]: 46.4 mm (n=35023), [1.0, 1.5]: 64.5 mm (n=7714), [1.5, 2.0]: 69.1 mm (n=2364), [2.0, 4.0]: 69.1 mm (n=1947)
+
+== s3: 6693 ToF frames, 22355 state samples, 4179 truth poses
+  Part A (Pollen's metric: real returns, true pose, land within 5 cm of an obstacle cell)
+    as first configured (slant, 0 ms, 0 deg)         n=109431  <=5cm 67.4%  <=10cm 74.8%  median 2.5 cm
+    axial                                            n= 96138  <=5cm 76.6%  <=10cm 81.8%  median 0.0 cm
+    axial + 60 ms                                    n= 90414  <=5cm 83.0%  <=10cm 86.6%  median 0.0 cm
+    axial + 60 ms + 3 deg down (upstream defaults)   n= 82312  <=5cm 87.6%  <=10cm 91.1%  median 0.0 cm
+    slant + 60 ms + 3 deg (axial off)                n= 85791  <=5cm 82.4%  <=10cm 88.8%  median 0.0 cm
+  Part B (sim model ray-cast into the scanned room vs the measured range, status 5/9 zones)
+    as first configured (slant, 0 ms, 0 deg)         n=164014  |err|<=5cm 40.1%  <=10cm 64.3%  median err  -46.0 mm  corner  -70.4  centre  -43.6
+    axial                                            n=164014  |err|<=5cm 51.4%  <=10cm 71.8%  median err  -12.0 mm  corner  -13.5  centre  -11.9
+    axial + 60 ms                                    n=163313  |err|<=5cm 58.1%  <=10cm 78.1%  median err   -8.4 mm  corner  -12.0  centre   -8.0
+    axial + 60 ms + 3 deg down (upstream defaults)   n=165255  |err|<=5cm 65.8%  <=10cm 81.1%  median err  +14.4 mm  corner  +14.1  centre  +14.4
+    slant + 60 ms + 3 deg (axial off)                n=165255  |err|<=5cm 62.3%  <=10cm 79.6%  median err  -14.0 mm  corner  -38.2  centre  -12.0
+  status counts: {0: 82264, 2: 17, 3: 117, 4: 12225, 5: 168651, 8: 4, 9: 4316, 10: 14128, 13: 6}
+  valid (5/9) fraction by row (row 0 = top): 0.46 0.56 0.62 0.51 0.52 0.65 0.75 0.84
+  valid fraction by predicted range [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0]: [0.919, 0.927, 0.725, 0.405, 0.397, 0.281, 0.226, 0.279, 0.406]
+    row 0: [0.89, 0.838, 0.696, 0.497, 0.394, 0.202, 0.149, 0.044, 0.339]
+    row 1: [0.93, 0.895, 0.78, 0.631, 0.491, 0.282, 0.181, 0.246, 0.413]
+    row 2: [0.944, 0.918, 0.841, 0.634, 0.515, 0.395, 0.277, 0.393, 0.532]
+    row 3: [0.941, 0.911, 0.748, 0.39, 0.324, 0.203, 0.201, 0.424, 0.431]
+    row 4: [0.895, 0.91, 0.672, 0.292, 0.285, 0.287, 0.352, 0.436, 0.551]
+    row 5: [0.901, 0.911, 0.72, 0.382, 0.387, 0.343, 0.318, 0.322, 0.61]
+    row 6: [0.915, 0.944, 0.738, 0.293, 0.365, 0.44, 0.638, None, 0.565]
+    row 7: [0.935, 0.961, 0.664, 0.26, 0.487, 0.508, 0.423, None, None]
+  inlier range noise: [0.0, 0.5]: 30.3 mm (n=70425), [0.5, 1.0]: 50.1 mm (n=68783), [1.0, 1.5]: 63.2 mm (n=14236), [1.5, 2.0]: 69.2 mm (n=5688), [2.0, 4.0]: 64.8 mm (n=3629)
+
+wrote logs/evals/vision/tof_dataset_check_2026-11-14/tof_dataset_check.json

@@ -1,0 +1,28 @@
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [2.0, 0.0], "pose": [0.0, 0.0, 0.0]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [2.0, 0.0], "heading_err_deg": 0.0, "dist": 2.0, "cmd": [0.2, 0.0, 0.0]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.83, 0.014], "heading_err_deg": 0.4, "dist": 1.83, "cmd": [0.2, 0.0, 0.012]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.62, 0.032], "heading_err_deg": 1.1, "dist": 1.62, "cmd": [0.2, 0.0, 0.03]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.41, 0.005], "heading_err_deg": 0.2, "dist": 1.41, "cmd": [0.2, 0.0, 0.005]}
+{"t": 3.96, "event": "PUSH", "v": [0.0, 1.6]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.195, 0.179], "heading_err_deg": 8.5, "dist": 1.208, "cmd": [0.2, 0.0, 0.223]}
+{"t": 4.08, "event": "FALL", "wp": 1, "tilt_deg": 35.5, "trunk_z": 0.12, "pose": [0.79, 0.107, -0.348]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "RECOVERING", "reason": "recovering", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 1, "state": "RECOVERING", "reason": "recovering", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}
+{"t": 6.12, "event": "RECOVERED", "wp": 1, "pose": [0.859, 0.147, 2.019]}
+{"t": 7.06, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.223, -1.14], "heading_err_deg": -78.9, "dist": 1.161, "cmd": [0.0, 0.0, -0.8]}
+{"t": 8.08, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [1.057, -0.528], "heading_err_deg": -26.6, "dist": 1.182, "cmd": [0.0, 0.0, -0.8]}
+{"t": 9.1, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.041, -0.035], "heading_err_deg": -1.9, "dist": 1.041, "cmd": [0.2, 0.0, -0.05]}
+{"t": 10.12, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.828, 0.014], "heading_err_deg": 1.0, "dist": 0.828, "cmd": [0.2, 0.0, 0.025]}
+{"t": 11.14, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.612, 0.017], "heading_err_deg": 1.6, "dist": 0.612, "cmd": [0.2, 0.0, 0.042]}
+{"t": 12.16, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.397, 0.003], "heading_err_deg": 0.5, "dist": 0.397, "cmd": [0.2, 0.0, 0.012]}
+{"t": 13.18, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.184, 0.01], "heading_err_deg": 3.2, "dist": 0.184, "cmd": [0.2, 0.0, 0.084]}
+{"t": 13.36, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.148, "pose": [1.854, 0.023, -0.145]}
+{"t": 13.38, "event": "GO_TO_START", "wp": 2, "goal": [2.0, 1.0], "pose": [1.858, 0.023, -0.143]}
+{"t": 14.2, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.741, 0.655], "heading_err_deg": 41.5, "dist": 0.989, "cmd": [0.0, 0.0, 0.8]}
+{"t": 15.22, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.917, 0.246], "heading_err_deg": 15.0, "dist": 0.95, "cmd": [0.2, 0.0, 0.394]}
+{"t": 16.24, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.738, 0.033], "heading_err_deg": 2.6, "dist": 0.739, "cmd": [0.2, 0.0, 0.067]}
+{"t": 17.26, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.525, 0.018], "heading_err_deg": 1.9, "dist": 0.525, "cmd": [0.2, 0.0, 0.05]}
+{"t": 18.28, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.308, 0.012], "heading_err_deg": 2.2, "dist": 0.308, "cmd": [0.2, 0.0, 0.059]}
+{"t": 19.04, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.15, "pose": [1.993, 0.85, 1.505]}
+{"t": 19.04, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 1}
+{"t": 19.3, "event": "GO_TO_TRACE", "wp": null, "state": "DONE", "reason": "done", "goal_local": null, "heading_err_deg": null, "dist": null, "cmd": [0.0, 0.0, 0.0]}

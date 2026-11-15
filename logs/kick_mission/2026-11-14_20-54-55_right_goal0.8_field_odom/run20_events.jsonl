@@ -1,0 +1,17 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [1.374, 0.256], "kick_heading_deg": 10.6, "aim_heading_deg": 3.9, "foot": "right", "aim_offset_deg": -6.7, "stance_shift_mm": 0.0, "stance": [1.282, 0.292], "route": [[0.883, 0.265], [1.162, 0.284]]}
+{"t": 0.0, "event": "GOAL_PLACED", "centre": [2.161, 0.403], "into_deg": 10.6, "opening_mm": 210.0, "ball_to_goal_m": 0.8}
+{"t": 0.0, "event": "GO_TO_START", "wp": 1, "goal": [0.8825814502730415, 0.264994378761412], "pose": [0.0, 0.0, 1.619]}
+{"t": 0.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.222, -0.894], "heading_err_deg": -76.1, "dist": 0.922, "cmd": [0.0, 0.0, -0.8]}
+{"t": 1.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.8, -0.488], "heading_err_deg": -31.4, "dist": 0.937, "cmd": [0.0, 0.0, -0.8]}
+{"t": 2.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.794, -0.108], "heading_err_deg": -7.8, "dist": 0.802, "cmd": [0.2, 0.0, -0.203]}
+{"t": 3.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.595, 0.003], "heading_err_deg": 0.3, "dist": 0.595, "cmd": [0.2, 0.0, 0.007]}
+{"t": 4.0, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.385, 0.0], "heading_err_deg": 0.1, "dist": 0.385, "cmd": [0.2, 0.0, 0.002]}
+{"t": 5.02, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.174, 0.009], "heading_err_deg": 3.0, "dist": 0.174, "cmd": [0.2, 0.0, 0.079]}
+{"t": 5.56, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.058, "pose": [0.828, 0.245, 0.233]}
+{"t": 5.58, "event": "GO_TO_START", "wp": 2, "goal": [1.1619487808194808, 0.2838064659225041], "pose": [0.832, 0.248, 0.241]}
+{"t": 6.04, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.238, -0.016], "heading_err_deg": -3.7, "dist": 0.239, "cmd": [0.2, 0.0, -0.098]}
+{"t": 6.9, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.058, "pose": [1.104, 0.289, 0.032]}
+{"t": 6.9, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 7.32, "event": "PRECISE_START", "n": 1, "offset": [0.1655, -0.0055, 0.0004]}
+{"t": 8.16, "event": "BALL_DISTURBED", "phase": "PRECISE"}
+{"t": 14.18, "event": "BALL_LOST", "ball_speed": 0.059}

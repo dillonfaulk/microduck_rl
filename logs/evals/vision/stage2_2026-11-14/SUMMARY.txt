@@ -1,0 +1,154 @@
+RUNG 6 STAGE 2: ToF model + odometry pose provider (2026-11-14, fork local/velstand-own-teachers)
+Brief: microduck-vision-rung6-stage2-brief.md (Dillon's five decisions). Sim only, CPU missions,
+GPU0 for one EGL render check. No training; 61->14 contract untouched; policies frozen:
+VelStand r3 3999, PrecisionStep v2 2500, BallKick v2 R 1250 / L 500, --calib v2.
+
+A. ToF MODEL VALIDATED ON POLLEN'S RECORDINGS (2.1)
+   Data: SLAM_JJ_Salon_with_GT subset (s2 + s3 sessions, ground truth, room), 160 MB, in
+   ~/microduck_refs/slam_gt (no films). Tools: scripts/tof_dataset_check.py and
+   scripts/odom_dataset_check.py (the dataset is read as data; its code/ is never run).
+   Output: ../tof_dataset_check_2026-11-14/.
+
+   - Pollen's own metric, reimplemented, reproduces their published s2 figures:
+     real returns at the true pose landing within 5 cm of a real obstacle.
+     | Sensor model | Within 5 cm (ours) | Pollen's published |
+     |---|---|---|
+     | Slant range, 0 ms, 0 deg | 57.5% | 58% |
+     | Axial range | 69.0% | 69% |
+     | Axial + 60 ms + 3 deg down | 80.6% | 81% |
+     On s3 the same three models give 67.4% -> 76.6% -> 87.6%.
+   - Forward check (ray-cast the sim model into the scanned room at the true pose, compare per zone):
+     - Every flaw helps. Measured within 5 cm of the model's prediction, s2 / s3:
+       - slant: 41.5 / 40.1%;
+       - axial: 55.7 / 51.4%;
+       - axial + 60 ms: 64.6 / 58.1%;
+       - axial + 60 ms + 3 deg: 69.7 / 65.8%.
+     - Axial confirmed directly, slant vs axial with 60 ms + 3 deg:
+       - slant: corner zones read -27 / -38 mm vs centre -7 / -12 mm;
+       - axial: corner and centre agree within +-1 mm.
+   - Dropout measured (status 5/9 = valid). It depends on range, not much on row:
+     | Reported range | <0.25 m | 0.25-0.5 m | 0.5-0.75 m | 0.75-1 m | 1-1.5 m | 1.5-2 m | 2-3 m |
+     |---|---|---|---|---|---|---|---|
+     | Valid share (s2+s3) | 0.955 | 0.94 | 0.68 | 0.40 | 0.355 | 0.24 | 0.225 |
+     The real wire has no status 255: "no target" is status 0, like a dropout. Real codes seen:
+     0, 2, 3, 4, 5, 8, 9, 10, 13.
+   - Not separable: sensor noise. The inlier spread (23-69 mm, growing with range) mixes pose and
+     map error, so the old noise model is kept.
+   - Not modelled: a flaw upstream's model lacks. Range scale beyond the scanned area could not be
+     checked; above 3 m the scan is incomplete (glass, doorway).
+   - Real-duck odometry, measured: heading drift median 3.3 deg/min (p90 9.0) over 20 s walking
+     windows; fit = bias 2.0 deg/min + random walk 0.36 deg/sqrt(s); position error 2.1 %/m
+     median (p90 4.7 %).
+
+B. WHAT WAS BUILT (2.2-2.6). Suite: 332 passed, 1 skipped; 13 new tests in tests/test_rung6_stage2.py.
+   - sim/tof.py: TofFlaws switches, default ON: axial_range, latency_s 0.060, pitch_offset_deg 3.0,
+     dropout (table above).
+     - Uses mj_multiRay; TofFlaws.none() is bit-identical to the old mj_ray sensor (tested).
+     - frame_at(data, t) applies the latency.
+     - The body server now serves frame_at, so the twin's tofd gets the flawed sensor that mapd's
+       defaults assume.
+   - sim/board_profiles.py: face-board-v1 (PRIMARY: GC2093 85.2x54.7 upright, VL53L8CX) and zero3
+     (IMX219 62.2x37.4 rotate 90, VL53L5CX), with family-solve intrinsics and distortion.
+     - ToF parameters do not differ between the chips in our model: no VL53L8CX measurement exists,
+       so the L8CX carries the L5CX's values, stated in the profile.
+   - sim/camera.py: apply_profile() mounts head_camera off the tof site (upright or rotate-90) and
+     sets fovy from the solve. Renders are checked in camera/*.png. The legacy twin camera stays the
+     body server's default, because mediad --sim-camera's intrinsics assume it.
+   - IMU yaw error (pose_provider.ImuYawError): default ON at the measured magnitudes above; the
+     bias sign is random per run.
+   - pose_provider.py: GroundTruthProvider (bit-identical to the old reads), OdometryProvider
+     (PyOdometry alpha16 + IMU, anchored at the mission's known start), GroundTruthBall.
+     - Output speaks mapd's MapState shape plus age_s.
+     - Absent past STALE_S 0.1 s ("stale"), never held.
+     - A dropout is a link outage.
+   - Seams:
+     - kick_mission.Mission and goto_point.run_route read pose and ball only through providers.
+     - The referee, ball_travel, peak and KICK/SETTLE falls stay ground truth.
+     - Absent pose: zero twist; resume when back; POSE_LOST_ABORT_S 5 s -> clean abort.
+   - Field (robot/microduck/field.xml + scene_field.xml): boards at +-3.0 m.
+     - 0.30 m tall, 12 mm, matte light wood (painted plywood or MDF at arrival).
+     - Goal mouths 0.25 m wide with 0.25 m boxes at both ends; both goals parked in the mouths.
+     - Geofence = boards inset 0.5 m = (-2.5, 2.5, -2.5, 2.5) = the old ARENA, read back from the model.
+     - Render extent pinned as in the goal scene.
+
+C. REGRESSION (regression/)
+   - The ground-truth seam is byte-identical: goal scene, 0.8 m, both feet, 50 runs, every per-run
+     line and the summary equal the published goalkick_v0_eval_2026-11-14 files.
+   - The field boards change nothing on ground truth: field-scene GT goals = published in all six
+     rows.
+   - Deterministic: all 12 field batteries ran twice; every per-run line is identical.
+     The first pass shared log dirs, so it is superseded; its numbers are the same.
+
+D. ACCEPTANCE (all on estimated pose: odometry + IMU error + flaws ON; ground truth = scoring only)
+   1. Go-to-point (goto/goto_all_odom.txt) - PASS.
+      - single 10/10, chain 4/4, fall PASS, geofence PASS.
+      - Estimate error at arrival: single median 2.1 cm (max 4.5); chain 3.3 / 5.3 / 6.6 / 5.5 cm.
+      - True distance to the goal at arrival: single median 12.8 cm (max 14.1), all 10 truly within
+        15 cm.
+      - Chain wp 4 was truly 16.2 cm away: just outside the 15 cm radius the supervisor believed it
+        was inside.
+      - Ground truth, for reference: 10/10, 4/4, arrival 14.8 cm.
+   2. GoalKick full battery (goalkick/, gap_table.txt). No goals floor this stage.
+
+      | Foot | Pose | Goals 0.5 / 0.8 / 1.1 m | Published |
+      |---|---|---|---|
+      | Right | gt (field) | 50 / 43 / 38 | 50 / 43 / 38 |
+      | Right | odom | 6 / 2 / 2 | |
+      | Left | gt (field) | 50 / 49 / 44 | 50 / 49 / 44 |
+      | Left | odom | 19 / 13 / 9 | |
+
+      - Odom rows also: 6 ball_lost aborts per row (the duck walked into a ball it believed
+        elsewhere), 8-14 short, 0 falls, 0 board contacts.
+      - Pose error at kick swap-in: right median 36.5 mm (p90 49.7), |yaw| 0.76 deg; left 32.7 mm
+        (p90 49.1), 0.64 deg.
+      - Ball placement versus the kicking foot, measured with the TRUE pose at swap-in:
+        - Right: median 19 mm along the kick line, 30 mm across it (p90 48).
+        - Left: 17 mm along, 20 mm across (p90 45).
+        - The supervisor believed both within 12 mm.
+      - |lateral at the line|, median (mm):
+
+        | Foot | Pose | 0.5 m | 0.8 m | 1.1 m |
+        |---|---|---|---|---|
+        | Right | gt | 18 | 28 | 34 |
+        | Right | odom | 194 | 244 | 338 |
+        | Left | gt | 11 | 18 | 26 |
+        | Left | odom | 56 | 60 | 173 |
+
+      - Cause:
+        - The pose error builds up in NAVIGATE: 29-37 mm over 8-12 s of walking.
+        - Isolated with no supervisor and a perfect IMU: a 3.1 m straight walk ends 53-60 mm short
+          along-track (-1.74 to -1.98 %, three headings), with 4-13 mm across-track. That is a
+          stride-scale bias of the twin's contact odometry under the round-3 gait.
+        - Other motions: pivot 0.8 rad/s 4 mm, arc 8 mm/2.3 m, strafe 10 mm/0.9 m.
+        - The upstream v15 anchor set is 2.5x worse.
+        - Same order as the real duck's measured 2.1 %/m. Upstream's "9 mm over 3.2 m" was with
+          Pollen's walk.
+      - Attribution (attrib_*: IMU error OFF, 0.8 m): goals right 3 (vs 2), left 20 (vs 13); pose
+        error 32 mm (vs 36). Mostly the leg odometry; the gyro adds a smaller share.
+   3. Falls attributable to pose error: 0. No falls in any estimated-pose row, go-to-point
+      included; the mid-route fall test is the intended push.
+   4. Dropout - PASS in both missions.
+      - Go-to-point (goto/goto_all_odom.txt, dropout section; link down at 3 s):
+        - 2 s outage: zero twist for all 97 held ticks, resumed, arrived [1, 2].
+        - Permanent: held, then ended pose_lost at 9.1 s.
+        - The trunk moved 1.9 cm while held (stopping distance).
+      - GoalKick (goalkick/dropout_*, right foot, 0.8 m, 10 runs each, link down at 4 s):
+        - 2 s outage: all 10 held and resumed after 1.92 s.
+        - Permanent: all 10 aborted pose_lost 5.02 s after the loss.
+        - 0 non-zero commands in 3,480 held ticks; trunk moved 2.1 cm (median) while held; 0 falls.
+      - A first pass FAILED the go-to-point dropout. run_route fed the supervisor a held pose
+        stamped "now", then relied on its 200 ms watchdog. Fixed: the estimate's own stamp, and zero
+        twist the moment the pose is absent.
+
+E. HONEST READ
+   - Odometry-only pose is enough for go-to-point, a 15 cm arrival radius.
+   - It is NOT enough for the kick's +-12 mm line-up. GoalKick collapses from 43/49 to 2/13 goals
+     at 0.8 m.
+   - The ToF channel was not in the loop this stage, by decision (localizer (b)).
+   - The supervisor's ball is still ground truth: a camera ball (Stage 3) measured relative to the
+     duck would remove most of this gap, because the line-up only needs the ball relative to the
+     foot.
+   - Open calls for Dillon, nothing done:
+     (a) an odometry stride-scale constant (+1.9 %, measured above), a --calib-style item;
+     (b) whether Stage 3 should take the line-up off world-frame pose entirely (camera-relative ball);
+     (c) the contingency ladder's rung 2: "re-observe before committing".

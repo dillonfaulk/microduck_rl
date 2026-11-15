@@ -41,6 +41,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 STALE_S = 0.10          # 5 control ticks; GotoSupervisor's own watchdog is 0.2 s
 VEL_WINDOW_S = 0.10     # odometry velocity: displacement over the last 0.1 s
 
+# Versioned odometry calibrations (rung 6 Stage 3, Workstream A; Dillon approved 2026-11-14).
+# A calibration scales the odometry's planar displacement since the anchor; the estimator itself
+# (PyOdometry, a replica of the Rust crate) is untouched.
+# - "none": raw contact odometry (Stage 2).
+# - "stride_v1": +1.9 %. Measured basis is Stage 2's isolated straight walks: 3.1 m with a
+#   perfect IMU and no supervisor ends -1.74 / -1.86 / -1.98 % short along-track over three
+#   headings, under the round-3 VelStand gait on the alpha16 anchor set.
+ODOM_CALIBS = {"none": 1.0, "stride_v1": 1.019}
+
 
 @dataclass
 class PoseEstimate:
@@ -152,8 +161,14 @@ class OdometryProvider(_Provider):
 
     name = "odom"
 
-    def __init__(self, sim, anchor_set: str = "alpha16", imu: ImuYawError | None = None, dropouts=(), dt=0.02):
+    def __init__(self, sim, anchor_set: str = "alpha16", imu: ImuYawError | None = None, dropouts=(), dt=0.02,
+                 calib: str = "none"):
         super().__init__(dropouts)
+        if calib not in ODOM_CALIBS:
+            raise SystemExit(f"unknown odometry calibration {calib!r} ({' | '.join(ODOM_CALIBS)})")
+        self.calib = calib
+        self.stride_scale = ODOM_CALIBS[calib]
+        self.offset = None                  # map<->odom correction (x, y, yaw), applied on top; None = none
         import infer_policy as ip
         self._ip = ip
         self.sim = sim
@@ -183,8 +198,11 @@ class OdometryProvider(_Provider):
         c, s = math.cos(e), math.sin(e)
         R_imu = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]]) @ R_true
         self.odo.update(self.frames.feet_in_trunk(data), R_imu)
-        xy = self.p0 + self.odo.position[:2]
+        xy = self.p0 + self.stride_scale * self.odo.position[:2]
         yaw = math.atan2(R_imu[1, 0], R_imu[0, 0])
+        self._odom_raw = (float(xy[0]), float(xy[1]), float(yaw))
+        if self.offset is not None:
+            xy, yaw = apply_offset(self.offset, xy, yaw)
         tilt = math.degrees(math.acos(max(-1.0, min(1.0, R_imu[2, 2]))))
         t = sim.t
         self.hist.append((t, xy.copy()))
@@ -221,11 +239,19 @@ class GroundTruthBall:
         return self.sim.ball()
 
 
-def make_provider(kind: str, sim, seed: int = 0, dropouts=(), imu_error: bool = True):
+def apply_offset(off, xy, yaw):
+    """Map pose = offset ∘ odom pose (autod's layering: map->odom rigid transform)."""
+    ox, oy, oyaw = off
+    c, s = math.cos(oyaw), math.sin(oyaw)
+    x, y = float(xy[0]), float(xy[1])
+    return np.array([ox + c * x - s * y, oy + s * x + c * y]), yaw + oyaw
+
+
+def make_provider(kind: str, sim, seed: int = 0, dropouts=(), imu_error: bool = True, calib: str = "none"):
     if kind == "gt":
         return GroundTruthProvider(sim, dropouts)
     if kind == "odom":
-        return OdometryProvider(sim, imu=ImuYawError(seed, enabled=imu_error), dropouts=dropouts)
+        return OdometryProvider(sim, imu=ImuYawError(seed, enabled=imu_error), dropouts=dropouts, calib=calib)
     raise SystemExit(f"unknown pose source {kind!r} (gt | odom)")
 
 

@@ -1,0 +1,67 @@
+RUNG 6 STAGE 3: stride calibration + camera ball channel + re-observe (2026-11-14, fork local/velstand-own-teachers)
+Brief: microduck-vision-rung6-stage3-brief.md. Sim only; no training; 61->14 untouched; policies frozen
+(VelStand r3 3999, PrecisionStep v2 2500, BallKick v2 R 1250 / L 500, --calib v2). GPU0 only (EGL renders).
+Suite: 337 passed, 1 skipped (5 new: tests/test_rung6_stage3.py).
+
+0. RUST: rustup stable, user-level (~/.cargo, no sudo): rustc 1.100.0 / cargo 1.100.0 (>= 1.89 required).
+   ~/microduck_runtime @ 094d4bb4 (0.21.1), unmodified: `cargo build --locked --release -p mapd` OK;
+   `cargo test --locked --release -p mapd -p maploc`: 37 passed, 0 failed (5 ignored upstream).
+
+A. STRIDE CONSTANT ONLY (strideA/): pose_provider.ODOM_CALIBS["stride_v1"] = 1.019, `--odom-calib stride_v1`.
+   Scales odometry displacement since the anchor; PyOdometry untouched. Everything else = Stage 2 odom rows.
+
+B. CAMERA CHANNEL (scripts/camera_ball.py, `--ball-src camera`), face-board-v1, 640x360, intrinsics from the
+   profile's fovy (fx 348.0), pinhole render, distortion carried in the profile not undone.
+   - Ball: colour segmentation (sim orange; real detector is tuned for purple = arrival item); blobs touching the
+     frame edge rejected. Ranging ray->plane z = r (primary), apparent size (cross-check).
+   - Output through the seam in the ESTIMATED frame: est pose (+) camera-relative ball, so every line-up quantity
+     is camera-relative; held between looks, re-based each look.
+   - Mission: SCAN (turn in place, 5 Hz looks, 15 s cap) -> NAVIGATE (5 Hz looks, head neutral) -> LOOK at the
+     pre-stance point (head pitch +1.1 rad: a VelStand command inside its trained +-1.1 range; settle 0.8 s,
+     3 looks averaged, head back, settle 0.6 s) -> PrecisionStep commits on the fresh relative ball.
+     Not found = hold, re-scan with head yaw 0 / +0.5 / -0.5, then abort ball_not_found. Never kicks blind.
+   - Kick heading: still WORLD-frame (estimated yaw). Goal perception NOT built (see E).
+   Ranging vs truth (camera_ranging.txt; standing, 3 headings x 5 lateral positions):
+     | head    | dist | found | ray |err| med/max mm | size |err| med/max mm |
+     | neutral | 0.50 | 15/15 | 2.1 / 3.4  | 64.5 / 129.6 |
+     | neutral | 0.80 | 15/15 | 2.7 / 6.3  | 49.3 / 158.0 |
+     | neutral | 1.10 | 15/15 | 6.7 / 11.7 | 43.4 / 194.2 |
+     | look    | 0.15 | 15/15 | 3.5 / 3.8  |  3.0 / 12.8  |
+     | look    | 0.21 | 15/15 | 2.5 / 3.5  |  9.3 / 18.7  |
+     | look    | 0.30 | 12/15 | 3.0 / 7.2  |  6.9 / 46.2  |
+     Neutral head sees nothing closer than ~0.4 m; the look pose sees nothing past ~0.35 m. Apparent size is a poor
+     cross-check off-axis (the projected sphere stretches toward the frame edge); ray->plane is the method.
+   - In the batteries: re-observe found the ball in 150/159 (L) and 150/168 (R) looks; 3 (L) / 6 (R) of 50 runs
+     needed a rescan, all recovered; camera-relative ball error at the look median 1.7-1.8 mm (p90 2.5-2.9).
+     40/50 runs started with the ball out of view and scanned (median 5.0 s).
+
+C. GOALKICK GAP TABLE (50 runs per row, field scene, goals at 0.5 / 0.8 / 1.1 m)
+   | Foot  | Ground truth | Stage 2 odom | A: + stride | Full stack (A + camera + re-observe) | Bar (80% GT, 0.5/0.8) |
+   | Right | 50 / 43 / 38 | 6 / 2 / 2    | 12 / 7 / 3  | 38 / 26 / 21                         | 40 / 34  -> FAIL      |
+   | Left  | 50 / 49 / 44 | 19 / 13 / 9  | 36 / 28 / 21| 49 / 44 / 38                         | 40 / 39  -> PASS      |
+   - Pose error at swap-in: Stage 2 33-37 mm; A 17 mm; full 17 mm (unchanged, by design: no longer used for the line-up).
+   - TRUE ball placement at swap-in (|ex| / |ey| median): A R 5.9 / 11.4, L 9.5 / 10.0 mm;
+     full R 5.6 / 3.2, L 5.2 / 4.2 mm; ground truth (0.8 m) R 6.5 / 2.8, L 10.6 / 2.2 mm. Line-up = GT quality.
+   - Full stack: 0 falls, 0 aborts, 0 board contacts in all 300 runs. ball_lost aborts: Stage 2 6/row, A 1/row, full 0.
+   - "bump" column 30-32/row in the full stack is a FALSE trigger: look-to-look range noise at 1.2-1.8 m reads as
+     > 0.05 m/s (checked: true ball still). It costs a stop + re-plan, not goals. Tunable; not tuned.
+   - Right-foot gap, attribution (attrib_right_*_noimu: full stack, IMU yaw error OFF): 40 / 30 (vs 38 / 26).
+     Kick-direction scatter |kick_dir_err| median: R GT 2.1 deg, full 3.2-4.8; L GT 1.4, full 2.2-2.5.
+     True heading error at swap ~1.1 deg median (world-frame kick heading + IMU yaw error) explains only +2/+4
+     goals. Placement matches GT. The rest of the right-foot gap is NOT yet explained (candidates, unmeasured:
+     approach geometry changed by SCAN, head/neck state at kick swap, the right kick's known narrower margin).
+
+D. OTHER ACCEPTANCE ITEMS
+   - Go-to-point on the full navigation stack (odom + stride_v1; the ball is not used): single 10/10, chain 4/4,
+     fall/geofence/dropout PASS. True arrival median 14.8 cm, 7/10 truly within 15 cm (Stage 2: 10/10 at 12.8).
+   - Behaviour, right foot 0.8 m, 10 runs each, full stack:
+     ball hidden 1 s from the re-observe: 10/10 held, re-scanned (1-2), kicked;   hidden for good: 10/10 abort
+     ball_not_found after 3 rescans, 0 kicks;   pose dropout 2 s: 10/10 resumed and kicked;   permanent:
+     10/10 abort pose_lost. 0 falls.
+   - Regression: ground-truth seam and Stage 2 odom path per-run lines IDENTICAL to Stage 2 (regression/).
+
+E. NOT DONE (honest)
+   - Workstream C (real mapd in the loop): toolchain verified, mapd built and its tests pass; the Python shim
+     (robot.subscribe + autonomy gate + tof.stream servers in duck-ipc-proto wire format) is NOT written.
+     pose_provider has the hook (OdometryProvider.offset + apply_offset, autod's composition) and nothing sets it.
+   - Goal perception -> camera-relative kick heading (audit A4). Not built; kick heading is world-frame.

@@ -25,7 +25,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import infer_policy as ip  # noqa: E402
 from goto_supervisor import GotoConfig, GotoSupervisor  # noqa: E402
-from pose_provider import make_provider, pose_error  # noqa: E402
+from pose_provider import ODOM_CALIBS, make_provider, pose_error  # noqa: E402
 
 POSE_LOST_ABORT_S = 5.0   # pose absent this long: the route ends cleanly (aborted pose_lost)
 
@@ -474,6 +474,8 @@ def main():
     ap.add_argument("--pose", choices=("gt", "odom"), default="gt",
                     help="supervisor pose source (rung 6): gt = simulator truth, odom = contact odometry + IMU")
     ap.add_argument("--no-imu-error", action="store_true", help="odom: perfect IMU heading")
+    ap.add_argument("--odom-calib", choices=tuple(ODOM_CALIBS), default="none",
+                    help="odom: versioned odometry calibration (stride_v1 = +1.9 %% stride scale)")
     ap.add_argument("--trials", type=int, default=10)
     ap.add_argument("--delay", type=int, default=1)
     ap.add_argument("--scene", default=SCENE)
@@ -489,9 +491,9 @@ def main():
         n += 1
         out = f"{base}_{n}"
     os.makedirs(out)
-    pose_src = None if args.pose == "gt" else make_provider(args.pose, sim, imu_error=not args.no_imu_error)
+    pose_src = None if args.pose == "gt" else make_provider(args.pose, sim, imu_error=not args.no_imu_error, calib=args.odom_calib)
     print(f"onnx={args.onnx}\nlogs -> {out}/\npose source: {args.pose}"
-          + (f" (IMU yaw error {'off' if args.no_imu_error else 'on'})" if pose_src is not None else ""))
+          + (f" (IMU yaw error {'off' if args.no_imu_error else 'on'}, calib {args.odom_calib})" if pose_src is not None else ""))
     results = {}
     if args.suite in ("single", "all"):
         results["single"] = suite_single(sim, out, args.trials, pose_src=pose_src)

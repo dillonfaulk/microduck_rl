@@ -788,7 +788,7 @@ def draw_mission(scn, m, sim):
 
 
 def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right", goal_dist=None,
-                pose_src=None, ball_src=None):
+                pose_src=None, ball_src=None, hide_s=0.0):
     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands.
     With goal_dist, the kick heading is the duck's walk-in bearing turned by an approach angle drawn
     from GOAL_APPROACH_DEG, and the goal stands goal_dist m past the ball on that line."""
@@ -812,7 +812,7 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=Non
         pose_src.reset(sim, seed=int(rng.integers(1 << 30)) if pose_src.name != "gt" else 0)   # a mission starts from a known pose
     if ball_src is not None:   # camera ball: re-anchored on the mission's pose source, starts unseen
         ball_src.pose_src = pose_src or GroundTruthProvider(sim)
-        ball_src.reset()
+        ball_src.reset(hide_s=hide_s)   # --hide-ball: same not-found test the battery runs
     return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal, pose_src=pose_src,
                    ball_src=ball_src)
 
@@ -934,7 +934,7 @@ def run_viewer(args):
     else:
         apply_profile(sim.model, head_cam, board_profiles.get(args.profile))
     m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist, pose_src=pose_src,
-                    ball_src=ball_cam)
+                    ball_src=ball_cam, hide_s=args.hide_ball)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
     goals = {"goal": 0, "post": 0, "miss": 0, "no_cross": 0}
 
@@ -1011,7 +1011,7 @@ def run_viewer(args):
                     n += 1
                     log = RunLog()
                     m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
-                                    pose_src=pose_src, ball_src=ball_cam)
+                                    pose_src=pose_src, ball_src=ball_cam, hide_s=args.hide_ball)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -1030,7 +1030,7 @@ def run_viewer(args):
                         break
                     log = RunLog(echo=False)
                     m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
-                                    pose_src=pose_src, ball_src=ball_cam)
+                                    pose_src=pose_src, ball_src=ball_cam, hide_s=args.hide_ball)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)

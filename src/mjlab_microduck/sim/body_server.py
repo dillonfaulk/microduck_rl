@@ -348,7 +348,12 @@ class Body:
         own 15 Hz rather than the control loop's 50, exactly as the hardware is.
         """
         with self.world.lock:
-            distance_mm, status = self.tof.frame(self.world.data)
+            # frame_at applies the real sensor's ~60 ms delay (TofFlaws.latency_s); until a capture
+            # is that old there is nothing to hand out, as on a sensor just started.
+            got = self.tof.frame_at(self.world.data, float(self.world.data.time))
+        if got is None:
+            return {"rows": ROWS, "cols": COLS, "distance_mm": [0] * (ROWS * COLS), "status": [0] * (ROWS * COLS)}
+        distance_mm, status, _ = got
         return {"rows": ROWS, "cols": COLS, "distance_mm": distance_mm, "status": status}
 
     # ── what the daemon commands ──────────────────────────────────────────

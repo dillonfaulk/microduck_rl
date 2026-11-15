@@ -50,6 +50,14 @@ from goto_point import CONTROL_DT, RunLog  # noqa: E402
 from goto_supervisor import GotoConfig, GotoSupervisor, wrap_angle  # noqa: E402
 from kick_battery import BALL_OFFSET_ABS_Y, BALL_OFFSET_X, SCENES, KickSim  # noqa: E402
 from soccer_referee import Goal, GoalReferee  # noqa: E402
+from pose_provider import STALE_S, GroundTruthBall, GroundTruthProvider, make_provider, pose_error  # noqa: E402
+
+# Rung 6 Stage 2: the supervisor reads pose and ball only through providers (pose_provider.py);
+# ground truth is the scoring reference (referee, ball_travel, peak, falls in KICK/SETTLE). While
+# the pose is ABSENT (older than STALE_S) the duck holds still (zero twist, no guessed motion) and
+# picks up where it was when the pose comes back; absent for longer than this ends the mission
+# cleanly as aborted "pose_lost".
+POSE_LOST_ABORT_S = 5.0
 
 # GoalKick v0 (rung 5, Option A: frozen policies, the goal is a mission feature). With
 # --goal-dist D a goal (scene_allcollisions_ball_goal.xml, 210 mm opening) stands D m past
@@ -225,8 +233,13 @@ class Aligner:
 
 
 class Mission:
-    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None, goal=None):
+    def __init__(self, sim, kick_session, kick_heading, log, foot="right", precision_session=None, goal=None,
+                 pose_src=None, ball_src=None):
         self.sim, self.kick_session = sim, kick_session
+        self.pose_src = pose_src if pose_src is not None else GroundTruthProvider(sim)
+        self.ball_src = ball_src if ball_src is not None else GroundTruthBall(sim)
+        self.estimated = self.pose_src.name != "gt"
+        self.pose_lost_t = None
         self.goal = goal              # soccer_referee.Goal, or None for a plain kick mission
         self.referee = None
         self.measured = False
@@ -249,18 +262,21 @@ class Mission:
         self.settle_left = 0
         self.pulse_twist = (0.0, 0.0, 0.0)
         self.result = {"approach_mode": "precision" if precision_session is not None else "pulse"}
-        b, _ = sim.ball()
+        b, _ = self.ball_src.get(sim.t)
         self.ball0 = b.copy()
         stance = self.stance_point(b)
         k = np.array([math.cos(self.kh), math.sin(self.kh)])
         line_up, pre = stance - LINE_UP_M * k, stance - PRE_STANCE_M * k
-        (x, y, _), _, _ = sim.pose()
+        start = self.pose_src.get(sim.t)
+        if start.pose is None:
+            raise RuntimeError(f"mission started without a pose ({start.lost})")
+        x, y, _ = start.pose
         route = [tuple(line_up), tuple(pre)]
         if self._seg_dist(np.array([x, y]), line_up, b) < DETOUR_CLEAR_M:
             side = np.array([-k[1], k[0]])
             side = side if (np.array([x, y]) - b) @ side > 0 else -side
             route.insert(0, tuple(b + 0.45 * side - 0.1 * k))
-        self.nav = GotoSupervisor(route, ARENA, GotoConfig(arrival_radius=0.06), log=log.event)
+        self.nav = GotoSupervisor(route, getattr(sim, "arena", ARENA), GotoConfig(arrival_radius=0.06), log=log.event)
         log.event({"t": 0.0, "event": "MISSION_START", "ball": [round(v, 3) for v in b],
                    "kick_heading_deg": round(math.degrees(kick_heading), 1),
                    "aim_heading_deg": round(math.degrees(self.kh), 1),
@@ -342,11 +358,20 @@ class Mission:
         self.log.event({"t": round(t, 3), "event": "KICK_SWAP_IN", "aligned": aligned, "pulses": self.pulses,
                         "mode": self.result["approach_mode"],
                         "err_mm": [round(ex * 1000, 1), round(ey * 1000, 1)], "err_heading_deg": round(math.degrees(eh), 2)})
+        if self.estimated:   # the gap at the moment it matters: where the duck thinks it is vs where it is
+            true_pose, _, _ = sim.pose()
+            exy, eyaw = pose_error(pose, true_pose)
+            ball_true, _ = sim.ball()
+            ex_t, ey_t, eh_t, _ = self.aligner.errors(true_pose, ball_true, self.kh,
+                                                     sim.site_local(sim.kick_site), sim.home_foot)
+            self.result.update(pose_err_mm=round(exy * 1000, 1), pose_err_yaw_deg=round(math.degrees(eyaw), 2),
+                               true_align_ex_mm=round(ex_t * 1000, 1), true_align_ey_mm=round(ey_t * 1000, 1),
+                               true_align_eh_deg=round(math.degrees(eh_t), 2))
         sim.policy.ort_session = self.kick_session
         if self.goal is not None:
             self.referee = GoalReferee(self.goal, GOAL_TIMEOUT_S)
         self.kick_dir = np.array([math.cos(pose[2]), math.sin(pose[2])])  # what the kick policy aims at
-        self.kick_ball0 = b.copy()
+        self.kick_ball0 = sim.ball()[0].copy()   # scoring origin: ground truth
         self.peak = 0.0
         self._goto("KICK")
         return (0.0, 0.0, 0.0)
@@ -354,8 +379,10 @@ class Mission:
     def tick(self):
         """Returns the twist for this control tick (and swaps sessions as the state changes)."""
         sim, t = self.sim, self.sim.t
-        pose, tilt, z = sim.pose()
-        b, bv = sim.ball()
+        est = self.pose_src.get(t)
+        pose, tilt, z = est.pose, est.tilt_deg, est.trunk_z     # the supervisor's view
+        b, bv = self.ball_src.get(t)
+        bt, bvt = sim.ball()                                     # ground truth: scoring only
         ball_post = False
         if self.goal is not None:
             ball_post, duck_post = goal_contacts(sim)
@@ -363,8 +390,32 @@ class Mission:
                 self.result["duck_post_contact"] = True
                 self.log.event({"t": round(t, 3), "event": "DUCK_POST_CONTACT", "phase": self.state})
             if self.referee is not None and not self.referee.done:
-                if self.referee.update(t, float(b[0]), float(b[1]), ball_post) is not None:
+                if self.referee.update(t, float(bt[0]), float(bt[1]), ball_post) is not None:
                     self.log.event({"t": round(t, 3), "event": "GOAL_DECIDED", **self.referee.result})
+        if getattr(sim, "board_geoms", None) and not self.result.get("duck_board_contact") and duck_board_contact(sim):
+            self.result["duck_board_contact"] = True
+            self.log.event({"t": round(t, 3), "event": "DUCK_BOARD_CONTACT", "phase": self.state})
+        if self.state in ("NAVIGATE", "ALIGN", "PRECISE_PIVOT", "PRECISE"):
+            if pose is None:   # pose absent: hold still, never guess
+                if self.pose_lost_t is None:
+                    self.pose_lost_t = t
+                    self.result["pose_lost"] = self.result.get("pose_lost", 0) + 1
+                    self.log.event({"t": round(t, 3), "event": "POSE_LOST", "phase": self.state, "lost": est.lost,
+                                    "age_s": round(est.age_s, 3)})
+                if t - self.pose_lost_t > POSE_LOST_ABORT_S:
+                    sim.policy.ort_session = self.walk_session
+                    self.result["aborted"] = "pose_lost"
+                    self.log.event({"t": round(t, 3), "event": "POSE_LOST_ABORT", "phase": self.state,
+                                    "after_s": round(t - self.pose_lost_t, 2)})
+                    self._goto("DONE")
+                return (0.0, 0.0, 0.0)
+            if self.pose_lost_t is not None:
+                self.log.event({"t": round(t, 3), "event": "POSE_BACK", "phase": self.state,
+                                "after_s": round(t - self.pose_lost_t, 2)})
+                self.result["pose_lost_s"] = round(self.result.get("pose_lost_s", 0.0) + t - self.pose_lost_t, 2)
+                self.pose_lost_t = None
+        if self.state in ("KICK", "SETTLE"):   # scoring phases: truth (as before the seam)
+            pose, tilt, z = sim.pose()
         if self.state in ("NAVIGATE", "ALIGN", "PRECISE_PIVOT", "PRECISE"):
             # A bumped ball: stand still until it stops rolling, then re-plan from where
             # it rests (ALIGN re-navigates if the new stance is out of reach). Chasing a
@@ -393,7 +444,7 @@ class Mission:
                 return (0.0, 0.0, 0.0)
 
         if self.state == "NAVIGATE":
-            self.nav.update(t, pose, tilt, z)
+            self.nav.update(est.t, pose, tilt, z)   # the estimate's own stamp feeds the watchdog
             twist = self.nav.command(t)
             if self.nav.state == "DONE":
                 self._enter_fine(t)
@@ -422,7 +473,7 @@ class Mission:
             if tilt > 35 or z < 0.06:
                 return self._precise_fail(t, "fall")
             off = self.precise_offset(pose, b)
-            vb = sim.data.qvel[sim.va:sim.va + 2]
+            vb = est.v_xy   # odometry velocity (ground truth's qvel under GroundTruthProvider)
             on = math.hypot(off[0], off[1]) < ALIGN_TOL and abs(off[2]) < ALIGN_HEADING_TOL
             self.on_ticks = self.on_ticks + 1 if on and np.linalg.norm(vb) < PRECISE_STILL_V else 0
             if self.on_ticks >= PRECISE_HOLD_TICKS:
@@ -485,7 +536,7 @@ class Mission:
             if np.linalg.norm(stance - pose[:2]) > ALIGN_ZONE_M:   # drifted out: navigate back in
                 self.log.event({"t": round(t, 3), "event": "ALIGN_LOST", "dist": round(float(np.linalg.norm(stance - pose[:2])), 3)})
                 k = np.array([math.cos(self.kh), math.sin(self.kh)])
-                self.nav = GotoSupervisor([tuple(stance - PRE_STANCE_M * k)], ARENA, GotoConfig(arrival_radius=0.06),
+                self.nav = GotoSupervisor([tuple(stance - PRE_STANCE_M * k)], getattr(sim, "arena", ARENA), GotoConfig(arrival_radius=0.06),
                                           log=self.log.event)
                 self._goto("NAVIGATE")
                 return (0.0, 0.0, 0.0)
@@ -524,7 +575,7 @@ class Mission:
             self.pulse_left -= 1
             return clamp_align(*self.pulse_twist)
 
-        _, bv = sim.ball()
+        bv = bvt   # KICK/SETTLE are scoring: ground truth
         if self.state == "KICK":
             fwd = float(bv @ np.array([math.cos(self.kh_goal), math.sin(self.kh_goal)]))
             if "kick_contact_t" not in self.result and np.linalg.norm(bv) > 0.05:
@@ -551,7 +602,7 @@ class Mission:
             if t - self.t_state >= SETTLE_S and up and not self.measured:
                 # measured at the same moment as every earlier kick mission (comparable numbers);
                 # ball_travel is the distance at that moment, NOT a rest distance (frictionless ball)
-                d = b - self.kick_ball0
+                d = bt - self.kick_ball0
                 self.measured = True
                 self.result.update(peak_ball_fwd=round(self.peak, 3), ball_travel=round(float(np.linalg.norm(d)), 3),
                                    kick_dir_err_deg=round(math.degrees(wrap_angle(math.atan2(d[1], d[0]) - self.kh_goal)), 1)
@@ -587,6 +638,12 @@ def draw_mission(scn, m, sim):
         c, s = math.cos(g.yaw), math.sin(g.yaw)
         h = g.half_opening + g.post_radius
         line((g.cx - s * h, g.cy + c * h, 0.002), (g.cx + s * h, g.cy - c * h, 0.002), [1, 1, 1, 0.9], 0.003)
+    if m.estimated:   # where the supervisor believes the duck is: blue disk + heading tick
+        e = m.pose_src.get(sim.t)
+        if e.pose is not None:
+            ex, ey, eyaw = e.pose
+            add(mujoco.mjtGeom.mjGEOM_CYLINDER, [0.025, 0.003, 0], [ex, ey, 0.004], [0.2, 0.4, 1.0, 0.8])
+            line((ex, ey, 0.007), (ex + 0.08 * math.cos(eyaw), ey + 0.08 * math.sin(eyaw), 0.007), [0.2, 0.4, 1.0, 0.9], 0.003)
     if m.state == "DONE":
         return
     b, _ = sim.ball()
@@ -607,7 +664,8 @@ def draw_mission(scn, m, sim):
             prev = (x, y)
 
 
-def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right", goal_dist=None):
+def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right", goal_dist=None,
+                pose_src=None):
     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands.
     With goal_dist, the kick heading is the duck's walk-in bearing turned by an approach angle drawn
     from GOAL_APPROACH_DEG, and the goal stands goal_dist m past the ball on that line."""
@@ -627,7 +685,9 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=Non
     sim.data.qpos[sim.bqa:sim.bqa + 7] = [ball[0], ball[1], 0.035, 1, 0, 0, 0]
     sim.data.qvel[sim.bva:sim.bva + 6] = 0
     mujoco.mj_forward(sim.model, sim.data)
-    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal)
+    if pose_src is not None:
+        pose_src.reset(sim, seed=int(rng.integers(1 << 30)) if pose_src.name != "gt" else 0)   # a mission starts from a known pose
+    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal, pose_src=pose_src)
 
 
 def setup_goal(sim, name="goal_a"):
@@ -643,8 +703,45 @@ def setup_goal(sim, name="goal_a"):
     # Render statistics: BAM's MujocoController calls mj_setConst, which recomputes extent/center
     # from the parked goals (+-50 m -> extent 100 m: blocky shadows, black horizon lines). Restore
     # the scene file's pinned <statistic>. extent/center are render-only (the solver uses meaninertia).
-    spec = mujoco.MjSpec.from_file(SCENES["allcollisions_ball_goal"])
+    spec = mujoco.MjSpec.from_file(getattr(sim, "scene_path", SCENES["allcollisions_ball_goal"]))
     m.stat.extent, m.stat.center[:] = spec.stat.extent, spec.stat.center
+
+
+FIELD_INSET_M = 0.5   # the duck's geofence sits this far inside the boards
+
+
+def field_from_model(m):
+    """The field's inner faces (x_min, x_max, y_min, y_max), read back from field.xml's board geoms."""
+    def face(name, axis, sign):
+        g = m.geom(name)
+        return float(g.pos[axis] - sign * g.size[axis])
+    return (face("field_board_end_neg_left", 0, -1), face("field_board_end_pos_left", 0, 1),
+            face("field_board_side_right", 1, -1), face("field_board_side_left", 1, 1))
+
+
+def setup_field(sim):
+    """Field scene: board geoms for contact checks, both goals parked in their mouths (goal_a at
+    +x, goal_b at -x, each facing out of the field). Call after setup_goal (which restores the
+    render statistics). Returns the geofence = the field inset by FIELD_INSET_M."""
+    m, d = sim.model, sim.data
+    sim.board_geoms = {g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_")}
+    fx0, fx1, fy0, fy1 = field_from_model(m)
+    for name, x, yaw in (("goal_a", fx1, 0.0), ("goal_b", fx0, math.pi)):
+        mid = int(m.body_mocapid[m.body(name).id])
+        d.mocap_pos[mid] = [x, 0.0, 0.0]
+        d.mocap_quat[mid] = [math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2)]
+    mujoco.mj_forward(m, d)
+    sim.field = (fx0, fx1, fy0, fy1)
+    return (fx0 + FIELD_INSET_M, fx1 - FIELD_INSET_M, fy0 + FIELD_INSET_M, fy1 - FIELD_INSET_M)
+
+
+def duck_board_contact(sim):
+    d = sim.data
+    for i in range(d.ncon):
+        g1, g2 = int(d.contact[i].geom1), int(d.contact[i].geom2)
+        if (g1 in sim.board_geoms and g2 in sim.robot_geoms) or (g2 in sim.board_geoms and g1 in sim.robot_geoms):
+            return True
+    return False
 
 
 def place_goal(sim, centre, into_yaw):
@@ -685,15 +782,18 @@ def run_viewer(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
-    if args.goal_dist is not None:
+    if args.goal_dist is not None or args.scene == "field":
         setup_goal(sim)
+    if args.scene == "field":
+        sim.arena = setup_field(sim)
+    pose_src = None if args.pose == "gt" else make_provider(args.pose, sim, imu_error=not args.no_imu_error)
     rng = np.random.default_rng(args.seed)
     out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}_viewer"
     os.makedirs(out, exist_ok=True)
     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
     log = RunLog(echo=not args.auto)
-    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist)
+    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist, pose_src=pose_src)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
     goals = {"goal": 0, "post": 0, "miss": 0, "no_cross": 0}
 
@@ -749,7 +849,8 @@ def run_viewer(args):
                     log.save(f"{out}/mission{n}")
                     n += 1
                     log = RunLog()
-                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
+                                    pose_src=pose_src)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -767,11 +868,14 @@ def run_viewer(args):
                                   f"{goals['miss']} misses, {goals['no_cross']} short")
                         break
                     log = RunLog(echo=False)
-                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist)
+                    m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
+                                    pose_src=pose_src)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)
             sim.step()
+            if pose_src is not None:
+                pose_src.update(sim)
             draw_mission(viewer.user_scn, m, sim)
             viewer.sync()
             time.sleep(max(0.0, CONTROL_DT - (time.time() - t0)))
@@ -785,12 +889,19 @@ def run_headless(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
-    if args.goal_dist is not None:
+    if args.goal_dist is not None or args.scene == "field":
         setup_goal(sim)
+    if args.scene == "field":
+        sim.arena = setup_field(sim)
+        print(f"field: boards {sim.field}, geofence {sim.arena}")
+    pose_src = None if (args.pose == "gt" and not args.dropout) else make_provider(args.pose, sim, imu_error=not args.no_imu_error)
+    print(f"pose source: {args.pose}" + (f" (IMU yaw error {'off' if args.no_imu_error else 'on'})" if args.pose != "gt" else "")
+          + (f", dropout {args.dropout}" if args.dropout else ""))
     print(f"{args.foot} (kicking) foot at HOME, trunk yaw frame: ({sim.home_foot[0]*1000:.1f}, {sim.home_foot[1]*1000:.1f}) mm")
     rng = np.random.default_rng(args.seed)
-    out = f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}"
-    os.makedirs(out, exist_ok=True)
+    out = unique_dir(f"logs/kick_mission/{time.strftime('%Y-%m-%d_%H-%M-%S')}_{args.foot}"
+                     + (f"_goal{args.goal_dist}" if args.goal_dist is not None else "") + f"_{args.scene}_{args.pose}"
+                     + ("_dropout" if args.dropout else ""))
     print(f"velstand={args.velstand}\nkick={args.kick}\nprecision={args.precision} (pulse aligner = fallback)\nscene={args.scene}  logs -> {out}/")
     print(f"kicking foot {args.foot}: precision stance shift {PRECISE_STANCE_SHIFT_M[args.foot]*1000:+.1f} mm along the kick line; "
           f"aim offset {math.degrees(KICK_AIM_OFFSET[args.foot]):+.1f} deg (+ = left)")
@@ -810,7 +921,10 @@ def run_headless(args):
         sim.data.qvel[sim.bva:sim.bva + 6] = 0
         mujoco.mj_forward(sim.model, sim.data)
         log = RunLog(echo=args.verbose)
-        m = Mission(sim, kick, kh, log, foot=args.foot, precision_session=precision, goal=goal)
+        if pose_src is not None:
+            pose_src.reset(sim, seed=k)
+            pose_src.dropouts = dropouts_for(args)
+        m = Mission(sim, kick, kh, log, foot=args.foot, precision_session=precision, goal=goal, pose_src=pose_src)
         while m.state != "DONE" and sim.t < args.timeout:
             twist = m.tick()
             sim.set_twist(twist)
@@ -823,7 +937,15 @@ def run_headless(args):
                               "ball_x": round(float(bxy[0]), 4), "ball_y": round(float(bxy[1]), 4),
                               "rfoot_x": round(float(rf[0]), 4), "rfoot_y": round(float(rf[1]), 4),
                               "lfoot_x": round(float(lf[0]), 4), "lfoot_y": round(float(lf[1]), 4)})
+            if pose_src is not None:
+                e = pose_src.get(sim.t)
+                log.trace[-1].update({"est_x": None if e.pose is None else round(e.pose[0], 4),
+                                      "est_y": None if e.pose is None else round(e.pose[1], 4),
+                                      "est_yaw": None if e.pose is None else round(e.pose[2], 4),
+                                      "est_lost": e.lost, "est_age_s": round(min(e.age_s, 99.0), 3)})
             sim.step()
+            if pose_src is not None:
+                pose_src.update(sim)
         if m.state != "DONE":
             sim.policy.ort_session = m.walk_session
             m.result["timeout_in"] = m.state
@@ -846,6 +968,45 @@ def run_headless(args):
     print(f"  approach mode: {modes}")
     if args.goal_dist is not None:
         print_goal_summary(rows, args.goal_dist, args.foot)
+    if pose_src is not None and pose_src.name != "gt":
+        print_pose_gap(rows)
+
+
+def unique_dir(base):
+    """A fresh log directory: batteries launched in the same second must not share one."""
+    out, n = base, 1
+    while True:
+        try:
+            os.makedirs(out)
+            return out
+        except FileExistsError:
+            n += 1
+            out = f"{base}_{n}"
+
+
+def dropouts_for(args):
+    """--dropout T0,DUR: the pose link is down from T0 s after each mission start for DUR s."""
+    if not args.dropout:
+        return []
+    t0, dur = (float(v) for v in args.dropout.split(","))
+    return [(t0, t0 + dur)]
+
+
+def print_pose_gap(rows):
+    """Estimated-vs-truth at the kick swap-in, and how the pose behaved over the battery."""
+    sw = [r for r in rows if r.get("pose_err_mm") is not None]
+    def q(vals, f=lambda v: v):
+        vals = [f(v) for v in vals]
+        return (f"median {np.median(vals):.1f}, p90 {np.percentile(vals, 90):.1f}, max {max(vals):.1f}"
+                if vals else "n/a")
+    print(f"\n  POSE GAP at kick swap-in ({len(sw)}/{len(rows)} missions reached it), estimate vs truth:")
+    print(f"    position error mm: {q([r['pose_err_mm'] for r in sw])}")
+    print(f"    |yaw error| deg:   {q([r['pose_err_yaw_deg'] for r in sw], abs)}")
+    print(f"    TRUE ball placement at swap (supervisor believed |ex|<=12/20, |ey|<=12 mm): "
+          f"|ex| {q([r['true_align_ex_mm'] for r in sw], abs)}; |ey| {q([r['true_align_ey_mm'] for r in sw], abs)}")
+    lost = [r for r in rows if r.get("pose_lost")]
+    print(f"    pose lost in {len(lost)} missions; aborted pose_lost {sum(r.get('aborted') == 'pose_lost' for r in rows)}; "
+          f"resumed {sum(1 for r in lost if r.get('aborted') != 'pose_lost')}")
 
 
 def print_goal_summary(rows, goal_dist, foot):
@@ -897,8 +1058,13 @@ def main():
     ap.add_argument("--goal-dist", type=float, default=None,
                     help="GoalKick: a 210 mm goal this many m past the ball on the kick line (switches to the goal "
                          "scene); headless cycles approach angles over GOAL_APPROACH_DEG")
+    ap.add_argument("--pose", choices=("gt", "odom"), default="gt",
+                    help="supervisor pose source (rung 6): gt = simulator truth (published baselines), odom = contact "
+                         "odometry + IMU from a known start (pose_provider.py)")
+    ap.add_argument("--no-imu-error", action="store_true", help="odom: perfect IMU heading (the measured yaw error off)")
+    ap.add_argument("--dropout", default=None, help='"T0,DUR": pose link down from T0 s after each mission start, DUR s')
     args = ap.parse_args()
-    if args.goal_dist is not None:
+    if args.goal_dist is not None and args.scene not in ("allcollisions_ball_goal", "field"):
         args.scene = "allcollisions_ball_goal"
     apply_calibration(args.calib)
     run_viewer(args) if args.viewer else run_headless(args)

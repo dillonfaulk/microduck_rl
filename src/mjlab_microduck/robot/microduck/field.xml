@@ -1,0 +1,42 @@
+<mujoco model="microduck_field">
+    <!-- The 2v2 field's boards (fork-local, rung 6 Stage 2, 2026-11-14): ToF landmarks and the
+         out-of-bounds geofence in one structure (Dillon). THE single definition of the field:
+         scripts read the inner faces back from the compiled model (field_from_model), nothing
+         is hand-copied.
+
+         Field frame = world frame: centre at the origin, inner faces at x, y = +-3.0 m. Sized so
+         every GoalKick battery mission (ball 1.0-1.8 m from the duck's start at the origin, goal
+         <= 1.1 m past the ball, so goal lines <= 2.9 m out) fits inside unchanged, which keeps the
+         battery comparable to its published baselines. The duck's geofence (ARENA) is the field
+         inset by 0.5 m = +-2.5 m, the same numbers go-to-point has always used.
+
+         Boards: 0.30 m tall, 12 mm thick, matte light wood. 0.30 m is just above the ToF axis
+         (level, ~0.25 m up at rest), so the sensor's middle rows return off a board and not only
+         its low rows. RoboCup Junior Soccer's walls are 0.22 m. Matte and light because a
+         VL53L5CX/L8CX ranges worst on dark or glossy targets. A real pitch would be painted 12 mm
+         plywood or MDF. Each end has a goal mouth 0.25 m wide (the goal posts' outer faces,
+         goal.xml) with a 0.25 m deep box behind it, so a scored ball stays in the goal. -->
+    <default>
+        <default class="field_board">
+            <geom type="box" contype="1" conaffinity="1" friction="0.5 0.005 0.0001" rgba="0.85 0.72 0.52 1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <!-- sides, y = +-3 -->
+        <geom name="field_board_side_left" class="field_board" pos="0 3.006 0.15" size="3.012 0.006 0.15"/>
+        <geom name="field_board_side_right" class="field_board" pos="0 -3.006 0.15" size="3.012 0.006 0.15"/>
+        <!-- ends, x = +-3, split around the goal mouth |y| < 0.125 -->
+        <geom name="field_board_end_pos_left" class="field_board" pos="3.006 1.5685 0.15" size="0.006 1.4435 0.15"/>
+        <geom name="field_board_end_pos_right" class="field_board" pos="3.006 -1.5685 0.15" size="0.006 1.4435 0.15"/>
+        <geom name="field_board_end_neg_left" class="field_board" pos="-3.006 1.5685 0.15" size="0.006 1.4435 0.15"/>
+        <geom name="field_board_end_neg_right" class="field_board" pos="-3.006 -1.5685 0.15" size="0.006 1.4435 0.15"/>
+        <!-- goal boxes behind each mouth -->
+        <geom name="field_goalbox_pos_left" class="field_board" pos="3.131 0.131 0.15" size="0.125 0.006 0.15"/>
+        <geom name="field_goalbox_pos_right" class="field_board" pos="3.131 -0.131 0.15" size="0.125 0.006 0.15"/>
+        <geom name="field_goalbox_pos_back" class="field_board" pos="3.262 0 0.15" size="0.006 0.137 0.15"/>
+        <geom name="field_goalbox_neg_left" class="field_board" pos="-3.131 0.131 0.15" size="0.125 0.006 0.15"/>
+        <geom name="field_goalbox_neg_right" class="field_board" pos="-3.131 -0.131 0.15" size="0.125 0.006 0.15"/>
+        <geom name="field_goalbox_neg_back" class="field_board" pos="-3.262 0 0.15" size="0.006 0.137 0.15"/>
+    </worldbody>
+</mujoco>

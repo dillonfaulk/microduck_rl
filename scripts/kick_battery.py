@@ -29,7 +29,8 @@ from goto_point import CONTROL_DT, DuckSim  # noqa: E402
 
 SCENES = {"ball": "src/mjlab_microduck/robot/microduck/scene_ball.xml",
           "allcollisions_ball": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball.xml",
-          "allcollisions_ball_goal": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball_goal.xml"}
+          "allcollisions_ball_goal": "src/mjlab_microduck/robot/microduck/scene_allcollisions_ball_goal.xml",
+          "field": "src/mjlab_microduck/robot/microduck/scene_field.xml"}
 # microduck_ball_kick_env_cfg
 BALL_OFFSET_X, BALL_OFFSET_ABS_Y, BALL_RADIUS, BALL_NOISE = 0.09, 0.042, 0.035, 0.015
 EPISODE_S = 5.0
@@ -41,6 +42,7 @@ MOVED = 0.05                            # m/s: the ball has been touched
 class KickSim(DuckSim):
     def __init__(self, onnx, scene, delay=1):
         super().__init__(onnx, scene=scene, delay=delay)
+        self.scene_path = scene
         j = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, "ball_free")
         self.bqa, self.bva = self.model.jnt_qposadr[j], self.model.jnt_dofadr[j]
         self.kick_session = self.policy.ort_session

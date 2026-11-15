@@ -59,6 +59,49 @@ def to_uyvy(rgb: np.ndarray) -> bytes:
     return packed.tobytes()
 
 
+# The camera's axes in the ToF site's frame (site: +x forward, +y left, +z up; MuJoCo camera: looks
+# along -z, +y is image up, +x image right). The site is on the same head body as the camera, so
+# both turn with the head.
+#   upright (rotate 0):        right = -y_site, up = +z_site, back = -x_site
+#   quarter turn (rotate 90):  right = -z_site (world down, as the legacy twin), up = -y_site,
+#                              back = -x_site. A consumer turns the frame 90 deg clockwise to
+#                              upright, which is mediad's `rotate` 90.
+_SITE_TO_CAM = {
+    0: np.array([[0.0, 0.0, -1.0], [-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]),
+    90: np.array([[0.0, 0.0, -1.0], [0.0, -1.0, 0.0], [-1.0, 0.0, 0.0]]),
+}
+
+
+def apply_profile(model: mujoco.MjModel, camera: int, profile, ref_site: str = "tof") -> None:
+    """Mount `camera` like the board's real camera: its rotation, and its field of view as MuJoCo's
+    `fovy` (the unrotated frame's vertical). Render at the profile's aspect ratio (16:9 for both)
+    to get its horizontal field too. Distortion is not rendered: `profile.camera.distortion` is
+    what a detector should undo on real frames, and a rendered pinhole has none."""
+    cam = profile.camera if hasattr(profile, "camera") else profile
+    site = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, ref_site)
+    if site < 0 or model.site_bodyid[site] != model.cam_bodyid[camera]:
+        raise SystemExit(f"apply_profile needs a '{ref_site}' site on the camera's own body")
+    if cam.rotate_deg not in _SITE_TO_CAM:
+        raise SystemExit(f"no camera mount for rotate {cam.rotate_deg}")
+    body_site = np.zeros(9)
+    mujoco.mju_quat2Mat(body_site, model.site_quat[site])
+    R = body_site.reshape(3, 3) @ _SITE_TO_CAM[cam.rotate_deg]
+    q = np.zeros(4)
+    mujoco.mju_mat2Quat(q, R.reshape(-1))
+    model.cam_quat[camera] = q
+    model.cam_fovy[camera] = cam.vfov_deg
+    need_w, need_h = WIDTH * 2, HEIGHT * 2   # room for the profile's 1280x720 delivered size
+    model.vis.global_.offwidth = max(int(model.vis.global_.offwidth), need_w)
+    model.vis.global_.offheight = max(int(model.vis.global_.offheight), need_h)
+
+
+def pinhole_intrinsics(model: mujoco.MjModel, camera: int, width: int, height: int) -> dict:
+    """fx, fy, cx, cy of a rendered frame (square pixels, centred principal point, no distortion):
+    the numbers a detector should read instead of hard-coding a field of view."""
+    fy = (height / 2.0) / np.tan(np.radians(model.cam_fovy[camera]) / 2.0)
+    return {"fx": fy, "fy": fy, "cx": width / 2.0, "cy": height / 2.0, "distortion": []}
+
+
 class Camera:
     """One duck's head camera, rendered on demand.
 
@@ -66,10 +109,24 @@ class Camera:
     loop touches it.
     """
 
-    def __init__(self, model: mujoco.MjModel, name: str, width: int = WIDTH, height: int = HEIGHT):
+    def __init__(self, model: mujoco.MjModel, name: str, width: int = WIDTH, height: int = HEIGHT,
+                 profile=None):
         self.camera = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, name)
         if self.camera < 0:
             raise SystemExit(f"the model has no camera {name!r}")
+        self.profile = profile
+        if profile is not None:
+            # A board profile (sim/board_profiles.py) sets the mount and the field of view from
+            # the real camera's family solve. Without one, everything below is the twin as it
+            # was: MuJoCo's default 45 deg fovy, on its side. `mediad --sim-camera` publishes
+            # intrinsics for exactly that (mediad/src/camera.rs:53-55), so the legacy mode stays
+            # the body server's default.
+            apply_profile(model, self.camera, profile)
+            self.renderer = mujoco.Renderer(model, height=height, width=width)
+            self.width, self.height = width, height
+            self.latest: bytes | None = None
+            self.lock = threading.Lock()
+            return
 
         # **The model's head camera faces backwards.** Measured against the duck's own forward axis
         # and the ToF site's: the camera's view direction is -x where both of those are +x, exactly

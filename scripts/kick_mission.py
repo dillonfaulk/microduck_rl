@@ -788,7 +788,7 @@ def draw_mission(scn, m, sim):
 
 
 def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=None, foot="right", goal_dist=None,
-                pose_src=None):
+                pose_src=None, ball_src=None):
     """Put the ball 1.0-1.8 m from the duck (or at `ball`) and start a mission from where the duck stands.
     With goal_dist, the kick heading is the duck's walk-in bearing turned by an approach angle drawn
     from GOAL_APPROACH_DEG, and the goal stands goal_dist m past the ball on that line."""
@@ -810,7 +810,11 @@ def new_mission(sim, kick, rng, log, ball=None, kick_heading=None, precision=Non
     mujoco.mj_forward(sim.model, sim.data)
     if pose_src is not None:
         pose_src.reset(sim, seed=int(rng.integers(1 << 30)) if pose_src.name != "gt" else 0)   # a mission starts from a known pose
-    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal, pose_src=pose_src)
+    if ball_src is not None:   # camera ball: re-anchored on the mission's pose source, starts unseen
+        ball_src.pose_src = pose_src or GroundTruthProvider(sim)
+        ball_src.reset()
+    return Mission(sim, kick, kh, log, foot=foot, precision_session=precision, goal=goal, pose_src=pose_src,
+                   ball_src=ball_src)
 
 
 def setup_goal(sim, name="goal_a"):
@@ -916,7 +920,21 @@ def run_viewer(args):
     ball = tuple(float(v) for v in args.ball.split(",")) if args.ball else None
     kh = math.radians(args.kick_heading) if args.kick_heading is not None else None
     log = RunLog(echo=not args.auto)
-    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist, pose_src=pose_src)
+    # Duck-cam: the head camera mounted exactly as the perception stack has it (apply_profile: the
+    # board's rotation and fovy off the tof site, which also undoes the MJCF camera facing backwards).
+    # With --ball-src camera, CameraBall applies the same profile to the same camera; either way the
+    # viewer's fixed camera IS the detector's camera.
+    from mjlab_microduck.sim import board_profiles
+    from mjlab_microduck.sim.camera import apply_profile
+    head_cam = mujoco.mj_name2id(sim.model, mujoco.mjtObj.mjOBJ_CAMERA, "head_camera")
+    ball_cam = None
+    if args.ball_src == "camera":
+        from camera_ball import CameraBall
+        ball_cam = CameraBall(sim, None, profile=args.profile)
+    else:
+        apply_profile(sim.model, head_cam, board_profiles.get(args.profile))
+    m = new_mission(sim, kick, rng, log, ball, kh, precision, args.foot, args.goal_dist, pose_src=pose_src,
+                    ball_src=ball_cam)
     n, t_mission, t_done, tally = 0, sim.t, None, {"kicked": 0, "missed": 0, "aborted": 0, "falls": 0}
     goals = {"goal": 0, "post": 0, "miss": 0, "no_cross": 0}
 
@@ -950,19 +968,39 @@ def run_viewer(args):
         print(f"  mission {n + 1:2d}: {outcome:58s} [{mode}] aligned to ({r.get('align_ex_mm', float('nan')):+.0f}, "
               f"{r.get('align_ey_mm', float('nan')):+.0f}) mm in {r.get('pulses', '-')} pulses   {tail}", flush=True)
 
-    print("\nKeys (type in THIS terminal): N = new mission (ball re-placed), P = push, Q = quit"
+    print(f"\nKeys (type in THIS terminal): N = new mission (ball re-placed), P = push, C = duck-cam ({args.profile}) "
+          f"/ V = free view, Q = quit\nball source: {args.ball_src}"
+          + ("  (head-down re-observe is camera-mode only)" if args.ball_src != "camera" else "")
           + (f"\nAuto mode: {args.auto} missions back to back\n" if args.auto else "\n"))
     with ip.TerminalInput() as term, \
             mujoco.viewer.launch_passive(sim.model, sim.data, show_left_ui=False, show_right_ui=False) as viewer:
         viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
         viewer.cam.trackbodyid = sim.trunk_body
         viewer.cam.distance, viewer.cam.elevation, viewer.cam.azimuth = 1.2, -30, 135
+        duck_cam = False
+
+        def set_view(on):
+            with viewer.lock():
+                if on:
+                    viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
+                    viewer.cam.fixedcamid = head_cam
+                else:   # back to the free (tracking) 3rd-person view, where it was
+                    viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
+                    viewer.cam.trackbodyid = sim.trunk_body
+            print(f"  view: {'DUCK CAM (' + args.profile + ', vfov ' + format(sim.model.cam_fovy[head_cam], '.1f') + ' deg)' if on else 'FREE'}",
+                  flush=True)
         quit_req = False
         while viewer.is_running() and not quit_req:
             t0 = time.time()
             for key in term.get_keys():
                 if key == "q":
                     quit_req = True
+                elif key == "c":
+                    duck_cam = not duck_cam
+                    set_view(duck_cam)
+                elif key == "v" and duck_cam:
+                    duck_cam = False
+                    set_view(False)
                 elif key == "p":
                     a = rng.uniform(0, 2 * math.pi)
                     sim.push(1.0 * math.cos(a), 1.0 * math.sin(a))
@@ -973,7 +1011,7 @@ def run_viewer(args):
                     n += 1
                     log = RunLog()
                     m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
-                                    pose_src=pose_src)
+                                    pose_src=pose_src, ball_src=ball_cam)
             if args.auto:
                 over = m.state == "DONE" or sim.t - t_mission > 60.0
                 if over and t_done is None:
@@ -992,14 +1030,17 @@ def run_viewer(args):
                         break
                     log = RunLog(echo=False)
                     m = new_mission(sim, kick, rng, log, precision=precision, foot=args.foot, goal_dist=args.goal_dist,
-                                    pose_src=pose_src)
+                                    pose_src=pose_src, ball_src=ball_cam)
                     t_mission, t_done = sim.t, None
             twist = m.tick() if m.state not in ("DONE",) and t_done is None else (0.0, 0.0, 0.0)
             sim.set_twist(twist)
             sim.step()
             if pose_src is not None:
                 pose_src.update(sim)
-            draw_mission(viewer.user_scn, m, sim)
+            if duck_cam:
+                viewer.user_scn.ngeom = 0     # the detector's frame has no overlays; neither does the duck-cam
+            else:
+                draw_mission(viewer.user_scn, m, sim)
             viewer.sync()
             time.sleep(max(0.0, CONTROL_DT - (time.time() - t0)))
     log.save(f"{out}/mission{n}")

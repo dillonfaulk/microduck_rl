@@ -1,0 +1,66 @@
+GoalKick v0 (rung 5, Option A: mission layer only) -- evaluation summary, 2026-11-14
+========================================================================================
+Brief: microduck-goalkick-brief.md. Dillon chose Option A (frozen policies, GoalKick as a
+supervisor feature). Sim only. Frictionless ball kept (Dillon: friction = separate item).
+
+Stack (all frozen, unchanged): VelStand round3 3999 -> PrecisionStep v2 2500 -> BallKick v2
+(right 1250 / left 500) with kick_mission.py --calib v2 (right 0 mm / -6.7 deg, left 0 mm /
++12.2 deg). No new constants.
+
+Goal: goal.xml, 210 mm clear opening = 3 ball widths (Dillon), posts 20 mm dia x 120 mm,
+full collision, no crossbar; mocap body placed per mission D m past the ball on the kick line.
+Scoring (scripts/soccer_referee.py, pure logic, 10 unit tests):
+  goal      ball centre crosses the goal line between the posts' inner faces, no post contact
+  post      any ball-post contact (own line; "in" = it still crossed between the posts)
+  miss      crosses the line extension outside the posts, no contact
+  no_cross  never reaches the line within 10 s of the kick swap-in
+  lateral   signed ball-centre offset at the line, + = left of centre as the kicker sees it.
+            A clean goal needs |lateral| < 70 mm (105 mm half-opening - 35 mm ball radius).
+
+1. HEADLESS BATTERY (kick_mission.py --runs 50 --seed 0 --goal-dist D; approach angle between
+   the duck's walk-in and the ball->goal line cycled 0/+45/-45/+90/-90, 10 each)
+                  goals  posts(in)  misses short | lateral median/mean/std mm | t to line
+right 0.5 m        50     0 (0)      0      0   |  -17 / -15 / 23            | 2.4 s
+right 0.8 m        43     7 (4)      0      0   |  -12 / -17 / 31            | 3.8 s
+right 1.1 m (str)  38    12 (5)      0      0   |  -14 / -19 / 45            | 5.2 s
+left  0.5 m        50     0 (0)      0      0   |   -3 /  -2 / 19            | 2.5 s
+left  0.8 m        49     1 (1)      0      0   |   -4 /  -4 / 28            | 3.9 s
+left  1.1 m (str)  44     6 (5)      0      0   |   -6 /  -7 / 36            | 5.4 s
+Every file: 50/50 kicks taken, 0 aborted, 0 ball bumps, 0 falls, 0 duck-post contacts.
+Per-approach-angle lines are in each file's GOAL SUMMARY (no angle has its own failure mode;
+posts are spread across angles).
+
+Prediction made before the build from the 2x30 --calib v2 calibration missions
+(lateral = d * tan(direction error)), clean-goal rate:
+  right 0.8 m 88% (measured 86%), 1.1 m 77% (76%); left 0.8 m 93% (98%), 1.1 m 88% (88%).
+
+2. DILLON'S LIVE VIEWER, 30 missions per foot, goal at 0.8 m, random approach angle
+right 1250 (logs/kick_mission/2026-11-14_16-45-42_viewer)
+  30/30 kicked, 0 falls: 26 goals, 4 post hits (1 went in), 0 misses, 0 short
+left 500  (logs/kick_mission/2026-11-14_16-55-58_viewer)
+  30/30 kicked, 0 falls: 29 goals, 1 post hit (went in), 0 misses, 0 short
+First viewer runs (16-09-15 right, 16-19-04 left) had blocky shadows / black horizon lines
+(render bug, below); reruns after the fix are byte-identical event logs (deterministic).
+Clips: logs/kick_mission/goalkick_{right,left}_fixed_60s_720p.mp4.
+
+3. FINDINGS (reported, not acted on)
+- Every off-target kick hit a post; none went wide. 210 mm sits right at the kick's accuracy
+  limit, so goals / posts both show up and the right foot's wider spread is visible.
+- Right foot lands 12-17 mm right of centre at every distance (about -1 deg on top of its
+  --calib v2 aim). Not re-calibrated: a separate measured decision for Dillon.
+- Frictionless ball: it rolls on at ~0.17-0.25 m/s after a kick and never stops, so distance
+  only adds lateral spread and time; nothing falls short in sim. On real floors it would.
+- The 1.1 m stretch line is "in range" only because of that.
+
+4. RENDER BUG FOUND AND FIXED (viewer only, physics untouched)
+Goals parked at +-50 m inflated model.stat.extent 0.415 -> 100 m; MuJoCo scales the shadow map
+and near/far clip by it -> blocky shadows + black horizon lines. An XML <statistic> pin
+(652ecaaa) was overridden by BAM's mj_setConst; setup_goal() now restores extent/center
+(cafebe8e). Verified through the real KickSim model; goal missions byte-identical before/after.
+
+5. CHECKS
+- Plain missions (no --goal-dist) byte-identical to the published BallKick v2 runs
+  (dev/regress_right_s0_10.txt vs ballkick_v2_eval right_m1250_s0_aim-6.7_s0).
+- Ball fired at the real posts: 80 mm off-centre grazes in (post, in); 100-130 mm bounces out
+  (post); 160 mm clean miss.
+- Suite 319 passed, 1 skipped (309 + 10 referee tests).

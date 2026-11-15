@@ -1,0 +1,37 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+right (kicking) foot at HOME, trunk yaw frame: (0.0, -41.8) mm
+velstand=logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+kick=logs/rsl_rl/ball_kick_v2_right/2026-11-13_18-51-32_v2_right_chunk1/2026-11-13_18-51-32_v2_right_chunk1_model_1250.onnx
+precision=logs/rsl_rl/precision_step_v2/2026-11-13_16-23-21_v2_chunk1/2026-11-13_16-23-21_v2_chunk1_model_2500.onnx (pulse aligner = fallback)
+scene=allcollisions_ball  logs -> logs/kick_mission/2026-11-14_15-47-00/
+kicking foot right: precision stance shift +0.0 mm along the kick line; aim offset -6.7 deg (+ = left)
+  run 0: ball 1.22 m away, kick heading -174deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-4.7), np.float64(-0.2)], lfoot_vs_home_mm=[np.float64(-7.7), np.float64(0.2)], trunk_speed_mm_s=1.6, tilt_deg=1.9, leg_dev_deg=4.4, align_ex_mm=7.9, align_ey_mm=-2.0, align_eh_deg=0.72, pulses=0, aligned=True, t_swap=10.12, kick_contact_t=0.16, peak_ball_fwd=0.374, ball_travel=0.865, kick_dir_err_deg=-2.3, t_done=14.16
+  run 1: ball 1.73 m away, kick heading  +83deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-3.0), np.float64(-1.1)], lfoot_vs_home_mm=[np.float64(-9.9), np.float64(-1.1)], trunk_speed_mm_s=0.1, tilt_deg=2.2, leg_dev_deg=5.9, align_ex_mm=2.9, align_ey_mm=-3.3, align_eh_deg=2.46, pulses=0, aligned=True, t_swap=11.94, kick_contact_t=0.16, peak_ball_fwd=0.4, ball_travel=1.012, kick_dir_err_deg=-1.5, t_done=15.98
+  run 2: ball 1.75 m away, kick heading -179deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-3.8), np.float64(-0.2)], lfoot_vs_home_mm=[np.float64(-7.5), np.float64(-0.8)], trunk_speed_mm_s=1.3, tilt_deg=2.1, leg_dev_deg=3.6, align_ex_mm=5.8, align_ey_mm=-2.8, align_eh_deg=1.18, pulses=0, aligned=True, t_swap=12.74, kick_contact_t=0.16, peak_ball_fwd=0.397, ball_travel=0.933, kick_dir_err_deg=0.1, t_done=16.78
+  run 3: ball 1.03 m away, kick heading -117deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-2.4), np.float64(-0.2)], lfoot_vs_home_mm=[np.float64(-5.2), np.float64(-0.6)], trunk_speed_mm_s=1.2, tilt_deg=1.4, leg_dev_deg=2.3, align_ex_mm=3.9, align_ey_mm=-2.2, align_eh_deg=0.6, pulses=0, aligned=True, t_swap=13.9, kick_contact_t=0.16, peak_ball_fwd=0.375, ball_travel=0.904, kick_dir_err_deg=1.6, t_done=17.94
+  run 4: ball 1.43 m away, kick heading  -28deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-5.3), np.float64(-0.3)], lfoot_vs_home_mm=[np.float64(-7.4), np.float64(0.2)], trunk_speed_mm_s=0.4, tilt_deg=1.8, leg_dev_deg=3.9, align_ex_mm=8.6, align_ey_mm=-2.3, align_eh_deg=1.03, pulses=0, aligned=True, t_swap=11.56, kick_contact_t=0.16, peak_ball_fwd=0.382, ball_travel=0.935, kick_dir_err_deg=0.7, t_done=15.6
+  run 5: ball 1.10 m away, kick heading  +53deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-2.6), np.float64(0.3)], lfoot_vs_home_mm=[np.float64(-3.4), np.float64(0.7)], trunk_speed_mm_s=1.7, tilt_deg=0.7, leg_dev_deg=2.2, align_ex_mm=3.5, align_ey_mm=-5.5, align_eh_deg=0.95, pulses=0, aligned=True, t_swap=8.4, kick_contact_t=0.16, peak_ball_fwd=0.391, ball_travel=1.003, kick_dir_err_deg=-7.7, t_done=12.44
+  run 6: ball 1.31 m away, kick heading +173deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-6.3), np.float64(0.4)], lfoot_vs_home_mm=[np.float64(-5.5), np.float64(0.7)], trunk_speed_mm_s=4.9, tilt_deg=1.5, leg_dev_deg=3.2, align_ex_mm=10.8, align_ey_mm=-0.7, align_eh_deg=-0.08, pulses=0, aligned=True, t_swap=10.26, kick_contact_t=0.16, peak_ball_fwd=0.399, ball_travel=0.944, kick_dir_err_deg=1.4, t_done=14.3
+  run 7: ball 1.52 m away, kick heading  -40deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-5.1), np.float64(0.8)], lfoot_vs_home_mm=[np.float64(-6.0), np.float64(0.4)], trunk_speed_mm_s=0.5, tilt_deg=1.8, leg_dev_deg=3.4, align_ex_mm=8.3, align_ey_mm=-2.6, align_eh_deg=0.36, pulses=0, aligned=True, t_swap=13.72, kick_contact_t=0.18, peak_ball_fwd=0.335, ball_travel=0.725, kick_dir_err_deg=-1.6, t_done=17.76
+  run 8: ball 1.58 m away, kick heading  -68deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-2.4), np.float64(-0.7)], lfoot_vs_home_mm=[np.float64(-7.8), np.float64(-0.1)], trunk_speed_mm_s=1.3, tilt_deg=1.4, leg_dev_deg=4.3, align_ex_mm=3.4, align_ey_mm=-4.2, align_eh_deg=1.63, pulses=0, aligned=True, t_swap=15.94, kick_contact_t=0.16, peak_ball_fwd=0.376, ball_travel=0.907, kick_dir_err_deg=-8.4, t_done=19.98
+  run 9: ball 1.71 m away, kick heading  -51deg -> approach_mode=precision, foot_vs_home_mm=[np.float64(-2.3), np.float64(-1.0)], lfoot_vs_home_mm=[np.float64(-8.0), np.float64(-0.8)], trunk_speed_mm_s=0.6, tilt_deg=1.4, leg_dev_deg=4.6, align_ex_mm=2.8, align_ey_mm=-2.5, align_eh_deg=1.68, pulses=0, aligned=True, t_swap=19.44, kick_contact_t=0.16, peak_ball_fwd=0.39, ball_travel=0.956, kick_dir_err_deg=-2.8, t_done=23.48
+
+  aligned within +-12 mm / 3 deg: 10/10; kicked (peak > 0.05 m/s): 10/10; falls: 0; ball disturbed before kick: 0 runs; median mission time 16.4 s
+  approach mode: {'precision': 10}

@@ -1,0 +1,25 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [-0.818, 0.288], "kick_heading_deg": -3.8, "aim_heading_deg": -10.5, "foot": "right", "aim_offset_deg": -6.7, "stance_shift_mm": 0.0, "stance": [-0.899, 0.345], "route": [[-1.293, 0.419], [-1.017, 0.367]]}
+{"t": 0.0, "event": "GOAL_PLACED", "centre": [-0.02, 0.234], "into_deg": -3.8, "opening_mm": 210.0, "ball_to_goal_m": 0.8}
+{"t": 227.86, "event": "GO_TO_START", "wp": 1, "goal": [-1.2925313611902574, 0.4185192114223055], "pose": [-0.71, 1.914, -1.886]}
+{"t": 227.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.602, -0.09], "heading_err_deg": -3.2, "dist": 1.605, "cmd": [0.2, 0.0, -0.084]}
+{"t": 228.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.46, 0.009], "heading_err_deg": 0.4, "dist": 1.46, "cmd": [0.2, 0.0, 0.01]}
+{"t": 229.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.248, 0.035], "heading_err_deg": 1.6, "dist": 1.249, "cmd": [0.2, 0.0, 0.042]}
+{"t": 230.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [1.035, 0.009], "heading_err_deg": 0.5, "dist": 1.035, "cmd": [0.2, 0.0, 0.013]}
+{"t": 231.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.825, 0.013], "heading_err_deg": 0.9, "dist": 0.825, "cmd": [0.2, 0.0, 0.023]}
+{"t": 232.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.612, 0.004], "heading_err_deg": 0.4, "dist": 0.612, "cmd": [0.2, 0.0, 0.009]}
+{"t": 233.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.398, 0.011], "heading_err_deg": 1.6, "dist": 0.398, "cmd": [0.2, 0.0, 0.042]}
+{"t": 234.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.188, 0.013], "heading_err_deg": 4.0, "dist": 0.189, "cmd": [0.2, 0.0, 0.105]}
+{"t": 235.48, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.055, "pose": [-1.271, 0.47, -1.932]}
+{"t": 235.5, "event": "GO_TO_START", "wp": 2, "goal": [-1.017244063517761, 0.3673635300156969], "pose": [-1.272, 0.466, -1.937]}
+{"t": 235.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.08, 0.268], "heading_err_deg": 73.4, "dist": 0.28, "cmd": [0.0, 0.0, 0.8]}
+{"t": 236.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.236, 0.163], "heading_err_deg": 34.5, "dist": 0.287, "cmd": [0.0, 0.0, 0.8]}
+{"t": 237.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.163, 0.02], "heading_err_deg": 6.9, "dist": 0.164, "cmd": [0.2, 0.0, 0.181]}
+{"t": 238.38, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.058, "pose": [-1.075, 0.375, -0.263]}
+{"t": 238.38, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 238.8, "event": "PRECISE_START", "n": 1, "offset": [0.157, 0.0253, 0.1165]}
+{"t": 240.22, "event": "PRECISE_ARRIVED", "after_s": 1.42}
+{"t": 240.22, "event": "KICK_SWAP_IN", "aligned": true, "pulses": 0, "mode": "precision", "err_mm": [7.8, -1.8], "err_heading_deg": 0.23}
+{"t": 240.4, "event": "KICK_FIRE", "after_swap_s": 0.18}
+{"t": 242.22, "event": "KICK_SWAP_OUT", "peak_ball_fwd": 0.308}
+{"t": 244.7, "event": "GOAL_DECIDED", "goal_outcome": "goal", "goal_lateral_mm": 2.7, "goal_miss_by_mm": null, "goal_t_line_s": 4.45, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 1.0}
+{"t": 244.7, "event": "MISSION_DONE", "approach_mode": "precision", "foot_vs_home_mm": [-4.9, 0.5], "lfoot_vs_home_mm": [-5.0, 0.5], "trunk_speed_mm_s": 1.5, "tilt_deg": 1.6, "leg_dev_deg": 2.6, "align_ex_mm": 7.8, "align_ey_mm": -1.8, "align_eh_deg": 0.23, "pulses": 0, "aligned": true, "t_swap": 240.22, "kick_contact_t": 0.18, "peak_ball_fwd": 0.308, "ball_travel": 0.713, "kick_dir_err_deg": 0.2, "t_done": 244.7, "goal_outcome": "goal", "goal_lateral_mm": 2.7, "goal_miss_by_mm": null, "goal_t_line_s": 4.45, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 1.0}

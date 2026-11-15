@@ -1,0 +1,25 @@
+{"t": 0.0, "event": "MISSION_START", "ball": [-0.285, 0.567], "kick_heading_deg": 38.7, "aim_heading_deg": 50.9, "foot": "left", "aim_offset_deg": 12.2, "stance_shift_mm": 0.0, "stance": [-0.31, 0.471], "route": [[-0.562, 0.16], [-0.385, 0.378]]}
+{"t": 0.0, "event": "GOAL_PLACED", "centre": [0.339, 1.067], "into_deg": 38.7, "opening_mm": 210.0, "ball_to_goal_m": 0.8}
+{"t": 49.86, "event": "GO_TO_START", "wp": 1, "goal": [-0.5620510796377296, 0.16042598463561047], "pose": [0.341, -0.216, 0.56]}
+{"t": 49.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [-0.565, 0.798], "heading_err_deg": 125.3, "dist": 0.978, "cmd": [0.0, 0.0, 0.8]}
+{"t": 50.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.121, 0.989], "heading_err_deg": 83.0, "dist": 0.996, "cmd": [0.0, 0.0, 0.8]}
+{"t": 51.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.778, 0.619], "heading_err_deg": 38.5, "dist": 0.995, "cmd": [0.0, 0.0, 0.8]}
+{"t": 52.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.91, 0.078], "heading_err_deg": 4.9, "dist": 0.913, "cmd": [0.2, 0.0, 0.129]}
+{"t": 53.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.702, 0.046], "heading_err_deg": 3.7, "dist": 0.704, "cmd": [0.2, 0.0, 0.097]}
+{"t": 54.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.491, 0.013], "heading_err_deg": 1.6, "dist": 0.492, "cmd": [0.2, 0.0, 0.041]}
+{"t": 55.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.279, 0.006], "heading_err_deg": 1.2, "dist": 0.279, "cmd": [0.2, 0.0, 0.032]}
+{"t": 56.86, "event": "GO_TO_TRACE", "wp": 1, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.065, 0.007], "heading_err_deg": 6.2, "dist": 0.066, "cmd": [0.2, 0.0, 0.164]}
+{"t": 56.9, "event": "GO_TO_ARRIVE", "wp": 1, "dist": 0.057, "pose": [-0.507, 0.145, 2.82]}
+{"t": 56.92, "event": "GO_TO_START", "wp": 2, "goal": [-0.3853311950812206, 0.37761273009291085], "pose": [-0.513, 0.145, 2.815]}
+{"t": 57.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "pivot", "goal_local": [0.139, -0.241], "heading_err_deg": -60.0, "dist": 0.278, "cmd": [0.0, 0.0, -0.8]}
+{"t": 58.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.265, -0.066], "heading_err_deg": -14.1, "dist": 0.273, "cmd": [0.2, 0.0, -0.369]}
+{"t": 59.86, "event": "GO_TO_TRACE", "wp": 2, "state": "NAVIGATE", "reason": "arc", "goal_local": [0.071, -0.02], "heading_err_deg": -15.6, "dist": 0.074, "cmd": [0.2, 0.0, -0.408]}
+{"t": 59.92, "event": "GO_TO_ARRIVE", "wp": 2, "dist": 0.06, "pose": [-0.436, 0.346, 0.796]}
+{"t": 59.92, "event": "GO_TO_DONE", "arrived": [1, 2], "rejected": [], "falls": 0}
+{"t": 60.58, "event": "PRECISE_START", "n": 1, "offset": [0.1496, 0.0034, 0.1319]}
+{"t": 61.9, "event": "PRECISE_ARRIVED", "after_s": 1.32}
+{"t": 61.9, "event": "KICK_SWAP_IN", "aligned": true, "pulses": 0, "mode": "precision", "err_mm": [11.9, -1.8], "err_heading_deg": 0.55}
+{"t": 62.06, "event": "KICK_FIRE", "after_swap_s": 0.16}
+{"t": 63.9, "event": "KICK_SWAP_OUT", "peak_ball_fwd": 0.314}
+{"t": 66.72, "event": "GOAL_DECIDED", "goal_outcome": "goal", "goal_lateral_mm": -30.6, "goal_miss_by_mm": null, "goal_t_line_s": 4.78, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 1.0}
+{"t": 66.72, "event": "MISSION_DONE", "approach_mode": "precision", "foot_vs_home_mm": [-7.1, 0.3], "lfoot_vs_home_mm": [-5.9, -0.2], "trunk_speed_mm_s": 3.9, "tilt_deg": 1.8, "leg_dev_deg": 4.2, "align_ex_mm": 11.9, "align_ey_mm": -1.8, "align_eh_deg": 0.55, "pulses": 0, "aligned": true, "t_swap": 61.9, "kick_contact_t": 0.16, "peak_ball_fwd": 0.314, "ball_travel": 0.667, "kick_dir_err_deg": -2.2, "t_done": 66.72, "goal_outcome": "goal", "goal_lateral_mm": -30.6, "goal_miss_by_mm": null, "goal_t_line_s": 4.78, "goal_post_hit": false, "goal_post_t_s": null, "goal_went_in": 1.0}

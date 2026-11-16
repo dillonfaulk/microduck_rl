@@ -276,7 +276,8 @@ def suite_single(sim, out, trials=10, seed=0, pose_src=None):
         final = log.trace[-1]
         final_true_d = math.hypot(final["x"] - goal[0], final["y"] - goal[1])
         SINGLE_ROWS.append({"trial": k, "arrived": arrived, "dist_m": round(dist, 2), "true_dist_at_arrival_m": round(true_d, 3),
-                            "est_err_at_arrival_m": round(est_err, 3), "final_true_dist_m": round(final_true_d, 3)})
+                            "est_err_at_arrival_m": round(est_err, 3), "final_true_dist_m": round(final_true_d, 3),
+                            **(pose_src.summary() if hasattr(pose_src, "summary") else {})})
         t_arr = next((e["t"] for e in log.events if e["event"] == "GO_TO_ARRIVE"), None)
         bad = unrecovered(sup, log)
         ok += arrived and bad == 0
@@ -471,7 +472,7 @@ def main():
     ap.add_argument("--waypoints", default="1.2,0;1.2,1;2.2,1.3;0,0", help='"x1,y1;x2,y2;..." world frame, m')
     ap.add_argument("--arena", default="-2.5,2.5,-2.5,2.5", help="xmin,xmax,ymin,ymax geofence, m")
     ap.add_argument("--suite", choices=["single", "chain", "fall", "geofence", "dropout", "all"], default="all")
-    ap.add_argument("--pose", choices=("gt", "odom"), default="gt",
+    ap.add_argument("--pose", choices=("gt", "odom", "mapd"), default="gt",
                     help="supervisor pose source (rung 6): gt = simulator truth, odom = contact odometry + IMU")
     ap.add_argument("--no-imu-error", action="store_true", help="odom: perfect IMU heading")
     ap.add_argument("--odom-calib", choices=tuple(ODOM_CALIBS), default="none",
@@ -509,6 +510,8 @@ def main():
         with open(f"{out}/single_errors.json", "w") as f:
             json.dump(SINGLE_ROWS, f, indent=1)
     print("\n== summary: " + ", ".join(f"{k} {'PASS' if v else 'FAIL'}" for k, v in results.items()))
+    if hasattr(pose_src, "shim"):
+        pose_src.shim.close()
 
 
 if __name__ == "__main__":

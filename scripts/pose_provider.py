@@ -198,6 +198,7 @@ class OdometryProvider(_Provider):
         c, s = math.cos(e), math.sin(e)
         R_imu = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]]) @ R_true
         self.odo.update(self.frames.feet_in_trunk(data), R_imu)
+        self._R_imu = R_imu
         xy = self.p0 + self.stride_scale * self.odo.position[:2]
         yaw = math.atan2(R_imu[1, 0], R_imu[0, 0])
         self._odom_raw = (float(xy[0]), float(xy[1]), float(yaw))
@@ -252,7 +253,14 @@ def make_provider(kind: str, sim, seed: int = 0, dropouts=(), imu_error: bool = 
         return GroundTruthProvider(sim, dropouts)
     if kind == "odom":
         return OdometryProvider(sim, imu=ImuYawError(seed, enabled=imu_error), dropouts=dropouts, calib=calib)
-    raise SystemExit(f"unknown pose source {kind!r} (gt | odom)")
+    if kind == "mapd":   # Stage 4: odometry + the real mapd's map<-odom offset (mapd_shim.py); close() when done
+        import mujoco
+        from mapd_shim import MapdProvider, MapdShim
+        from mjlab_microduck.sim.tof import Tof
+        tof = Tof(sim.model, mujoco.mj_name2id(sim.model, mujoco.mjtObj.mjOBJ_SITE, "tof"), seed=seed)
+        return MapdProvider(sim, MapdShim(), tof, imu=ImuYawError(seed, enabled=imu_error), dropouts=dropouts,
+                            calib=calib)
+    raise SystemExit(f"unknown pose source {kind!r} (gt | odom | mapd)")
 
 
 def pose_error(est_pose, true_pose):

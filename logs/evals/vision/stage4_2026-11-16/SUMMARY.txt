@@ -1,0 +1,90 @@
+RUNG 6 STAGE 4: goal perception + real mapd in the loop + supervisor cutover -- THE RUNG REPORT (2026-11-16, fork local/velstand-own-teachers)
+Brief: microduck-vision-rung6-stage4-brief.md (approved by Dillon; NO pass floor pre-set; rung closure = Dillon's call on this report).
+Sim only; no training; 61->14 @ 50 Hz untouched; policies frozen (VelStand r3 3999, PrecisionStep v2 2500, BallKick v2 R 1250 / L 500,
+--calib v2). Camera: face-board-v1 (GC2093) profile -- the board VERIFY is still open; every camera number assumes this profile.
+Right-foot gap: DEFERRED by Dillon (not chased here); its numbers print unchanged below. Bump threshold: NOT tuned (out of scope).
+Suite: 346 passed, 1 skipped (9 new: tests/test_rung6_stage4.py). GPU0 for EGL renders; viewer on GPU1 (no PRIME vars).
+
+A. GOAL PERCEPTION (scripts/camera_goal.py, `--goal-src camera`)
+   - Detect: bright unsaturated blobs, kept only if they are the size a 120 x 20 mm post would be at their floor-ranged base.
+     Pair: base-ranged spacing within 80 mm of 230 mm (210 mm opening + one post). Fit: Gauss-Newton on (centre x, y, facing)
+     from both posts' columns (sigma 0.5 px) and base/top rows (sigma 1.5 px), the camera's own intrinsics (fx 348 @ 640x360).
+   - The field holds a SECOND real goal (the field's own goal at x = -3). The detector reports every goal; the mission is told
+     WHICH goal to attack as a coarse assignment (the goal's nominal spot rounded to a 0.25 m grid, gate 0.6 m) -- an instruction
+     like a go-to-point waypoint. WHERE the goal is comes only from the camera.
+   Ranging vs truth (goal_ranging.txt; duck standing, head neutral, 15 placements per range = 5 bearings x 3 facings):
+     | dist | found | fit centre err mm med/max | base-only mm med/max | facing err deg med/max | KICK-HEADING err deg med/max |
+     | 0.6  | 13/15 | 5.8 / 13.8 | 10.9 / 30.1 | 0.2 / 1.1 | 0.2 / 0.5 |
+     | 0.9  | 15/15 | 6.2 / 7.5  | 10.9 / 13.8 | 0.2 / 0.8 | 0.2 / 0.4 |
+     | 1.2  | 15/15 | 6.2 / 12.4 | 11.4 / 18.1 | 0.2 / 1.3 | 0.1 / 0.6 |
+     | 1.6  | 15/15 | 7.8 / 14.4 | 12.1 / 20.0 | 0.3 / 6.3 | 0.3 / 0.6 |
+     | 2.0  | 15/15 | 7.6 / 21.3 | 17.7 / 34.5 | 0.6 / 7.7 | 0.2 / 0.9 |
+     (the 2 misses at 0.6 m: a post outside the frame at the widest bearing). The spacing fit halves the base-only error.
+   - Mission: kick heading = ball -> perceived goal centre, both camera-relative (world pose error cancels). The goal is looked at
+     head-NEUTRAL: in SCAN (turn until ball AND goal are known) and again at the pre-stance point BEFORE the head-down ball look;
+     the heading is refreshed from the fresh ball + fresh goal. --calib v2 aim offsets unchanged (heading source replaced only).
+   - Goal not visible at the line-up (defined before building): head-yaw sweep 0 / +0.5 / -0.5 rad, then abort goal_not_found.
+     A kick on a stale or absent goal is never taken. In SCAN: goal_not_found after SCAN_MAX_S.
+   - In the batteries: |aim error| at swap-in (duck-relative: perceived kick line vs true ball->goal line) median 0.6-0.8 deg,
+     max 2.0 deg (300 kicks); heading change at the re-observe median 0.9-1.8 deg.
+
+B. REAL mapd IN THE LOOP (scripts/mapd_shim.py, `--pose mapd`)
+   - Unmodified upstream mapd (~/microduck_runtime @ 094d4bb4, 0.21.1, release build). The shim serves robotd (robot.mode ->
+     autonomous: the "duck on its own" gate, exercised: [map] enabled = false) and tofd (tof.stream), newline JSON-RPC in
+     duck-ipc-proto's format; JSON checked against the real Rust types (RobotState/TofFrame -> StateSample/DepthFrame).
+     Fed: odometry (stride_v1) + IMU (with the yaw error) + ToF pose from FK + every ToF frame (15 Hz, 60 ms, all Stage 2 flaws).
+   - LOCKSTEP: every input waits for map.status t_ns = its stamp, so a battery is deterministic and mapd's two feed threads cannot
+     race. One mapd per battery, map.wipe + 2 s clock gap per run.
+   - Into the pose: autod's pattern -- offset = map (-) odom, estimate = offset (+) odometry; lost/silent = keep the last offset.
+   - With --pose mapd a mission opens with autod's survey (head yaw 0/+0.6/-0.6/0, 2.4 s still) so mapd has a first keyframe.
+   REGIMES (mapd_regimes.txt; 2 laps of a 1 m square, 9 survey stops, driven on mapd; odometry-only with the SAME IMU seed rides
+   along on the identical motion; 10 trials each):
+     | regime      | odom-only xy mm med/p90/max | WITH mapd med/p90/max | last stop odom -> mapd | corrections/trial |
+     | near-boards | 26.2 / 52.6 / 71.8          | 25.7 / 52.0 / 71.8    | 27 -> 24 mm            | 2                 |
+     | open field  | 29.7 / 56.8 / 93.5          | 29.7 / 56.8 / 93.5    | 34 -> 34 mm            | 0                 |
+   FINDING, plainly: near the boards mapd makes a few accepted corrections and trims ~3 mm; in the open it contributes NOTHING
+   (no structure for the 8x8 ToF to match). One board pins one direction only (mapd's own design note).
+   In the GoalKick batteries (field centre, boards 2-3 m away): 0 corrections in 300 runs (2-3 keyframes each) -> pose error at
+   kick swap-in WITH mapd median 17.1-19.8 mm vs WITHOUT (odom_goalcam/) 17.1-19.6 mm: no contribution, measured.
+   Single go-to-point: 0 keyframes (the duck never stands 0.4 s before arriving).
+
+C. SUPERVISOR CUTOVER + ENFORCEMENT (scripts/truth_guard.py, `--estimated-only`)
+   - All supervisor inputs estimated: pose = odometry + mapd offset; ball = camera; goal = camera. Every Stage 4 battery ran with
+     --estimated-only: Mission refuses any ground-truth source (or a hand-fed kick heading) and runs on a TruthGuard sim whose
+     pose()/ball() raise TruthAccess outside Mission._truth() (scoring + logs). 0 TruthAccess in 600 + 50 runs.
+   - Moved off truth: the SETTLE "up" decision (now the estimate; falls still SCORED on truth). Declared boundary: sensor models
+     (providers, camera ball/goal, mapd shim) read the raw sim -- they ARE the simulated sensors.
+   - Tests: guard blocks/permits; estimated-only refuses truth inputs; a guarded mission on estimated inputs kicks with truth read
+     only inside scoring; truth defaults on a guarded sim fail before the duck moves.
+   - Staleness rule unchanged: absent pose = hold zero twist, never guessed; > 5 s = abort pose_lost.
+
+D. THE RUNG REPORT -- GOALKICK GAP TABLE (goals of 50 at 0.5 / 0.8 / 1.1 m, field scene)
+   | Foot  | Ground truth | Stage 2 odom | Stage 3 full | STAGE 4 FULL (mapd+cam ball+cam goal) | Stage 4 w/o mapd (odom) |
+   | Right | 50 / 43 / 38 | 6 / 2 / 2    | 38 / 26 / 21 | 41 / 27 / 18                          | 42 / 29 / 13            |
+   | Left  | 50 / 49 / 44 | 19 / 13 / 9  | 49 / 44 / 38 | 50 / 47 / 36                          | 49 / 44 / 36            |
+   Stage 4 full, posts (in): R 9(4) / 14(4) / 17(6), L 0 / 3(3) / 14(9); misses R 0 / 9 / 15, L 0 / 0 / 0.
+   0 falls, 0 aborts, 0 board contacts, 0 duck-post contacts in the 300 full-stack runs. Bump (false, untuned): 21-26 per row.
+   Reading: goal perception holds the line-up and the aim (|aim err| <= 2 deg) with NO ground truth in the supervisor; the totals
+   are within run-to-run noise of Stage 3. The right foot's deficit is unchanged in kind (kick-direction scatter, deferred).
+   Odom-only control: 3 runs aborted goal_not_found and 1 kicked 72 deg off -- all run 39, a PrecisionStep FALL that corrupted the
+   contact odometry by ~0.4 m, after which the world-frame target assignment no longer projects onto the goal. Honest limit:
+   association needs pose error < the 0.6 m gate. (The mapd row did not fall on run 39: the survey shifts timing.)
+
+E. GO-TO-POINT ON ESTIMATED INPUTS (behaviour/goto_all_mapd_*.txt; GT baseline 10/10 + 4/4)
+   | scene        | single | chain | fall | geofence | dropout | true arrival median | truly within 15 cm |
+   | open         | 10/10  | 4/4   | PASS | PASS     | PASS    | 14.8 cm             | 7/10               |
+   | field boards | 10/10  | 4/4   | PASS | PASS     | PASS    | 14.9 cm             | 7/10               |
+   (Stage 3 odom+stride: 10/10, 14.8 cm, 7/10; Stage 2: 10/10 at 12.8 cm.)
+
+F. BEHAVIOUR (behaviour/, full stack, right foot 0.8 m, 10 runs each)
+   goal hidden from the start: 10/10 abort goal_not_found (SCAN), 0 kicks;  goal hidden at the re-observe: 10/10 swept 3x then
+   abort goal_not_found, 0 kicks;  ball hidden for good: 10/10 abort ball_not_found, 0 kicks;  pose dropout 2 s: 10/10 held,
+   resumed and kicked;  permanent: 10/10 abort pose_lost.  0 falls.
+
+G. REGRESSION (regression/): ground-truth seam and Stage 2 odom path, 50 runs each: per-run lines IDENTICAL to Stage 3.
+
+H. DEFERRED / OPEN (on the record)
+   - Right-foot gap (Dillon 2026-11-15): baseline unchanged -- kick-direction scatter; placement and aim are GT-quality.
+   - False-bump threshold: open, untuned. Camera board VERIFY (GC2093 vs IMX219): open.
+   - Goal colour/shape is the sim's white posts; the real goal and the purple ball are arrival calibration items.
+   - mapd: robotd's idle head glance (+-0.6 rad after 2 s) is not modelled; the survey stands in for it in missions.

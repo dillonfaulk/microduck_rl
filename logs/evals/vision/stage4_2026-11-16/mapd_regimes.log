@@ -1,0 +1,63 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  near-boards trial 0: last stop odom 27 mm -> mapd 19 mm, 31 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 1: last stop odom 22 mm -> mapd 22 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 2: last stop odom 27 mm -> mapd 27 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 3: last stop odom 50 mm -> mapd 32 mm, 25 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 4: last stop odom 66 mm -> mapd 66 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 5: last stop odom 6 mm -> mapd 34 mm, 4 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 6: last stop odom 19 mm -> mapd 19 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 7: last stop odom 69 mm -> mapd 41 mm, 3 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 8: last stop odom 14 mm -> mapd 14 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  near-boards trial 9: last stop odom 39 mm -> mapd 15 mm, 8 corrections, 8 keyframes, lost None, falls 0
+| near-boards | 90 | 26.2 / 52.6 / 71.8 | 25.7 / 52.0 / 71.8 | 1.07 / 6.42 | 1.10 / 6.42 | 27 -> 24 | 2 | 8 | 0/10 |
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  open field trial 0: last stop odom 34 mm -> mapd 34 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 1: last stop odom 34 mm -> mapd 34 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 2: last stop odom 22 mm -> mapd 22 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 3: last stop odom 53 mm -> mapd 53 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 4: last stop odom 81 mm -> mapd 81 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 5: last stop odom 9 mm -> mapd 9 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 6: last stop odom 12 mm -> mapd 12 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 7: last stop odom 94 mm -> mapd 94 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 8: last stop odom 15 mm -> mapd 15 mm, 0 corrections, 8 keyframes, lost None, falls 0
+  open field trial 9: last stop odom 46 mm -> mapd 46 mm, 0 corrections, 8 keyframes, lost None, falls 0
+| open field | 90 | 29.7 / 56.8 / 93.5 | 29.7 / 56.8 / 93.5 | 1.14 / 6.35 | 1.14 / 6.35 | 34 -> 34 | 0 | 8 | 0/10 |
+
+mapd regimes: 2 laps of a 1 m square, survey stop at every corner (9 stops), driven on the mapd estimate; odometry-only (same IMU seed) rides along passively. Pose error at each stop, mm / deg.
+| regime | stops | odom-only xy mm med/p90/max | WITH mapd xy mm med/p90/max | odom |yaw| deg med/max | mapd |yaw| deg med/max | last stop odom -> mapd mm (med) | corrections/trial med | keyframes/trial med | lost at end |
+| near-boards | 90 | 26.2 / 52.6 / 71.8 | 25.7 / 52.0 / 71.8 | 1.07 / 6.42 | 1.10 / 6.42 | 27 -> 24 | 2 | 8 | 0/10 |
+| open field | 90 | 29.7 / 56.8 / 93.5 | 29.7 / 56.8 / 93.5 | 1.14 / 6.35 | 1.14 / 6.35 | 34 -> 34 | 0 | 8 | 0/10 |

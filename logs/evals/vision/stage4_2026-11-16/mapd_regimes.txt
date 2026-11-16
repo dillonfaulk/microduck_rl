@@ -1,0 +1,4 @@
+mapd regimes: 2 laps of a 1 m square, survey stop at every corner (9 stops), driven on the mapd estimate; odometry-only (same IMU seed) rides along passively. Pose error at each stop, mm / deg.
+| regime | stops | odom-only xy mm med/p90/max | WITH mapd xy mm med/p90/max | odom |yaw| deg med/max | mapd |yaw| deg med/max | last stop odom -> mapd mm (med) | corrections/trial med | keyframes/trial med | lost at end |
+| near-boards | 90 | 26.2 / 52.6 / 71.8 | 25.7 / 52.0 / 71.8 | 1.07 / 6.42 | 1.10 / 6.42 | 27 -> 24 | 2 | 8 | 0/10 |
+| open field | 90 | 29.7 / 56.8 / 93.5 | 29.7 / 56.8 / 93.5 | 1.14 / 6.35 | 1.14 / 6.35 | 34 -> 34 | 0 | 8 | 0/10 |

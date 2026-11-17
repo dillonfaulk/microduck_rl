@@ -312,6 +312,7 @@ class MapdProvider(OdometryProvider):
         self.mapd_log = []
         self.last_status = None
         self.corrections = 0
+        self.relocalizations, self._reloc0 = 0, None
         self.tof_sensor.random = np.random.default_rng(seed)
         self.tof_sensor._queue.clear()
         self.next_tof_t = 0.0
@@ -350,6 +351,16 @@ class MapdProvider(OdometryProvider):
     def _take(self, status: dict, t: float) -> None:
         s = status["state"]
         self.last_status = s
+        n = status.get("relocalizations", 0)
+        if self._reloc0 is None:
+            self._reloc0 = n
+        if n - self._reloc0 > self.relocalizations:
+            # mapd recognised where it is in its own map (after a fall: a stop matched the pre-fall
+            # keyframes). Its map frame IS the field frame (anchored at the known kickoff pose), so its
+            # pose is absolute: any landmark fix layered on top is superseded.
+            self.relocalizations = n - self._reloc0
+            self.mapd_log.append({"t": round(t, 3), "event": "relocalized", "keyframes": s.get("keyframes")})
+            self.fix = None
         pose = s.get("pose")
         odom = self.sent.get(s["t_ns"]) or self.sent.get(s["t_ns"] - 1)
         if pose is not None and odom is not None:
@@ -366,5 +377,5 @@ class MapdProvider(OdometryProvider):
     def summary(self) -> dict:
         s = self.last_status or {}
         return {"mapd_keyframes": s.get("keyframes"), "mapd_lost": s.get("lost"),
-                "mapd_corrections": self.corrections,
+                "mapd_corrections": self.corrections, "mapd_relocalizations": self.relocalizations,
                 "mapd_offset": None if self.offset is None else [round(v, 4) for v in self.offset]}

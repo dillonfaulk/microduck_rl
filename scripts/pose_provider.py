@@ -169,6 +169,7 @@ class OdometryProvider(_Provider):
         self.calib = calib
         self.stride_scale = ODOM_CALIBS[calib]
         self.offset = None                  # map<->odom correction (x, y, yaw), applied on top; None = none
+        self.fix = None                     # a landmark fix (continuous play, fall re-localization), on top of that
         import infer_policy as ip
         self._ip = ip
         self.sim = sim
@@ -189,6 +190,7 @@ class OdometryProvider(_Provider):
         self.hist = deque()
         self._last = None
         self._est = None
+        self.fix = None
         self._integrate(sim, first=True)
 
     def _integrate(self, sim, first=False):
@@ -204,6 +206,9 @@ class OdometryProvider(_Provider):
         self._odom_raw = (float(xy[0]), float(xy[1]), float(yaw))
         if self.offset is not None:
             xy, yaw = apply_offset(self.offset, xy, yaw)
+        self._pre_fix = (float(xy[0]), float(xy[1]), float(yaw))
+        if self.fix is not None:
+            xy, yaw = apply_offset(self.fix, xy, yaw)
         tilt = math.degrees(math.acos(max(-1.0, min(1.0, R_imu[2, 2]))))
         t = sim.t
         self.hist.append((t, xy.copy()))
@@ -217,6 +222,21 @@ class OdometryProvider(_Provider):
     def update(self, sim=None) -> None:
         """Call once per control tick, after sim.step(): the robot's odometry never stops."""
         self._integrate(sim or self.sim)
+
+    def apply_fix(self, pose) -> tuple:
+        """Re-anchor (fall re-localization): from now on the estimate is `pose` here, carried by odometry
+        (and by mapd's offset underneath, which keeps working). Returns the fix transform. The velocity
+        window restarts so the jump is not read as motion."""
+        x, y, yaw = self._pre_fix
+        oyaw = pose[2] - yaw
+        c, s = math.cos(oyaw), math.sin(oyaw)
+        self.fix = (pose[0] - (c * x - s * y), pose[1] - (s * x + c * y), oyaw)
+        e = self._est
+        self._est = PoseEstimate(e.t, (float(pose[0]), float(pose[1]), float(pose[2])), None, 0.0, e.tilt_deg,
+                                 e.trunk_z, np.zeros(2))
+        self.hist.clear()
+        self.hist.append((e.t, np.array(pose[:2], float)))
+        return self.fix
 
     def get(self, t: float) -> PoseEstimate:
         if self._est is None:

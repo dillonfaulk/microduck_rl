@@ -30,6 +30,7 @@ def main():
     ap.add_argument("velstand")
     ap.add_argument("--profile", default=None)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--dists", default=None, help="comma list of ranges, m (default 0.6,0.9,1.2,1.6,2.0)")
     args = ap.parse_args()
     sim = KickSim(args.velstand, SCENES["field"])
     setup_goal(sim)
@@ -42,7 +43,7 @@ def main():
              "| dist | found | fit centre err mm med/max | base-only centre err mm med/max | facing err deg med/max "
              "| KICK-HEADING err deg med/max (ball 0.8 m before goal) | spacing m med |"]
     rng = np.random.default_rng(0)
-    for dist in DISTS:
+    for dist in (DISTS if args.dists is None else [float(v) for v in args.dists.split(",")]):
         rows = []
         for frac in HFOV_FRAC:
             for face in FACINGS_DEG:

@@ -253,6 +253,14 @@ class CameraGoal:
         self.centre, self.into, self.t_seen, self.last_meas = centre, into, t, m
         return {"centre": centre, "into": into, "t": t, "meas": m}
 
+    def landmark_sightings(self) -> list[dict]:
+        """Every goal in view, in the duck's yaw frame (continuous play, fall re-localization: the
+        field's FIXED goals are landmarks; which one is which is the caller's business)."""
+        if self.hide == "all" or (self.hide == "look" and self.found):
+            self._set_hidden(True)
+        self.stats["landmark_looks"] = self.stats.get("landmark_looks", 0) + 1
+        return self.cam.measure_all(self.sim.data)
+
     def get(self, t: float = 0.0):
         if self.centre is None:
             return None, None, None

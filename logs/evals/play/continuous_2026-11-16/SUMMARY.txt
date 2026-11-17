@@ -1,0 +1,86 @@
+CONTINUOUS PLAY + FALL RE-LOCALIZATION (brief: microduck-continuous-play-brief.md, Workstreams A-C) -- 2026-11-16
+Fork local/velstand-own-teachers. Sim only; no training; 61->14 @ 50 Hz untouched; policies frozen (VelStand r3 3999,
+PrecisionStep v2 2500, BallKick v2 R 1250 / L 500, --calib v2). Camera numbers assume the face-board-v1 (GC2093) profile.
+Every battery ran --estimated-only (TruthGuard: ground truth only for scoring/logs); 0 TruthAccess.
+Workstream D (hop policies, new training): NOT started -- waits on Dillon's word, as the brief says.
+Suite: 355 passed, 1 skipped (new: tests/test_continuous_play.py, 9 tests).
+Code: scripts/play.py (play loop, referee, BallDrag, PlaySupervisor incl. the fall protocol), scripts/play_viewer.py,
+Mission play hooks (kick_mission.py, all behind play=None), pose_provider.apply_fix, mapd relocalization hook,
+camera_goal.landmark_sightings, kick_mission.py --only-runs / --reloc. Reproduce: run_all.sh, run39_replay/run.sh.
+
+SETTINGS (stated, not hidden -- all are play.py constants or flags):
+  field +-3 m boards; goals LOCKED: goal_a (3, 0) facing +x, goal_b (-3, 0) facing -x; attack alternates +x / -x by run.
+  time cap 240 s/run (C: 150 s); kick cap 6 kicks per ball without a decision (dead ball -> respawn); mission cap 90 s.
+  respawn: anywhere 0.6 m inside the boards, >= 0.6 m from the duck. Duck geofence: field inset 0.2 m.
+  ball rolling resistance (BallDrag) 0.03 m/s^2 -- NEW, play only: the sim ball never stops (MuJoCo's rolling friction
+    barely slows it: 3-4 m in 10 s). Measured roll per kick in 10 s: median 0.89-1.01 m, p90 1.16-1.23, max 1.47.
+
+DESIGN DECISIONS MADE IN THE BUILD (for Dillon's OK):
+  1. Respawn after out-of-bounds too (the brief's flagged item), plus two counted restarts: kick cap, and "unplayable"
+     (the duck reports a ball whose stance spot is off the geofence, e.g. pinned on a post or in a corner).
+  2. OUT = the ball touches a board (boards stand on the boundary lines), or its centre is past a line outside the mouth
+     (a ball the duck pushed through a board's soft contact -- seen once).
+  3. ADVANCE KICKS / TAP-INS aim at the goal's FIELD-MAP spot through the estimated pose. The camera finds the 20 mm posts
+     only to ~2.5-3 m (ranging 2.5 m: 15/15, fit err <= 28 mm; 3.5 m: 5/15; 4 m: 4/15) on a 6 m field; and below ~0.9 m
+     the posts overflow the frame. Between 0.6 and 2.5 m (ball->goal) the Stage 4 camera path is unchanged: goal seen at
+     the pre-stance look, heading from the perceived goal, not seen after the sweep = goal_not_found. SCAN needs the ball only.
+  4. ROUTINE LANDMARK FIXES (beyond the brief's fall trigger) -- standing in WATCH after each kick:
+       full fix (position + heading) from a fixed goal at 0.9-1.3 m (facing) / <= 2.0 m (position);
+       heading-only fix from the BEARING to a fixed goal through its map spot, <= 3 m.
+     Why: odometry + IMU drift grows without bound over 240 s. Control without them (B_right_odom_noroutine below):
+     end pose error median 237 mm (max 961); 6/30 runs ended goal_not_found -- every one with 10-18 deg of heading drift,
+     which pushes the target goal outside the 0.6 m association gate.
+     Gates: sightings only upright + still, >= 0.9 m; a fix may not turn the heading > 10 deg (4 agreeing looks at 0.95 m once
+     put it 36 deg off) nor move a routine position > 0.5 m.
+
+B. CONTINUOUS PLAY -- 30 runs x 240 s each (goals in the attacked end; "other end" = own goals)
+ | row (pose)               | goals | runs >=1 goal | other end | out | kick cap | unplayable | kicks to score (1/2/3/4/5) | 1st goal median | early ends               | end pose err med/max |
+ | right, odom              | 44    | 27/30         | 0         | 11  | 4        | 12         | 4/7/13/12/8, median 3      | 75 s            | 3 goal_nf, 2 ball_nf     | 111 / 521 mm |
+ | left, odom               | 52    | 28/30         | 0         | 2   | 7        | 7          | 1/12/13/14/12, median 4    | 80 s            | 2 goal_nf, 1 ball_nf     | 66 / 549 mm  |
+ | right, mapd              | 40    | 24/30         | 0         | 7   | 4        | 14         | 3/8/13/10/6, median 3      | 95 s            | 3 goal_nf, 2 ball_nf     | 134 / 583 mm |
+ | left, mapd               | 55    | 29/30         | 0         | 1   | 5        | 8          | 2/10/16/14/13, median 3    | 91 s            | 3 goal_nf                | 95 / 613 mm  |
+ | right, odom, NO routine  | 37    | 26/30         | 0         | 18  | 1        | 9          | 3/3/10/12/9, median 4      | 90 s            | 6 goal_nf, 2 ball_nf     | 237 / 961 mm |
+ Runs that hit the time cap without a goal: 1 / 1 / 3 / 0 / 0.  Falls: 0 in all 150 B runs.  Kicks while not localized: 0.
+ Aim at the kick swap-in (|perceived - true line|, duck-relative):
+   camera kicks (123-151 per row): median 0.5 deg, max 1.6-2.4 deg.
+   map kicks, far (128-141 per row): median 1.6-1.8, p90 5.2-5.8, max 10.4-14.2 deg (residual heading drift).
+   map kicks, tap-in (2-6 per row): degrees are geometric (ball 0.2-0.6 m from the centre): median 0.6-8.6, max 29.4.
+ Routine fixes per 30 runs: full 12-27 (error before -> after median 40-58 -> 7-8 mm); heading-only 108-128 (|yaw| 1.6-2.2 ->
+   1.0-2.0 deg median).
+ Early ends, plainly: goal_not_found (2-3 per row) = residual heading drift of 6-13 deg at the end (measured on every one);
+   ball_not_found = a full turn + walk to the centre + a second turn without seeing it.
+ mapd: no measurable contribution here either (right 40 vs 44, left 55 vs 52 -- within run-to-run noise); 0 relocalizations.
+
+C. FALL RE-LOCALIZATION -- scripted falls (push 2 m/s sideways until fallen), 20 runs x 150 s per row
+ | row                  | falls | protocol fired | fixed | err before fix med/max | err after med/max | protocol s med | falls during | unlocalized kicks | goals |
+ | NAVIGATE, right      | 20    | 20             | 20/20 | 273 / 537 mm           | 7 / 66 mm         | 11             | 0            | 0                 | 13    |
+ | LOOK, right          | 20    | 19 (*)         | 19/19 | 312 / 403 mm           | 8 / 38 mm         | 9              | 0            | 0                 | 13    |
+ | PRECISE, right       | 20    | 20             | 20/20 | 249 / 397 mm           | 14 / 82 mm        | 9              | 0            | 0                 | 12    |
+ | PRECISE, left        | 20    | 20             | 20/20 | 264 / 352 mm           | 10 / 61 mm        | 10             | 0            | 0                 | 14    |
+ | PRECISE, right, mapd | 20    | 20             | 20/20 | 248 / 348 mm           | 10 / 48 mm        | 9              | 0            | 0                 | 12    |
+ | WATCH, right         | 20    | 20             | 20/20 | 258 / 389 mm           | 13 / 109 mm       | 10             | 0            | 0                 | 11    |
+ (*) LOOK run 5: VelStand never got up (sat at 42 deg tilt for 126 s to the time cap); the supervisor held zero twist, no kick.
+ Every fix came from the primary source (a fixed goal); mapd relocalized 0 times (falls mid-field, boards 2-3 m away).
+ Against the bar that matters (the 0.6 m association gate): worst post-fix error 109 mm over 119 fixes.
+ Run-39 REPLICA, exact (Stage 4's odom-only run 39 replayed: --only-runs 39; without the protocol the 4 rows reproduce Stage 4's
+ lines byte for byte -- run39_replay/*_plain.txt). With --reloc (landmark: the field's fixed goal_b):
+   | row        | Stage 4 outcome                  | with the protocol: err before -> after | outcome      |
+   | left 0.5   | goal_not_found abort             | 354 -> 6 mm                             | GOAL         |
+   | left 0.8   | kicked 72 deg off (pose 400 mm)  | 103 -> 9 mm                             | GOAL         |
+   | right 0.5  | goal_not_found abort             | 59 -> 7 mm                              | GOAL         |
+   | right 0.8  | goal_not_found abort             | 93 -> 7 mm                              | post         |
+   0 kicks while unlocalized, 0 falls during the protocol.
+
+B5. BEHAVIOUR (right foot, 10 runs each)
+   ball never found after a respawn (greyed out): 10/10 end ball_not_found (after a scan, a walk to the centre, a scan); 0 kicks
+     at an unseen ball (the 38 kicks counted were all before the respawn).
+   goal never found (posts dark): 10/10 end goal_not_found; 20 advance kicks (map aim, far from the goal) were taken before the
+     ball came within camera range; 0 camera-path kicks, 0 kicks within 2.5 m of the goal.
+   pose lost permanently at 60 s: 10/10 end pose_lost 5 s later (incl. during SETTLE -- a hole found and fixed in this build).
+   pose dropout 2 s at 60 s: 10/10 held and resumed, to the time cap; 14 goals.
+
+REGRESSION (regression/): Stage 4 ground-truth seam, Stage 2 odom path and Stage 4 full stack (mapd + camera ball + camera goal),
+50 runs each: per-run lines IDENTICAL (the full stack once the new mapd_relocalizations=0 field is stripped).
+
+DEFERRED / OPEN (on the record): right-foot diagnosis; false-bump threshold; mapd's place; camera board VERIFY; Workstream D.
+New: VelStand get-up failure seen once (LOOK run 5); unplayable balls (7-14 per 30 runs) are a geofence/stance limit near boards.

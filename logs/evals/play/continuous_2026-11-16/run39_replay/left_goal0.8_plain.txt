@@ -1,0 +1,43 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+field: boards (-3.0, 3.0, -3.0, 3.0), geofence (-2.5, 2.5, -2.5, 2.5)
+pose source: odom (IMU yaw error on, calib stride_v1)
+left (kicking) foot at HOME, trunk yaw frame: (0.0, 41.8) mm
+velstand=logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+kick=logs/rsl_rl/ball_kick_v2_left/2026-11-13_19-50-52_v2_left_chunk1/2026-11-13_19-50-52_v2_left_chunk1_model_500.onnx
+precision=logs/rsl_rl/precision_step_v2/2026-11-13_16-23-21_v2_chunk1/2026-11-13_16-23-21_v2_chunk1_model_2500.onnx (pulse aligner = fallback)
+scene=field  logs -> logs/kick_mission/2026-11-16_20-41-54_left_goal0.8_field_odom_cam_goalcam/
+kicking foot left: precision stance shift +0.0 mm along the kick line; aim offset +12.2 deg (+ = left)
+ball source: camera (face-board-v1, ray->plane, K fx=348.0 at 640x360)
+goal source: camera (face-board-v1, 230 mm post-spacing fit; target assigned on a 0.25 m grid)
+  run 39: ball 1.10 m away, kick heading  +41deg -> approach_mode=precision, scan_s=9.8, ball_disturbed=1, foot_vs_home_mm=[np.float64(-6.9), np.float64(-1.5)], lfoot_vs_home_mm=[np.float64(-0.2), np.float64(-0.6)], trunk_speed_mm_s=0.1, tilt_deg=0.7, leg_dev_deg=4.1, align_ex_mm=7.7, align_ey_mm=-0.5, align_eh_deg=1.15, pulses=0, aligned=True, t_swap=16.58, aim_err_deg=71.65, pose_err_mm=399.8, pose_err_yaw_deg=1.37, true_align_ex_mm=551.5, true_align_ey_mm=1342.1, true_align_eh_deg=-0.22, kick_contact_t=0.02, peak_ball_fwd=0.087, ball_travel=1.236, kick_dir_err_deg=111.1, t_done=26.62, goal_outcome=no_cross, goal_lateral_mm=None, goal_miss_by_mm=None, goal_t_line_s=None, goal_post_hit=False, goal_post_t_s=None, goal_went_in=False, cam_looks={'looks': 55, 'found': 4, 'edge': 1}, goal_cam_looks={'looks': 51, 'found': 1}, approach_deg=-90
+
+  aligned within +-12 mm / 3 deg: 1/1; kicked (peak > 0.05 m/s): 1/1; falls: 0; ball disturbed before kick: 1 runs; median mission time 26.6 s
+  approach mode: {'precision': 1}
+
+  GOAL SUMMARY (left foot, goal 0.80 m past the ball, 210 mm opening):
+  all            n=  1  GOALS   0  posts  0 (0 in)  misses  0  short  1 | lateral at line median  +nan mm, worst  +nan | time to line nan s | no kick 0, aborted 0, bumped 1, falls 0, duck hit post 0
+  approach -90   n=  1  GOALS   0  posts  0 (0 in)  misses  0  short  1 | lateral at line median  +nan mm, worst  +nan | time to line nan s | no kick 0, aborted 0, bumped 1, falls 0, duck hit post 0
+  goal perception: |aim error| (perceived vs true ball->goal line at swap-in) median 71.65, p90 71.65, max 71.65 deg over 1 kicks; heading update at the re-observe |median| nan deg; goal_not_found aborts 0
+
+  POSE GAP at kick swap-in (1/1 missions reached it), estimate vs truth:
+    position error mm: median 399.8, p90 399.8, max 399.8
+    |yaw error| deg:   median 1.4, p90 1.4, max 1.4
+    TRUE ball placement at swap (supervisor believed |ex|<=12/20, |ey|<=12 mm): |ex| median 551.5, p90 551.5, max 551.5; |ey| median 1342.1, p90 1342.1, max 1342.1
+    pose lost in 0 missions; aborted pose_lost 0; resumed 0

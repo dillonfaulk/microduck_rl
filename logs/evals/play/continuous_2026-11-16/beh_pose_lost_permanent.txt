@@ -1,0 +1,42 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+continuous play: field (-3.0, 3.0, -3.0, 3.0), geofence (-2.8, 2.8, -2.8, 2.8), goals +x (3.000, 0.000) into 0 deg, -x (-3.000, 0.000) into 180 deg
+  foot right calib v2, pose odom (stride_v1), estimated-only True, ball decel 0.03 m/s^2, time cap 240 s, kick cap 6/ball, pose dropout 60,100000, routine landmark fix on
+  logs -> logs/evals/play/continuous_2026-11-16/logs/beh_pose_lost_permanent/
+  run  0 attack +x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 0, map 2) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  1 attack -x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 1, map 1) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 1 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  2 attack +x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 1 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  3 attack -x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 0, map 2) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {'pose_lost': 1}
+  run  4 attack +x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 3 (cam 1, map 2) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  5 attack -x: GOALS 1  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 1, map 1) | first goal 63.8 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 2 | end pose_lost at 68.8 s, pose err None mm | decisions ['GOAL'] kicks/ball [2] | aborts {'pose_lost': 1}
+  run  6 attack +x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 0, map 2) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  7 attack -x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 3 (cam 0, map 3) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {}
+  run  8 attack +x: GOALS 1  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 2, map 0) | first goal 59.7 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 2 | end pose_lost at 65.1 s, pose err None mm | decisions ['GOAL'] kicks/ball [2] | aborts {'pose_lost': 1}
+  run  9 attack -x: GOALS 0  other-end 0  out 0  kick-cap 0  unplayable 0 | kicks 2 (cam 0, map 2) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end pose_lost at 65.1 s, pose err None mm | decisions [] kicks/ball [] | aborts {'pose_lost': 1}
+
+PLAY SUMMARY: 10 runs x 240 s cap, right foot, pose odom, ball decel 0.03 m/s^2, kick cap 6/ball, mission cap 90 s
+  goals (attacked end): total 2, per run median 0.0 (min 0, max 1); runs with >= 1 goal 2/10
+  goals in the OTHER end: 0; out of bounds 0; kick-cap restarts 0; unplayable restarts 0
+  kicks to score (per scored ball): 2: 2 (median 2)
+  time to first goal: median 62 s over 2 runs; runs hitting the time cap without a goal 0
+  camera kicks 7: |aim err| median 0.3, max 1.8 deg; per-kick outcomes {'goal': 0, 'post': 0, 'miss': 0, 'no_cross': 5}
+  map    kicks 16: |aim err| median 0.9, max 3.2 deg; per-kick outcomes {'goal': 0, 'post': 0, 'miss': 0, 'no_cross': 16}
+  falls 0 (during the protocol 0); re-localizations 0; kicks while NOT localized 0
+  routine HEADING-ONLY fixes 6: error before median 44 mm (max 71), after median 44 mm (max 71); heading fixed too in 6; |yaw err| before median 1.7 -> after 0.3 deg
+  run ends: {'pose_lost': 10}

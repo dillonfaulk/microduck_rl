@@ -1,0 +1,4 @@
+right_goal0.8_field_gt.txt: IDENTICAL (50 runs)
+right_goal0.8_field_odom_stage2.txt: IDENTICAL (50 runs)
+right_goal0.8_full.txt: DIFFERS
+IDENTICAL once the new mapd_relocalizations=0 field is removed (50 runs)

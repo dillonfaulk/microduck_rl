@@ -1,0 +1,110 @@
+FIELD CHANGE + RUNG-6 CLOSING WORK (brief microduck-field-change-rung6-closing-brief.md, WS1-WS5) -- 2026-11-18
+Fork local/velstand-own-teachers. Sim only; nothing trained; 61->14 @ 50 Hz untouched; policies frozen (VelStand r3 3999,
+PrecisionStep v2 2500, BallKick v2 R 1250 / L 500, --calib v2); ball drag HELD at 0.03 m/s^2; vault untouched. Every battery
+--estimated-only (ground truth for scoring only). Camera numbers assume face-board-v1 (GC2093); board VERIFY still open.
+Suite 361 passed, 1 skipped. Reproduce: baseline/run.sh (WS2), final/run.sh (WS3-5 on + regression).
+THE 6 m NUMBERS ARE HISTORY: nothing below is compared to them without the label "6 m field".
+
+WS1 THE FIELD (field4.xml, scene_field4.xml; play.py --field 4 is the default; --field 6 keeps the old board field)
+  4 m x 4 m, lines at x, y = +-2.0; goals locked at (+-2, 0), 210 mm opening, 20 x 120 mm white posts (unchanged).
+  Boundary wall: VISUAL ONLY (transparent blue, no collision), geom group 5 = not drawn by the duck's camera, not seen by the
+  ToF (tof.py now casts groups 0-4 only); the viewer shows it.
+  Corner posts: one centred on each corner, 75 mm diameter x 0.40 m tall, matte blue, full collision (= 3-inch PVC pipe,
+  painted, weighted base). Blue so neither the white-post goal detector nor the orange-ball detector fires on it.
+  Geofence (the duck's field): the lines moved OUT 0.25 m (+-2.25) -- a player may stand just over a line to play a ball near
+  it. Unplayable = stance spot outside the geofence. Ball respawns 0.4 m inside the lines, >= 0.6 m from the duck.
+  OUT (carried over): the WHOLE ball over a line outside the mouth (soccer rule); a GOAL = the centre crossing a goal line
+  between the posts. The wall stops nothing.
+  RETRIEVAL + RESPAWN, the precedence rule:
+    1. The out call always fires and is counted. It opens a RETRIEVAL WINDOW of 45 s.
+    2. In the window the duck leaves the field (geofence widens to the lines + 1.45 m) and kicks the ball back toward the
+       centre spot (a map-aimed kick). The whole ball back inside a line = RETRIEVED: play on, same ball, no respawn.
+    3. RESPAWN when the window expires, or at once if the ball is more than 1.0 m beyond a line, or if the duck reports the
+       ball unplayable. No goal counts while the ball is out. A call during a kick waits for the kick to finish.
+    4. A ball the duck estimates on/over a line is not reported unplayable for 3 s (the referee's out call has priority).
+  ToF / mapd model, stated: the field's ToF signature is the 8 posts and the floor. Measured: a corner post returns 9/64 zones
+  at 0.5 m, 4 at 1.0 m, 0 beyond 1.5 m; a goal post 0-3 zones. The shim and mapd are unmodified; mapd sees floor + posts.
+  New routing rule (found on this field): routes detour around the 8 map posts (0.2 m clearance) -- a duck coming back in
+  from behind a goal stood ON a goal post for 150 s stepping in place while its odometry walked 0.9 m.
+  Map-aimed kicks aim 0.3 m INTO the goal (a ball resting on the line made ball->line-centre a 2 cm vector) and a goal seen
+  more than 50 deg edge-on (corner balls) is map-aimed too (the two posts overlap; ranging only ever covered +-35 deg).
+
+WS2 RE-BASELINE, 4 m field (baseline/: before WS3-5), 30 runs x 240 s, kick cap 6, mission cap 90 s
+ | row         | goals | runs w/ goal | own | outs (retrieved / respawned) | unplayable | end pose err med / max |
+ | right odom  | 54    | 26/30        | 0   | 36 (26 / 6)                  | 0          | 70 / 430 mm            |
+ | left odom   | 72    | 29/30        | 0   | 21 (11 / 5)                  | 0          | 80 / 1046 mm           |
+ | right mapd  | 51    | 26/30        | 0   | 32 (23 / 7)                  | 1          | 66 / 595 mm            |
+ | left mapd   | 70    | 29/30        | 0   | 28 (22 / 3)                  | 0          | 86 / 994 mm            |
+ All 120 runs reached the time cap (no goal_not_found ends). Unplayable 0-1 per 30 runs (6 m field: 7-14).
+ Falls (20 runs x 150 s, one scripted fall each): 120/120 fixed, error 253-318 -> 8-14 mm median, worst 143 mm; 0 unlocalized
+ kicks, 0 falls in the protocol. Retrieval battery (environment rolls the ball out every 30 s): 42 outs, 34 retrieved, 2 respawned.
+ Regression carried over: Stage 4 ground-truth + Stage 2 odom paths (identical, see final). RE-BASED: all play numbers
+ (6 m field -> 4 m field; the 6 m continuous-play report is history).
+
+WS3 HEADING DRIFT + DILLON'S 60 s FIX (final/: all on)
+  Corner-post camera (camera_landmarks.py; camera_corner_check.py): found 24/24 at 0.6-4.0 m; bearing error <= 1 deg (<= 0.2 deg
+  past 2 m); range error <= 39 mm to 2.5 m, 60-115 mm at 3-3.5 m; 0 false detections from 12 headings.
+  Fixes: any >= 2 DISTINCT landmarks (goal centres, corner posts) in one standing survey -> rigid 2D fit (Procrustes, weight
+  1/range^2, residual gate); else the goal rules as before; else a corner post's bearing fixes the heading (>= 1.5 m).
+  Same gates as every routine fix (upright + still, >= 0.9 m from a goal, heading turn <= 10 deg, routine move <= 0.5 m).
+  Look before each advance kick: at the pre-stance point, head neutral, 3 looks, fix, heading refreshed from the corrected pose.
+  60 s timer: due every 60 s; carried out at the next SCAN/NAVIGATE or WATCH end: stand, head 0/+0.6/-0.6, 3 looks each, fix.
+ | row (final)  | goals | runs w/ goal | 60 s fix landed / fired | landed using a corner | using a goal | end pose err med / max |
+ | right odom   | 56    | 26/30        | 69/90 (77 %)            | 64                    | 37           | 28 / 179 mm            |
+ | left odom    | 59    | 26/30        | 79/86 (92 %)            | 70                    | 46           | 35 / 178 mm            |
+ | right mapd   | 48    | 27/30        | 78/89 (88 %)            | 74                    | 40           | 34 / 345 mm            |
+ | left mapd    | 61    | 29/30        | 76/90 (84 %)            | 66                    | 42           | 32 / 283 mm            |
+ | right, NO corner posts      | 46 | 25/30 | 38/89 (43 %)     | -                     | 38           | 58 / 271 mm            |
+ | right, NO timer, NO pre-kick| 54 | 28/30 | -                | -                     | -            | 49 / 557 mm            |
+ Corner posts' contribution, measurable: with them the 60 s fix lands 77-92 %, without them 43 %; ~90 % of landed fixes use one.
+ Drift result: end pose error median 66-86 -> 28-35 mm, worst 430-1046 -> 178-345 mm. goal_not_found ends: 0 in the 120 B runs.
+ TRADE-OFF, plainly: goals on the right foot held (54 -> 56 odom; 51 -> 48 mapd), the LEFT foot lost goals (72 -> 59 odom,
+ 70 -> 61 mapd): the surveys cost time (~4 s per minute + a 1 s pre-kick look) and the left foot was the one scoring fast.
+ Goals per run are noisy at n = 30 (the right no-timer ablation scored 54); Dillon's call whether the pose gain is worth it.
+
+WS4 GET-UP FAILURE
+  Detection: not upright (estimated tilt >= 25 deg or trunk <= 0.09 m) for 15 s continuously = GET-UP FAILURE (normal get-ups
+  over 119 falls: median 1.0 s, max 5.4 s). Every battery counts it as a failure and ENDS the run (getup_failed). The viewer
+  instead waits: R = the human pick-up (viewer only, counted as viewer_resets; the fall protocol then runs).
+  Rate: final wave 1 failure in 417 scripted falls (G_getup_PRECISE_left run 24: 43.7 deg, trunk 0.10 m -- the same stall);
+  6 m field 1 in 120. Get-up battery: 30 runs x 5 falls in NAVIGATE (right) 150 falls, 0 failures; PRECISE (left) 147, 1.
+  ROOT CAUSE of the 42 deg stall (exact replay of 6 m LOOK run 5, state dumped at 60 s): pitched 43 deg nose-down (roll -10),
+  trunk 0.10 m; neck_pitch -110 deg from HOME, head_yaw -59; the jaw in contact with the right ankle, the right leg, the left
+  hip and the floor -- the head is folded under and jammed against its own legs. VelStand keeps commanding neck_pitch -3.83 rad
+  (far past the joint range), pressing the beak into the floor: beak + two feet = a stable tripod. Zero command, head-neutral,
+  walk/turn commands and forward/sideways 0.3 m/s pushes leave it stuck (tilt 43 deg after 10-20 s); a 0.3 m/s push BACKWARD
+  frees it (tilt 1.7 deg). A self-entangled fixed point of the get-up behaviour: a TRAINING item (e.g. neck action limits /
+  head-under-body states in StandUp/VelStand), not something the supervisor can command its way out of.
+
+WS5 DEFERRED WRAP-UP
+  Right-foot diagnosis (Stage 4 GoalKick batteries, ground truth vs full stack, same seeds; kick mechanics are field-independent):
+    under the estimated stack the TRUE placement spreads for both feet (lateral std 1.0 -> 3.6 mm, heading 0.4 -> 1.8 deg), but
+    only the right kick cares: kick direction vs true lateral offset +1.57 deg/mm (R^2 0.66 with ex/eh), left +0.08 deg/mm
+    (left responds to heading, +1.1 deg/deg). 3.6 mm -> ~5.6 deg of right-foot scatter vs a 5.5 deg half-goal at 1.1 m.
+    Where the lateral error comes from: the head-down look is good to 0.6 mm (std); the supervisor's swap-in lateral estimate
+    correlates only 0.29 with the truth -- the error enters during the last ~0.2 m of PrecisionStep stepping on contact
+    odometry, after the look, where the camera cannot see the ball (0.09 m ahead < 0.15 m minimum view).
+    Fix candidates: (1) TRAINING: BallKick v3 right made lateral-invariant like the left; (2) cheap mission experiment: a
+    re-observe nearer the ball (shorter blind walk) -- untested.
+  False bumps: audit vs truth (bump_audit.py). Baseline 18-35 false calls per 30 runs, all at 0.75-1.0 m (the camera speed test
+    switches on under 1 m; a walking duck's head bob reads a resting ball as moving). Fix (play only): the speed test needs 2
+    consecutive fast looks. Final: 1-9 false per 30 B runs (real calls kept: 22-47); the G_getup_NAVIGATE row 20 false (the
+    scripted 2 m/s pushes shake the camera).
+  mapd's place, evidence on the 4 m field: 0 corrections and 0 relocalizations in 80 runs (10-30 keyframes per run); mapd rows
+    score within noise of the odometry rows (baseline 51 vs 54, 70 vs 72; final 48 vs 56, 61 vs 59); the ToF sees a corner
+    post only within ~1 m. The camera landmarks do the job mapd was meant to do here. Options: drop it from the play loop on
+    this field / keep it as a passive observer / revisit in a cluttered room with real ToF data. Dillon decides.
+
+FALL PROTOCOL (final, 4 m): C rows 120/120 fixed, median error 258-308 -> 11-23 mm, worst 130 mm; get-up batteries 296/296
+  fixed (+1 get-up failure, no fix possible), worst 554 mm (one fix, G PRECISE left); 0 unlocalized kicks, 0 falls in the protocol.
+RETRIEVAL (final): 43 outs, 32 retrieved, 6 respawned (20 runs, a bad bounce every 30 s). B rows: 22-33 outs per 30 runs, 14-18
+  retrieved, 3-9 respawned.
+BEHAVIOUR (final, 10 runs each): ball hidden after a respawn 9/10 end ball_not_found (1 run never respawned before the cap);
+  goal hidden 10/10 goal_not_found (0 goals; map-aimed advance kicks only before it); pose lost permanently 10/10 pose_lost;
+  2 s dropout 10/10 held and resumed to the time cap.
+REGRESSION (final/regression/): Stage 4 ground-truth seam 50/50 identical; Stage 2 odom 50/50 identical; Stage 4 full stack
+  49/50 identical -- run 28 differs in the 4th significant digit (foot 0.3 vs 0.4 mm, ball travel 0.969 vs 0.968 m, same goal);
+  the only change touching that path is the ToF ray group mask (the old scene has no group-5 geoms). Run-39 replays with the
+  protocol: unchanged (3 goals + a post; 59-354 -> 6-9 mm).
+DEFERRED / OPEN: camera board VERIFY; ball drag (real-ball measurement); right-foot fix (training); 42 deg stall (training);
+  mapd's place (Dillon). Rung 6 closure: Dillon's call.

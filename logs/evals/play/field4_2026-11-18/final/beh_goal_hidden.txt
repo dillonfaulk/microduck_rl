@@ -1,0 +1,159 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+continuous play: field (-2.0, 2.0, -2.0, 2.0), geofence (-2.25, 2.25, -2.25, 2.25), goals +x (2.000, 0.000) into 0 deg, -x (-2.000, 0.000) into 180 deg
+  foot right calib v2, pose odom (stride_v1), estimated-only True, ball decel 0.03 m/s^2, time cap 240 s, kick cap 6/ball, goal hidden: all, routine landmark fix on
+  logs -> logs/evals/play/field4_2026-11-18/final/logs/beh_goal_hidden/
+  run  0 attack +x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 2 | end goal_not_found at 37.3 s, pose err 34.7 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  1 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 0 (cam 0, map 0) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 22.1 s, pose err 17.3 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  2 attack +x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 32.3 s, pose err 18.9 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  3 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 38.1 s, pose err 34.5 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  4 attack +x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 31.5 s, pose err 7.8 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  5 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 0 (cam 0, map 0) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 22.5 s, pose err 52.9 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  6 attack +x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 35.4 s, pose err 16.8 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  7 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 38.6 s, pose err 58.9 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  8 attack +x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 0 (cam 0, map 0) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 19.2 s, pose err 6.6 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+  run  9 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 1 (cam 0, map 1) | first goal None s | falls 0 getup-fail 0 relocs 0 unlocalized kicks 0 routine fixes 0 | end goal_not_found at 44.6 s, pose err 8.6 mm | decisions [] kicks/ball [] | aborts {'goal_not_found': 1}
+
+PLAY SUMMARY: 10 runs x 240 s cap, right foot, pose odom, ball decel 0.03 m/s^2, kick cap 6/ball, mission cap 90 s
+  goals (attacked end): total 0, per run median 0.0 (min 0, max 0); runs with >= 1 goal 0/10
+  out of bounds (4 m field, retrieval): 0 outs -> retrieved 0, respawned 0 (window 0, too far 0), other 0; retrieval kicks 0
+  goals in the OTHER end: 0; out of bounds 0; kick-cap restarts 0; unplayable restarts 0
+  time to first goal: median nan s over 0 runs; runs hitting the time cap without a goal 0
+  camera kicks 0: |aim err| median nan, max nan deg; per-kick outcomes {'goal': 0, 'post': 0, 'miss': 0, 'no_cross': 0}
+  map    kicks 7: |aim err| median 2.4, max 3.3 deg; per-kick outcomes {'goal': 0, 'post': 0, 'miss': 0, 'no_cross': 7}
+  GET-UP FAILURES 0 (runs ended getup_failed 0)
+  falls 0 (during the protocol 0); re-localizations 0; kicks while NOT localized 0
+  fixes [heading] 1: error before median 40 mm (max 40), after median 40 mm (max 40); heading fixed too in 1; |yaw err| before median 0.4 -> after 0.5 deg
+  fixes [prekick:heading] 1: error before median 36 mm (max 36), after median 36 mm (max 36); heading fixed too in 1; |yaw err| before median 0.3 -> after 0.1 deg
+  run ends: {'goal_not_found': 10}; pose error at the end median 18 mm, max 59 mm
+Exception ignored in: <function Renderer.__del__ at 0x7127bebdc180>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/platform/baseplatform.py", line 487, in __call__
+    return self(*args, **named)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x71277659a2d0>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7127beb8ba60>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x71277659a2d0>,
+	),
+	result = 0
+)
+Exception ignored in: <function Renderer.__del__ at 0x7127bebdc180>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 131, in free
+    EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE,
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglMakeCurrent,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7127beb3e0d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7127beb3e0d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7127beb3dfd0>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7127beb8ba60>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 131, in free
+    EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE,
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglMakeCurrent,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7127beb3e0d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7127beb3e0d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7127beb3dfd0>,
+	),
+	result = 0
+)
+Exception ignored in: <function Renderer.__del__ at 0x7127bebdc180>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x712770007450>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7127beb8ba60>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x71277659b8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x712770007450>,
+	),
+	result = 0
+)

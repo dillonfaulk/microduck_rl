@@ -1,0 +1,338 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+continuous play: field (-2.0, 2.0, -2.0, 2.0), geofence (-2.25, 2.25, -2.25, 2.25), goals +x (2.000, 0.000) into 0 deg, -x (-2.000, 0.000) into 180 deg
+  foot right calib v2, pose odom (stride_v1), estimated-only True, ball decel 0.03 m/s^2, time cap 240 s, kick cap 6/ball, scripted fall in NAVIGATE (push 2.0 m/s), routine landmark fix on
+  logs -> logs/evals/play/field4_2026-11-18/final/logs/G_getup_NAVIGATE_right/
+  run  0 attack +x: GOALS 0  other-end 0  out 2 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 53.9 mm | decisions [] kicks/ball [] | aborts {}
+      reloc: {'t_fall': 8.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 42.4, 'err_before_mm': 305.1, 'yaw_err_before_deg': -1.51, 'source': 'multi:+x+c1', 'sightings': 9, 'err_after_mm': 11.7, 'yaw_err_after_deg': 0.33, 'attempts': 1, 'protocol_s': 6.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.55}
+      reloc: {'t_fall': 32.38, 'phase': 'NAVIGATE', 'err_at_fall_mm': 66.4, 'err_before_mm': 266.3, 'yaw_err_before_deg': -0.21, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 38.7, 'yaw_err_after_deg': -1.12, 'attempts': 1, 'protocol_s': 8.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.46}
+      reloc: {'t_fall': 69.86, 'phase': 'NAVIGATE', 'err_at_fall_mm': 87.9, 'err_before_mm': 165.3, 'yaw_err_before_deg': 0.93, 'source': 'multi:-x+c2', 'sightings': 15, 'err_after_mm': 7.4, 'yaw_err_after_deg': -0.35, 'attempts': 1, 'protocol_s': 4.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.96}
+      reloc: {'t_fall': 102.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 39.2, 'err_before_mm': 402.3, 'yaw_err_before_deg': -1.08, 'source': 'multi:+x+c0', 'sightings': 12, 'err_after_mm': 10.1, 'yaw_err_after_deg': -0.29, 'attempts': 1, 'protocol_s': 6.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.03}
+      reloc: {'t_fall': 126.92, 'phase': 'NAVIGATE', 'err_at_fall_mm': 26.0, 'err_before_mm': 338.8, 'yaw_err_before_deg': -1.48, 'source': 'multi:+x+c0', 'sightings': 11, 'err_after_mm': 7.8, 'yaw_err_after_deg': 0.65, 'attempts': 1, 'protocol_s': 5.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.87}
+  run  1 attack -x: GOALS 0  other-end 0  out 2 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 4 (cam 2, map 2) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 9.1 mm | decisions [] kicks/ball [] | aborts {}
+      reloc: {'t_fall': 11.06, 'phase': 'NAVIGATE', 'err_at_fall_mm': 47.7, 'err_before_mm': 95.5, 'yaw_err_before_deg': 0.73, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 6.7, 'yaw_err_after_deg': 0.41, 'attempts': 1, 'protocol_s': 6.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.68}
+      reloc: {'t_fall': 36.28, 'phase': 'NAVIGATE', 'err_at_fall_mm': 85.7, 'err_before_mm': 389.6, 'yaw_err_before_deg': -2.15, 'source': 'multi:+x+c1', 'sightings': 13, 'err_after_mm': 24.8, 'yaw_err_after_deg': 0.91, 'attempts': 1, 'protocol_s': 6.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.29}
+      reloc: {'t_fall': 64.32, 'phase': 'NAVIGATE', 'err_at_fall_mm': 37.9, 'err_before_mm': 398.6, 'yaw_err_before_deg': -0.1, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 4.8, 'yaw_err_after_deg': -0.36, 'attempts': 1, 'protocol_s': 4.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.17}
+      reloc: {'t_fall': 94.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 113.8, 'err_before_mm': 382.1, 'yaw_err_before_deg': 0.23, 'source': 'corner_position:c1', 'sightings': 3, 'err_after_mm': 51.5, 'yaw_err_after_deg': -0.44, 'attempts': 1, 'protocol_s': 6.9, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.44}
+      reloc: {'t_fall': 119.1, 'phase': 'NAVIGATE', 'err_at_fall_mm': 82.7, 'err_before_mm': 235.3, 'yaw_err_before_deg': -1.77, 'source': 'multi:+x+c1', 'sightings': 11, 'err_after_mm': 16.3, 'yaw_err_after_deg': 0.28, 'attempts': 1, 'protocol_s': 6.9, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.78}
+  run  2 attack +x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 169.4 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 12.5 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 65.8, 'err_before_mm': 548.7, 'yaw_err_before_deg': 0.43, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 10.3, 'yaw_err_after_deg': 0.34, 'attempts': 1, 'protocol_s': 3.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.73}
+      reloc: {'t_fall': 34.36, 'phase': 'NAVIGATE', 'err_at_fall_mm': 25.2, 'err_before_mm': 215.3, 'yaw_err_before_deg': 0.38, 'source': 'multi:-x+c2', 'sightings': 15, 'err_after_mm': 10.2, 'yaw_err_after_deg': 1.06, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.91}
+      reloc: {'t_fall': 68.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 75.5, 'err_before_mm': 367.9, 'yaw_err_before_deg': -0.34, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 50.1, 'yaw_err_after_deg': -0.84, 'attempts': 1, 'protocol_s': 8.2, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.52}
+      reloc: {'t_fall': 93.56, 'phase': 'NAVIGATE', 'err_at_fall_mm': 127.4, 'err_before_mm': 354.1, 'yaw_err_before_deg': -2.84, 'source': 'multi:+x+c0', 'sightings': 9, 'err_after_mm': 27.6, 'yaw_err_after_deg': -0.16, 'attempts': 1, 'protocol_s': 7.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.8}
+      reloc: {'t_fall': 118.56, 'phase': 'NAVIGATE', 'err_at_fall_mm': 32.1, 'err_before_mm': 306.6, 'yaw_err_before_deg': -0.91, 'source': 'multi:+x+c0', 'sightings': 12, 'err_after_mm': 7.6, 'yaw_err_after_deg': 0.01, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.79}
+  run  3 attack -x: GOALS 1  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 140.4 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 112.4 mm | decisions ['GOAL', 'out'] kicks/ball [3, 1] | aborts {}
+      reloc: {'t_fall': 8.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 27.5, 'err_before_mm': 286.2, 'yaw_err_before_deg': -1.55, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 12.9, 'yaw_err_after_deg': 0.65, 'attempts': 1, 'protocol_s': 8.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.74}
+      reloc: {'t_fall': 34.08, 'phase': 'NAVIGATE', 'err_at_fall_mm': 34.7, 'err_before_mm': 196.5, 'yaw_err_before_deg': 0.38, 'source': 'corner_position:c0', 'sightings': 6, 'err_after_mm': 32.8, 'yaw_err_after_deg': -0.11, 'attempts': 1, 'protocol_s': 3.3, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.47}
+      reloc: {'t_fall': 63.46, 'phase': 'NAVIGATE', 'err_at_fall_mm': 90.6, 'err_before_mm': 198.6, 'yaw_err_before_deg': 0.36, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 20.6, 'yaw_err_after_deg': 0.78, 'attempts': 1, 'protocol_s': 3.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.31}
+      reloc: {'t_fall': 89.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 9.8, 'err_before_mm': 289.7, 'yaw_err_before_deg': -1.22, 'source': 'multi:+x+c0+c1', 'sightings': 12, 'err_after_mm': 6.2, 'yaw_err_after_deg': 0.5, 'attempts': 1, 'protocol_s': 8.1, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.75}
+      reloc: {'t_fall': 121.36, 'phase': 'NAVIGATE', 'err_at_fall_mm': 59.8, 'err_before_mm': 363.8, 'yaw_err_before_deg': -1.24, 'source': 'multi:-x+c2+c3', 'sightings': 15, 'err_after_mm': 14.7, 'yaw_err_after_deg': -0.29, 'attempts': 1, 'protocol_s': 5.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.0}
+  run  4 attack +x: GOALS 1  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 4, map 1) | first goal 178.3 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 15.0 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 5.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 65.9, 'err_before_mm': 329.6, 'yaw_err_before_deg': 0.32, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 13.0, 'yaw_err_after_deg': -0.64, 'attempts': 1, 'protocol_s': 3.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.63}
+      reloc: {'t_fall': 26.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 74.8, 'err_before_mm': 310.7, 'yaw_err_before_deg': -0.17, 'source': 'multi:-x+c2', 'sightings': 18, 'err_after_mm': 5.0, 'yaw_err_after_deg': 0.12, 'attempts': 1, 'protocol_s': 12.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.93}
+      reloc: {'t_fall': 57.12, 'phase': 'NAVIGATE', 'err_at_fall_mm': 101.0, 'err_before_mm': 230.5, 'yaw_err_before_deg': -3.19, 'source': 'multi:-x+c2', 'sightings': 15, 'err_after_mm': 9.1, 'yaw_err_after_deg': 0.77, 'attempts': 1, 'protocol_s': 6.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.84}
+      reloc: {'t_fall': 81.5, 'phase': 'NAVIGATE', 'err_at_fall_mm': 32.6, 'err_before_mm': 428.0, 'yaw_err_before_deg': -3.04, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 144.9, 'yaw_err_after_deg': -3.34, 'attempts': 1, 'protocol_s': 8.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.43}
+      reloc: {'t_fall': 119.18, 'phase': 'NAVIGATE', 'err_at_fall_mm': 217.6, 'err_before_mm': 447.6, 'yaw_err_before_deg': 0.38, 'source': 'multi:-x+c2', 'sightings': 9, 'err_after_mm': 18.4, 'yaw_err_after_deg': 0.3, 'attempts': 1, 'protocol_s': 7.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.68}
+  run  5 attack -x: GOALS 1  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal 219.7 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 20.2 mm | decisions ['out', 'GOAL'] kicks/ball [0, 3] | aborts {'ball_not_found': 2}
+      reloc: {'t_fall': 10.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 14.5, 'err_before_mm': 291.6, 'yaw_err_before_deg': 1.29, 'source': 'multi:+x+c1', 'sightings': 9, 'err_after_mm': 15.9, 'yaw_err_after_deg': 0.4, 'attempts': 1, 'protocol_s': 6.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.57}
+      reloc: {'t_fall': 35.0, 'phase': 'NAVIGATE', 'err_at_fall_mm': 16.2, 'err_before_mm': 236.7, 'yaw_err_before_deg': 2.26, 'source': 'multi:+x+c0', 'sightings': 11, 'err_after_mm': 11.8, 'yaw_err_after_deg': 0.43, 'attempts': 1, 'protocol_s': 9.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.07}
+      reloc: {'t_fall': 73.16, 'phase': 'NAVIGATE', 'err_at_fall_mm': 31.0, 'err_before_mm': 276.5, 'yaw_err_before_deg': -1.48, 'source': 'multi:-x+c2', 'sightings': 7, 'err_after_mm': 30.5, 'yaw_err_after_deg': 1.47, 'attempts': 1, 'protocol_s': 11.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.08}
+      reloc: {'t_fall': 101.88, 'phase': 'NAVIGATE', 'err_at_fall_mm': 89.9, 'err_before_mm': 245.3, 'yaw_err_before_deg': 3.92, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 7.2, 'yaw_err_after_deg': 1.08, 'attempts': 1, 'protocol_s': 8.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.79}
+      reloc: {'t_fall': 145.94, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.5, 'err_before_mm': 289.1, 'yaw_err_before_deg': 3.51, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 9.3, 'yaw_err_after_deg': 1.43, 'attempts': 1, 'protocol_s': 6.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.07}
+  run  6 attack +x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 7 (cam 5, map 2) | first goal 112.2 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 18.2 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 2] | aborts {}
+      reloc: {'t_fall': 6.26, 'phase': 'NAVIGATE', 'err_at_fall_mm': 79.2, 'err_before_mm': 242.2, 'yaw_err_before_deg': -1.89, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 6.9, 'yaw_err_after_deg': 0.31, 'attempts': 1, 'protocol_s': 6.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.67}
+      reloc: {'t_fall': 30.86, 'phase': 'NAVIGATE', 'err_at_fall_mm': 20.6, 'err_before_mm': 231.1, 'yaw_err_before_deg': 1.09, 'source': 'corner_position:c3', 'sightings': 6, 'err_after_mm': 44.3, 'yaw_err_after_deg': -0.15, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.8}
+      reloc: {'t_fall': 57.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.8, 'err_before_mm': 206.1, 'yaw_err_before_deg': 1.55, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 36.2, 'yaw_err_after_deg': 1.44, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.36}
+      reloc: {'t_fall': 88.42, 'phase': 'NAVIGATE', 'err_at_fall_mm': 89.6, 'err_before_mm': 295.0, 'yaw_err_before_deg': -0.23, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 10.6, 'yaw_err_after_deg': 0.27, 'attempts': 1, 'protocol_s': 7.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.21}
+      reloc: {'t_fall': 118.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 42.5, 'err_before_mm': 257.9, 'yaw_err_before_deg': 3.03, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 12.0, 'yaw_err_after_deg': 1.19, 'attempts': 1, 'protocol_s': 2.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.73}
+  run  7 attack -x: GOALS 1  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 4, map 2) | first goal 183.3 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 12.1 mm | decisions ['GOAL'] kicks/ball [4] | aborts {}
+      reloc: {'t_fall': 8.06, 'phase': 'NAVIGATE', 'err_at_fall_mm': 68.0, 'err_before_mm': 278.3, 'yaw_err_before_deg': 0.52, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 9.8, 'yaw_err_after_deg': 0.12, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.19}
+      reloc: {'t_fall': 39.5, 'phase': 'NAVIGATE', 'err_at_fall_mm': 37.8, 'err_before_mm': 343.5, 'yaw_err_before_deg': 0.02, 'source': 'corner_position:c1', 'sightings': 6, 'err_after_mm': 64.5, 'yaw_err_after_deg': -0.86, 'attempts': 1, 'protocol_s': 4.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.72}
+      reloc: {'t_fall': 72.8, 'phase': 'NAVIGATE', 'err_at_fall_mm': 101.4, 'err_before_mm': 221.4, 'yaw_err_before_deg': 0.69, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 11.8, 'yaw_err_after_deg': 0.54, 'attempts': 1, 'protocol_s': 4.9, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.73}
+      reloc: {'t_fall': 105.08, 'phase': 'NAVIGATE', 'err_at_fall_mm': 33.4, 'err_before_mm': 271.1, 'yaw_err_before_deg': -0.26, 'source': 'multi:-x+c2+c3', 'sightings': 15, 'err_after_mm': 16.8, 'yaw_err_after_deg': -0.07, 'attempts': 1, 'protocol_s': 5.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.36}
+      reloc: {'t_fall': 130.2, 'phase': 'NAVIGATE', 'err_at_fall_mm': 79.6, 'err_before_mm': 358.9, 'yaw_err_before_deg': -1.75, 'source': 'multi:-x+c3', 'sightings': 12, 'err_after_mm': 14.9, 'yaw_err_after_deg': -1.0, 'attempts': 1, 'protocol_s': 3.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.61}
+  run  8 attack +x: GOALS 1  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 4 (cam 1, map 3) | first goal 225.2 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 82.3 mm | decisions ['GOAL'] kicks/ball [4] | aborts {}
+      reloc: {'t_fall': 8.06, 'phase': 'NAVIGATE', 'err_at_fall_mm': 49.5, 'err_before_mm': 184.7, 'yaw_err_before_deg': -0.12, 'source': 'multi:+x+c0', 'sightings': 9, 'err_after_mm': 15.9, 'yaw_err_after_deg': -0.91, 'attempts': 1, 'protocol_s': 5.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.64}
+      reloc: {'t_fall': 31.3, 'phase': 'NAVIGATE', 'err_at_fall_mm': 71.2, 'err_before_mm': 220.9, 'yaw_err_before_deg': -2.78, 'source': 'multi:+x+c0', 'sightings': 15, 'err_after_mm': 5.7, 'yaw_err_after_deg': 0.15, 'attempts': 1, 'protocol_s': 5.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.06}
+      reloc: {'t_fall': 54.54, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.4, 'err_before_mm': 235.6, 'yaw_err_before_deg': 0.75, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 22.0, 'yaw_err_after_deg': 0.81, 'attempts': 1, 'protocol_s': 6.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.45}
+      reloc: {'t_fall': 80.92, 'phase': 'NAVIGATE', 'err_at_fall_mm': 90.4, 'err_before_mm': 469.7, 'yaw_err_before_deg': 0.13, 'source': 'multi:+x+c0', 'sightings': 15, 'err_after_mm': 6.1, 'yaw_err_after_deg': 0.31, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.13}
+      reloc: {'t_fall': 118.32, 'phase': 'NAVIGATE', 'err_at_fall_mm': 46.9, 'err_before_mm': 211.4, 'yaw_err_before_deg': -1.72, 'source': 'corner_position:c0', 'sightings': 9, 'err_after_mm': 42.2, 'yaw_err_after_deg': -0.76, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.69}
+  run  9 attack -x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 4 (cam 1, map 3) | first goal 188.8 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 22.3 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 11.46, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.7, 'err_before_mm': 257.8, 'yaw_err_before_deg': -0.52, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 10.4, 'yaw_err_after_deg': 0.74, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.75}
+      reloc: {'t_fall': 44.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 49.8, 'err_before_mm': 220.1, 'yaw_err_before_deg': 1.17, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 9.3, 'yaw_err_after_deg': 0.95, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.38}
+      reloc: {'t_fall': 75.96, 'phase': 'NAVIGATE', 'err_at_fall_mm': 45.7, 'err_before_mm': 390.4, 'yaw_err_before_deg': -0.18, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 18.4, 'yaw_err_after_deg': -1.12, 'attempts': 1, 'protocol_s': 4.3, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.6}
+      reloc: {'t_fall': 102.42, 'phase': 'NAVIGATE', 'err_at_fall_mm': 48.3, 'err_before_mm': 252.4, 'yaw_err_before_deg': -2.05, 'source': 'multi:+x+c0', 'sightings': 14, 'err_after_mm': 22.7, 'yaw_err_after_deg': -1.08, 'attempts': 1, 'protocol_s': 6.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.01}
+      reloc: {'t_fall': 137.92, 'phase': 'NAVIGATE', 'err_at_fall_mm': 31.9, 'err_before_mm': 417.6, 'yaw_err_before_deg': -1.56, 'source': 'multi:-x+c2', 'sightings': 9, 'err_after_mm': 9.4, 'yaw_err_after_deg': 0.31, 'attempts': 1, 'protocol_s': 7.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.85}
+  run 10 attack +x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal 226.9 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 11.1 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 69.0, 'err_before_mm': 220.6, 'yaw_err_before_deg': -0.0, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 8.7, 'yaw_err_after_deg': 0.55, 'attempts': 1, 'protocol_s': 7.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.77}
+      reloc: {'t_fall': 30.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 35.4, 'err_before_mm': 431.8, 'yaw_err_before_deg': 1.22, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 17.3, 'yaw_err_after_deg': -0.09, 'attempts': 2, 'protocol_s': 19.9, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.43}
+      reloc: {'t_fall': 68.02, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.4, 'err_before_mm': 255.6, 'yaw_err_before_deg': -0.82, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 13.2, 'yaw_err_after_deg': -0.24, 'attempts': 2, 'protocol_s': 19.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.2}
+      reloc: {'t_fall': 105.62, 'phase': 'NAVIGATE', 'err_at_fall_mm': 117.5, 'err_before_mm': 371.6, 'yaw_err_before_deg': -1.0, 'source': 'multi:+x+c0+c1', 'sightings': 10, 'err_after_mm': 14.7, 'yaw_err_after_deg': 0.45, 'attempts': 2, 'protocol_s': 18.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.39}
+      reloc: {'t_fall': 141.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 56.7, 'err_before_mm': 207.9, 'yaw_err_before_deg': -0.33, 'source': 'multi:+x+c0+c1', 'sightings': 12, 'err_after_mm': 10.7, 'yaw_err_after_deg': 0.47, 'attempts': 2, 'protocol_s': 19.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.12}
+  run 11 attack -x: GOALS 1  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 2 (cam 1, map 1) | first goal 122.6 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 21.4 mm | decisions ['GOAL'] kicks/ball [1] | aborts {}
+      reloc: {'t_fall': 8.06, 'phase': 'NAVIGATE', 'err_at_fall_mm': 78.8, 'err_before_mm': 254.5, 'yaw_err_before_deg': 2.41, 'source': 'multi:-x+c2+c3', 'sightings': 15, 'err_after_mm': 14.1, 'yaw_err_after_deg': -0.35, 'attempts': 1, 'protocol_s': 8.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.16}
+      reloc: {'t_fall': 38.98, 'phase': 'NAVIGATE', 'err_at_fall_mm': 47.6, 'err_before_mm': 299.8, 'yaw_err_before_deg': -0.53, 'source': 'multi:-x+c2', 'sightings': 9, 'err_after_mm': 36.0, 'yaw_err_after_deg': 0.88, 'attempts': 1, 'protocol_s': 3.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.11}
+      reloc: {'t_fall': 68.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 73.7, 'err_before_mm': 306.2, 'yaw_err_before_deg': 1.83, 'source': 'corner_position:c2', 'sightings': 6, 'err_after_mm': 114.9, 'yaw_err_after_deg': 2.07, 'attempts': 1, 'protocol_s': 6.1, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.59}
+      reloc: {'t_fall': 97.44, 'phase': 'NAVIGATE', 'err_at_fall_mm': 128.4, 'err_before_mm': 289.4, 'yaw_err_before_deg': 1.7, 'source': 'corner_position:c3', 'sightings': 6, 'err_after_mm': 31.3, 'yaw_err_after_deg': 0.74, 'attempts': 1, 'protocol_s': 5.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.86}
+      reloc: {'t_fall': 131.76, 'phase': 'NAVIGATE', 'err_at_fall_mm': 66.6, 'err_before_mm': 345.8, 'yaw_err_before_deg': -1.74, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 126.1, 'yaw_err_after_deg': -3.68, 'attempts': 1, 'protocol_s': 4.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.81}
+  run 12 attack +x: GOALS 2  other-end 0  out 1 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 4, map 2) | first goal 63.2 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 10 | end time_cap at 240.0 s, pose err 12.6 mm | decisions ['GOAL', 'GOAL'] kicks/ball [2, 3] | aborts {}
+      reloc: {'t_fall': 5.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 40.8, 'err_before_mm': 420.3, 'yaw_err_before_deg': 2.09, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 9.0, 'yaw_err_after_deg': 0.51, 'attempts': 1, 'protocol_s': 8.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.14}
+      reloc: {'t_fall': 39.18, 'phase': 'NAVIGATE', 'err_at_fall_mm': 41.7, 'err_before_mm': 257.4, 'yaw_err_before_deg': -1.51, 'source': 'multi:+x+c0', 'sightings': 15, 'err_after_mm': 20.7, 'yaw_err_after_deg': -0.78, 'attempts': 1, 'protocol_s': 4.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.0}
+      reloc: {'t_fall': 69.4, 'phase': 'NAVIGATE', 'err_at_fall_mm': 43.8, 'err_before_mm': 252.1, 'yaw_err_before_deg': -0.27, 'source': 'multi:+x+c0', 'sightings': 9, 'err_after_mm': 18.5, 'yaw_err_after_deg': 0.31, 'attempts': 1, 'protocol_s': 4.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.05}
+      reloc: {'t_fall': 91.54, 'phase': 'NAVIGATE', 'err_at_fall_mm': 87.9, 'err_before_mm': 147.9, 'yaw_err_before_deg': 1.6, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 7.7, 'yaw_err_after_deg': 0.26, 'attempts': 1, 'protocol_s': 4.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.9}
+      reloc: {'t_fall': 113.86, 'phase': 'NAVIGATE', 'err_at_fall_mm': 24.8, 'err_before_mm': 150.3, 'yaw_err_before_deg': 1.19, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 22.4, 'yaw_err_after_deg': 0.55, 'attempts': 1, 'protocol_s': 4.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.94}
+  run 13 attack -x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 3, map 0) | first goal 36.9 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 74.5 mm | decisions ['GOAL', 'GOAL'] kicks/ball [0, 1] | aborts {'ball_not_found': 1}
+      reloc: {'t_fall': 5.84, 'phase': 'NAVIGATE', 'err_at_fall_mm': 29.1, 'err_before_mm': 265.4, 'yaw_err_before_deg': 0.42, 'source': 'multi:+x+c0+c1', 'sightings': 12, 'err_after_mm': 10.1, 'yaw_err_after_deg': 0.27, 'attempts': 1, 'protocol_s': 6.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.06}
+      reloc: {'t_fall': 44.9, 'phase': 'NAVIGATE', 'err_at_fall_mm': 21.9, 'err_before_mm': 338.7, 'yaw_err_before_deg': -0.2, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 17.5, 'yaw_err_after_deg': 0.14, 'attempts': 1, 'protocol_s': 4.3, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.12}
+      reloc: {'t_fall': 66.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 26.5, 'err_before_mm': 297.0, 'yaw_err_before_deg': 1.69, 'source': 'multi:-x+c2+c3', 'sightings': 12, 'err_after_mm': 16.0, 'yaw_err_after_deg': 0.01, 'attempts': 1, 'protocol_s': 7.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.08}
+      reloc: {'t_fall': 91.56, 'phase': 'NAVIGATE', 'err_at_fall_mm': 19.6, 'err_before_mm': 377.6, 'yaw_err_before_deg': 0.64, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 11.8, 'yaw_err_after_deg': 0.57, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.12}
+      reloc: {'t_fall': 129.96, 'phase': 'NAVIGATE', 'err_at_fall_mm': 49.5, 'err_before_mm': 209.7, 'yaw_err_before_deg': 0.49, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 21.8, 'yaw_err_after_deg': -0.85, 'attempts': 1, 'protocol_s': 5.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.85}
+  run 14 attack +x: GOALS 1  other-end 0  out 1 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 143.6 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 9 | end time_cap at 240.0 s, pose err 59.0 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 41.6, 'err_before_mm': 295.0, 'yaw_err_before_deg': 2.39, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 19.2, 'yaw_err_after_deg': -0.71, 'attempts': 1, 'protocol_s': 4.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.67}
+      reloc: {'t_fall': 28.32, 'phase': 'NAVIGATE', 'err_at_fall_mm': 17.6, 'err_before_mm': 261.2, 'yaw_err_before_deg': -1.23, 'source': 'corner_position:c3', 'sightings': 6, 'err_after_mm': 69.4, 'yaw_err_after_deg': -0.55, 'attempts': 1, 'protocol_s': 2.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.78}
+      reloc: {'t_fall': 57.4, 'phase': 'NAVIGATE', 'err_at_fall_mm': 121.5, 'err_before_mm': 296.1, 'yaw_err_before_deg': -0.06, 'source': 'goal-x', 'sightings': 6, 'err_after_mm': 21.6, 'yaw_err_after_deg': -0.02, 'attempts': 1, 'protocol_s': 7.9, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.37}
+      reloc: {'t_fall': 88.74, 'phase': 'NAVIGATE', 'err_at_fall_mm': 46.6, 'err_before_mm': 369.4, 'yaw_err_before_deg': -0.61, 'source': 'goal-x', 'sightings': 6, 'err_after_mm': 12.1, 'yaw_err_after_deg': 1.2, 'attempts': 1, 'protocol_s': 9.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.43}
+      reloc: {'t_fall': 123.98, 'phase': 'NAVIGATE', 'err_at_fall_mm': 74.1, 'err_before_mm': 326.0, 'yaw_err_before_deg': 0.51, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 6.8, 'yaw_err_after_deg': 0.13, 'attempts': 1, 'protocol_s': 5.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.19}
+  run 15 attack -x: GOALS 1  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 2 (cam 1, map 1) | first goal 227.0 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 2 | end time_cap at 240.0 s, pose err 129.0 mm | decisions ['GOAL'] kicks/ball [1] | aborts {'ball_lost': 1}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 34.6, 'err_before_mm': 194.5, 'yaw_err_before_deg': -0.68, 'source': 'multi:-x+c3', 'sightings': 12, 'err_after_mm': 8.7, 'yaw_err_after_deg': 0.36, 'attempts': 1, 'protocol_s': 6.1, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.78}
+      reloc: {'t_fall': 29.36, 'phase': 'NAVIGATE', 'err_at_fall_mm': 86.8, 'err_before_mm': 323.2, 'yaw_err_before_deg': 2.76, 'source': 'multi:-x+c3', 'sightings': 12, 'err_after_mm': 11.6, 'yaw_err_after_deg': -0.37, 'attempts': 1, 'protocol_s': 6.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.95}
+      reloc: {'t_fall': 53.34, 'phase': 'NAVIGATE', 'err_at_fall_mm': 76.3, 'err_before_mm': 288.6, 'yaw_err_before_deg': 1.61, 'source': 'multi:-x+c3', 'sightings': 15, 'err_after_mm': 15.9, 'yaw_err_after_deg': -0.48, 'attempts': 1, 'protocol_s': 6.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.0}
+      reloc: {'t_fall': 77.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 91.6, 'err_before_mm': 207.7, 'yaw_err_before_deg': -2.35, 'source': 'multi:-x+c3', 'sightings': 15, 'err_after_mm': 21.4, 'yaw_err_after_deg': -1.18, 'attempts': 1, 'protocol_s': 6.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.92}
+      reloc: {'t_fall': 117.56, 'phase': 'NAVIGATE', 'err_at_fall_mm': 28.5, 'err_before_mm': 200.3, 'yaw_err_before_deg': 1.4, 'source': 'corner_position:c2', 'sightings': 9, 'err_after_mm': 121.9, 'yaw_err_after_deg': 2.41, 'attempts': 1, 'protocol_s': 6.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.56}
+  run 16 attack +x: GOALS 0  other-end 0  out 3 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 4 (cam 3, map 1) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 2 | end time_cap at 240.0 s, pose err 23.7 mm | decisions [] kicks/ball [] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.7, 'err_before_mm': 334.9, 'yaw_err_before_deg': 0.13, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 21.0, 'yaw_err_after_deg': -0.19, 'attempts': 1, 'protocol_s': 5.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.95}
+      reloc: {'t_fall': 37.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 56.4, 'err_before_mm': 233.9, 'yaw_err_before_deg': -0.55, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 26.4, 'yaw_err_after_deg': 0.78, 'attempts': 1, 'protocol_s': 7.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.18}
+      reloc: {'t_fall': 73.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.8, 'err_before_mm': 416.3, 'yaw_err_before_deg': 3.04, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 7.7, 'yaw_err_after_deg': -0.41, 'attempts': 1, 'protocol_s': 2.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.06}
+      reloc: {'t_fall': 99.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 25.8, 'err_before_mm': 347.7, 'yaw_err_before_deg': 0.46, 'source': 'corner_position:c0', 'sightings': 6, 'err_after_mm': 27.0, 'yaw_err_after_deg': -0.32, 'attempts': 1, 'protocol_s': 4.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.69}
+      reloc: {'t_fall': 130.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 30.5, 'err_before_mm': 310.0, 'yaw_err_before_deg': 4.98, 'source': 'multi:+x+c0', 'sightings': 9, 'err_after_mm': 7.2, 'yaw_err_after_deg': -0.36, 'attempts': 1, 'protocol_s': 4.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.72}
+  run 17 attack -x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 5, map 1) | first goal 170.0 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 17.7 mm | decisions ['GOAL', 'GOAL'] kicks/ball [4, 1] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 54.6, 'err_before_mm': 365.5, 'yaw_err_before_deg': 0.45, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 15.0, 'yaw_err_after_deg': 0.18, 'attempts': 1, 'protocol_s': 4.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.06}
+      reloc: {'t_fall': 34.8, 'phase': 'NAVIGATE', 'err_at_fall_mm': 90.8, 'err_before_mm': 345.7, 'yaw_err_before_deg': 2.52, 'source': 'corner_position:c1', 'sightings': 9, 'err_after_mm': 121.3, 'yaw_err_after_deg': 2.82, 'attempts': 1, 'protocol_s': 2.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.64}
+      reloc: {'t_fall': 63.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 73.5, 'err_before_mm': 286.5, 'yaw_err_before_deg': 0.28, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 11.5, 'yaw_err_after_deg': 0.39, 'attempts': 1, 'protocol_s': 5.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.7}
+      reloc: {'t_fall': 93.94, 'phase': 'NAVIGATE', 'err_at_fall_mm': 28.3, 'err_before_mm': 229.4, 'yaw_err_before_deg': -0.56, 'source': 'multi:-x+c2+c3', 'sightings': 15, 'err_after_mm': 12.9, 'yaw_err_after_deg': 0.24, 'attempts': 1, 'protocol_s': 9.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.28}
+      reloc: {'t_fall': 120.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.6, 'err_before_mm': 279.5, 'yaw_err_before_deg': 0.09, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 8.5, 'yaw_err_after_deg': -0.09, 'attempts': 1, 'protocol_s': 5.9, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.88}
+  run 18 attack +x: GOALS 2  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 7 (cam 4, map 3) | first goal 85.8 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 10.0 mm | decisions ['out', 'GOAL', 'GOAL'] kicks/ball [0, 2, 4] | aborts {}
+      reloc: {'t_fall': 5.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 42.3, 'err_before_mm': 273.1, 'yaw_err_before_deg': -1.13, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 6.2, 'yaw_err_after_deg': -0.35, 'attempts': 1, 'protocol_s': 3.1, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.53}
+      reloc: {'t_fall': 33.92, 'phase': 'NAVIGATE', 'err_at_fall_mm': 41.2, 'err_before_mm': 209.1, 'yaw_err_before_deg': 0.04, 'source': 'multi:-x+c3', 'sightings': 12, 'err_after_mm': 24.0, 'yaw_err_after_deg': -0.49, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.98}
+      reloc: {'t_fall': 68.0, 'phase': 'NAVIGATE', 'err_at_fall_mm': 105.6, 'err_before_mm': 327.8, 'yaw_err_before_deg': 0.58, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 10.9, 'yaw_err_after_deg': -0.33, 'attempts': 1, 'protocol_s': 5.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.84}
+      reloc: {'t_fall': 92.28, 'phase': 'NAVIGATE', 'err_at_fall_mm': 38.0, 'err_before_mm': 231.0, 'yaw_err_before_deg': 0.85, 'source': 'corner_position:c1', 'sightings': 3, 'err_after_mm': 15.0, 'yaw_err_after_deg': 0.26, 'attempts': 1, 'protocol_s': 4.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.01}
+      reloc: {'t_fall': 113.62, 'phase': 'NAVIGATE', 'err_at_fall_mm': 21.6, 'err_before_mm': 230.3, 'yaw_err_before_deg': 0.06, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 16.0, 'yaw_err_after_deg': 0.44, 'attempts': 1, 'protocol_s': 8.1, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.03}
+  run 19 attack -x: GOALS 1  other-end 0  out 2 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 4 (cam 3, map 1) | first goal 120.9 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 85.6 mm | decisions ['GOAL'] kicks/ball [2] | aborts {}
+      reloc: {'t_fall': 5.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 48.4, 'err_before_mm': 485.1, 'yaw_err_before_deg': -0.9, 'source': 'corner_position:c0', 'sightings': 3, 'err_after_mm': 44.8, 'yaw_err_after_deg': -0.99, 'attempts': 1, 'protocol_s': 6.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.22}
+      reloc: {'t_fall': 30.14, 'phase': 'NAVIGATE', 'err_at_fall_mm': 82.0, 'err_before_mm': 253.9, 'yaw_err_before_deg': 0.9, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 6.7, 'yaw_err_after_deg': -0.29, 'attempts': 1, 'protocol_s': 8.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.42}
+      reloc: {'t_fall': 63.44, 'phase': 'NAVIGATE', 'err_at_fall_mm': 28.1, 'err_before_mm': 205.4, 'yaw_err_before_deg': -1.18, 'source': 'multi:+x+c0', 'sightings': 10, 'err_after_mm': 21.4, 'yaw_err_after_deg': -0.01, 'attempts': 1, 'protocol_s': 10.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.14}
+      reloc: {'t_fall': 100.82, 'phase': 'NAVIGATE', 'err_at_fall_mm': 110.5, 'err_before_mm': 343.2, 'yaw_err_before_deg': 1.35, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 25.4, 'yaw_err_after_deg': 1.35, 'attempts': 1, 'protocol_s': 4.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.35}
+      reloc: {'t_fall': 126.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 16.5, 'err_before_mm': 350.7, 'yaw_err_before_deg': -0.03, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 7.8, 'yaw_err_after_deg': 0.09, 'attempts': 1, 'protocol_s': 5.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 0.95}
+  run 20 attack +x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 5, map 1) | first goal 170.4 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 20.0 mm | decisions ['GOAL', 'GOAL'] kicks/ball [4, 2] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 72.4, 'err_before_mm': 313.4, 'yaw_err_before_deg': 0.53, 'source': 'multi:-x+c2+c3', 'sightings': 15, 'err_after_mm': 13.5, 'yaw_err_after_deg': -0.01, 'attempts': 1, 'protocol_s': 6.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.2}
+      reloc: {'t_fall': 38.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 103.0, 'err_before_mm': 388.5, 'yaw_err_before_deg': 2.31, 'source': 'corner_position:c2', 'sightings': 6, 'err_after_mm': 119.9, 'yaw_err_after_deg': 2.37, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.7}
+      reloc: {'t_fall': 67.4, 'phase': 'NAVIGATE', 'err_at_fall_mm': 81.5, 'err_before_mm': 342.7, 'yaw_err_before_deg': 2.05, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 5.1, 'yaw_err_after_deg': 0.3, 'attempts': 1, 'protocol_s': 5.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.69}
+      reloc: {'t_fall': 96.22, 'phase': 'NAVIGATE', 'err_at_fall_mm': 33.7, 'err_before_mm': 390.4, 'yaw_err_before_deg': -0.7, 'source': 'multi:+x+c0', 'sightings': 15, 'err_after_mm': 9.4, 'yaw_err_after_deg': -0.35, 'attempts': 1, 'protocol_s': 6.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.2}
+      reloc: {'t_fall': 120.72, 'phase': 'NAVIGATE', 'err_at_fall_mm': 34.1, 'err_before_mm': 222.0, 'yaw_err_before_deg': 0.66, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 24.2, 'yaw_err_after_deg': 0.3, 'attempts': 1, 'protocol_s': 7.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.34}
+  run 21 attack -x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 7 (cam 3, map 4) | first goal 144.4 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 3.9 mm | decisions ['GOAL'] kicks/ball [3] | aborts {}
+      reloc: {'t_fall': 5.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 37.5, 'err_before_mm': 306.7, 'yaw_err_before_deg': 0.35, 'source': 'multi:+x+c0', 'sightings': 12, 'err_after_mm': 4.7, 'yaw_err_after_deg': 0.88, 'attempts': 1, 'protocol_s': 2.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.66}
+      reloc: {'t_fall': 25.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 31.7, 'err_before_mm': 426.5, 'yaw_err_before_deg': 0.43, 'source': 'corner_position:c0', 'sightings': 6, 'err_after_mm': 81.1, 'yaw_err_after_deg': 1.59, 'attempts': 1, 'protocol_s': 6.1, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.62}
+      reloc: {'t_fall': 59.08, 'phase': 'NAVIGATE', 'err_at_fall_mm': 106.8, 'err_before_mm': 181.1, 'yaw_err_before_deg': 5.13, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 94.9, 'yaw_err_after_deg': 3.61, 'attempts': 1, 'protocol_s': 7.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.41}
+      reloc: {'t_fall': 90.22, 'phase': 'NAVIGATE', 'err_at_fall_mm': 57.9, 'err_before_mm': 315.6, 'yaw_err_before_deg': -0.21, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 8.5, 'yaw_err_after_deg': 0.13, 'attempts': 1, 'protocol_s': 9.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.34}
+      reloc: {'t_fall': 125.88, 'phase': 'NAVIGATE', 'err_at_fall_mm': 70.6, 'err_before_mm': 287.8, 'yaw_err_before_deg': -0.66, 'source': 'multi:-x+c2', 'sightings': 13, 'err_after_mm': 3.5, 'yaw_err_after_deg': 0.43, 'attempts': 1, 'protocol_s': 4.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.21}
+  run 22 attack +x: GOALS 0  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 2, map 3) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 202.6 mm | decisions ['out'] kicks/ball [5] | aborts {}
+      reloc: {'t_fall': 9.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 25.9, 'err_before_mm': 233.4, 'yaw_err_before_deg': -2.0, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 8.8, 'yaw_err_after_deg': 0.3, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.14}
+      reloc: {'t_fall': 32.68, 'phase': 'NAVIGATE', 'err_at_fall_mm': 23.4, 'err_before_mm': 183.4, 'yaw_err_before_deg': 0.87, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 61.2, 'yaw_err_after_deg': -0.74, 'attempts': 1, 'protocol_s': 4.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.58}
+      reloc: {'t_fall': 64.12, 'phase': 'NAVIGATE', 'err_at_fall_mm': 31.2, 'err_before_mm': 191.2, 'yaw_err_before_deg': -1.52, 'source': 'corner_position:c2', 'sightings': 9, 'err_after_mm': 106.2, 'yaw_err_after_deg': -2.66, 'attempts': 1, 'protocol_s': 3.9, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.18}
+      reloc: {'t_fall': 85.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 84.8, 'err_before_mm': 315.2, 'yaw_err_before_deg': -5.91, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 201.9, 'yaw_err_after_deg': -5.49, 'attempts': 1, 'protocol_s': 2.9, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.96}
+      reloc: {'t_fall': 106.04, 'phase': 'NAVIGATE', 'err_at_fall_mm': 239.9, 'err_before_mm': 477.8, 'yaw_err_before_deg': -6.32, 'source': 'multi:-x+c3', 'sightings': 12, 'err_after_mm': 12.0, 'yaw_err_after_deg': 0.45, 'attempts': 1, 'protocol_s': 6.2, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.68}
+  run 23 attack -x: GOALS 0  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 1, map 2) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 19.4 mm | decisions [] kicks/ball [] | aborts {}
+      reloc: {'t_fall': 8.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 44.5, 'err_before_mm': 227.2, 'yaw_err_before_deg': 1.12, 'source': 'multi:+x+c1', 'sightings': 9, 'err_after_mm': 4.0, 'yaw_err_after_deg': 0.63, 'attempts': 1, 'protocol_s': 6.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.54}
+      reloc: {'t_fall': 32.16, 'phase': 'NAVIGATE', 'err_at_fall_mm': 64.3, 'err_before_mm': 301.8, 'yaw_err_before_deg': -2.01, 'source': 'multi:+x+c0', 'sightings': 12, 'err_after_mm': 34.9, 'yaw_err_after_deg': -1.44, 'attempts': 1, 'protocol_s': 8.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.12}
+      reloc: {'t_fall': 72.38, 'phase': 'NAVIGATE', 'err_at_fall_mm': 91.5, 'err_before_mm': 149.8, 'yaw_err_before_deg': 0.71, 'source': 'multi:-x+c2', 'sightings': 10, 'err_after_mm': 36.4, 'yaw_err_after_deg': 1.78, 'attempts': 1, 'protocol_s': 10.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.09}
+      reloc: {'t_fall': 100.8, 'phase': 'NAVIGATE', 'err_at_fall_mm': 112.9, 'err_before_mm': 533.1, 'yaw_err_before_deg': 1.74, 'source': 'corner_position:c2', 'sightings': 6, 'err_after_mm': 118.4, 'yaw_err_after_deg': 2.44, 'attempts': 1, 'protocol_s': 10.4, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.7}
+      reloc: {'t_fall': 128.82, 'phase': 'NAVIGATE', 'err_at_fall_mm': 77.4, 'err_before_mm': 134.9, 'yaw_err_before_deg': 1.11, 'source': 'multi:-x+c2', 'sightings': 14, 'err_after_mm': 44.1, 'yaw_err_after_deg': 2.09, 'attempts': 1, 'protocol_s': 6.9, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.14}
+  run 24 attack +x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 4, map 2) | first goal 147.5 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 19.2 mm | decisions ['GOAL'] kicks/ball [4] | aborts {}
+      reloc: {'t_fall': 8.46, 'phase': 'NAVIGATE', 'err_at_fall_mm': 63.3, 'err_before_mm': 200.2, 'yaw_err_before_deg': 1.76, 'source': 'multi:-x+c2', 'sightings': 12, 'err_after_mm': 6.0, 'yaw_err_after_deg': 0.27, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.78}
+      reloc: {'t_fall': 42.7, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.0, 'err_before_mm': 310.0, 'yaw_err_before_deg': 4.58, 'source': 'corner_position:c2', 'sightings': 3, 'err_after_mm': 147.5, 'yaw_err_after_deg': 4.4, 'attempts': 1, 'protocol_s': 3.8, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.06}
+      reloc: {'t_fall': 72.38, 'phase': 'NAVIGATE', 'err_at_fall_mm': 122.8, 'err_before_mm': 409.5, 'yaw_err_before_deg': 0.7, 'source': 'multi:-x+c2', 'sightings': 9, 'err_after_mm': 4.0, 'yaw_err_after_deg': 0.59, 'attempts': 1, 'protocol_s': 7.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.52}
+      reloc: {'t_fall': 106.74, 'phase': 'NAVIGATE', 'err_at_fall_mm': 84.6, 'err_before_mm': 249.6, 'yaw_err_before_deg': -1.8, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 17.1, 'yaw_err_after_deg': -0.1, 'attempts': 1, 'protocol_s': 6.0, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.26}
+      reloc: {'t_fall': 130.26, 'phase': 'NAVIGATE', 'err_at_fall_mm': 44.2, 'err_before_mm': 295.6, 'yaw_err_before_deg': 1.26, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 9.6, 'yaw_err_after_deg': 0.1, 'attempts': 1, 'protocol_s': 5.4, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.72}
+  run 25 attack -x: GOALS 0  other-end 0  out 2 (retrieved 1, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 1, map 2) | first goal None s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 19.8 mm | decisions ['out'] kicks/ball [0] | aborts {}
+      reloc: {'t_fall': 6.06, 'phase': 'NAVIGATE', 'err_at_fall_mm': 67.9, 'err_before_mm': 288.0, 'yaw_err_before_deg': -0.22, 'source': 'multi:-x+c2', 'sightings': 10, 'err_after_mm': 7.1, 'yaw_err_after_deg': 0.7, 'attempts': 1, 'protocol_s': 7.3, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.56}
+      reloc: {'t_fall': 30.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 27.6, 'err_before_mm': 381.6, 'yaw_err_before_deg': 2.85, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 25.2, 'yaw_err_after_deg': -0.75, 'attempts': 1, 'protocol_s': 8.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.95}
+      reloc: {'t_fall': 57.02, 'phase': 'NAVIGATE', 'err_at_fall_mm': 107.8, 'err_before_mm': 381.6, 'yaw_err_before_deg': -0.97, 'source': 'multi:-x+c3', 'sightings': 15, 'err_after_mm': 18.7, 'yaw_err_after_deg': -0.95, 'attempts': 1, 'protocol_s': 8.1, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.92}
+      reloc: {'t_fall': 82.58, 'phase': 'NAVIGATE', 'err_at_fall_mm': 55.5, 'err_before_mm': 345.1, 'yaw_err_before_deg': -0.4, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 7.8, 'yaw_err_after_deg': -0.18, 'attempts': 1, 'protocol_s': 2.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.36}
+      reloc: {'t_fall': 102.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 89.3, 'err_before_mm': 207.8, 'yaw_err_before_deg': 0.77, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 24.4, 'yaw_err_after_deg': -0.53, 'attempts': 1, 'protocol_s': 6.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.37}
+  run 26 attack +x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 61.1 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 9 | end time_cap at 240.0 s, pose err 17.5 mm | decisions ['GOAL', 'GOAL'] kicks/ball [1, 3] | aborts {}
+      reloc: {'t_fall': 8.48, 'phase': 'NAVIGATE', 'err_at_fall_mm': 81.9, 'err_before_mm': 225.9, 'yaw_err_before_deg': 0.09, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 17.1, 'yaw_err_after_deg': -0.38, 'attempts': 1, 'protocol_s': 8.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.24}
+      reloc: {'t_fall': 41.2, 'phase': 'NAVIGATE', 'err_at_fall_mm': 90.6, 'err_before_mm': 296.2, 'yaw_err_before_deg': 1.13, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 36.3, 'yaw_err_after_deg': 1.3, 'attempts': 1, 'protocol_s': 3.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.41}
+      reloc: {'t_fall': 67.22, 'phase': 'NAVIGATE', 'err_at_fall_mm': 4.2, 'err_before_mm': 275.2, 'yaw_err_before_deg': -0.75, 'source': 'corner_position:c1', 'sightings': 3, 'err_after_mm': 42.4, 'yaw_err_after_deg': -0.72, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.01}
+      reloc: {'t_fall': 88.3, 'phase': 'NAVIGATE', 'err_at_fall_mm': 96.3, 'err_before_mm': 324.4, 'yaw_err_before_deg': 0.15, 'source': 'multi:-x+c3', 'sightings': 9, 'err_after_mm': 26.5, 'yaw_err_after_deg': -0.22, 'attempts': 1, 'protocol_s': 6.7, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.82}
+      reloc: {'t_fall': 125.62, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.1, 'err_before_mm': 217.4, 'yaw_err_before_deg': -0.3, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 25.8, 'yaw_err_after_deg': -0.32, 'attempts': 1, 'protocol_s': 10.4, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.4}
+  run 27 attack -x: GOALS 1  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 4, map 2) | first goal 121.3 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 11.8 mm | decisions ['GOAL'] kicks/ball [2] | aborts {}
+      reloc: {'t_fall': 6.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 30.6, 'err_before_mm': 241.4, 'yaw_err_before_deg': -0.81, 'source': 'multi:+x+c1', 'sightings': 12, 'err_after_mm': 12.1, 'yaw_err_after_deg': 0.6, 'attempts': 1, 'protocol_s': 6.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.61}
+      reloc: {'t_fall': 30.36, 'phase': 'NAVIGATE', 'err_at_fall_mm': 31.1, 'err_before_mm': 321.6, 'yaw_err_before_deg': 0.84, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 11.9, 'yaw_err_after_deg': 1.26, 'attempts': 1, 'protocol_s': 9.0, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.37}
+      reloc: {'t_fall': 65.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 53.2, 'err_before_mm': 252.3, 'yaw_err_before_deg': 0.11, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 23.2, 'yaw_err_after_deg': -1.24, 'attempts': 1, 'protocol_s': 10.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.34}
+      reloc: {'t_fall': 103.08, 'phase': 'NAVIGATE', 'err_at_fall_mm': 94.8, 'err_before_mm': 288.0, 'yaw_err_before_deg': 0.55, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 6.5, 'yaw_err_after_deg': 1.14, 'attempts': 1, 'protocol_s': 5.5, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.42}
+      reloc: {'t_fall': 130.3, 'phase': 'NAVIGATE', 'err_at_fall_mm': 34.7, 'err_before_mm': 306.3, 'yaw_err_before_deg': 2.63, 'source': 'corner_position:c2', 'sightings': 6, 'err_after_mm': 72.5, 'yaw_err_after_deg': 2.24, 'attempts': 1, 'protocol_s': 3.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.02}
+  run 28 attack +x: GOALS 1  other-end 0  out 3 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal 182.0 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 9 | end time_cap at 240.0 s, pose err 15.1 mm | decisions ['GOAL'] kicks/ball [1] | aborts {}
+      reloc: {'t_fall': 5.66, 'phase': 'NAVIGATE', 'err_at_fall_mm': 65.5, 'err_before_mm': 245.3, 'yaw_err_before_deg': -0.64, 'source': 'multi:+x+c0+c1', 'sightings': 15, 'err_after_mm': 12.3, 'yaw_err_after_deg': 0.08, 'attempts': 1, 'protocol_s': 5.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 2.13}
+      reloc: {'t_fall': 37.9, 'phase': 'NAVIGATE', 'err_at_fall_mm': 49.5, 'err_before_mm': 268.9, 'yaw_err_before_deg': -1.08, 'source': 'goal+x', 'sightings': 6, 'err_after_mm': 5.4, 'yaw_err_after_deg': -0.02, 'attempts': 1, 'protocol_s': 3.6, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.29}
+      reloc: {'t_fall': 66.14, 'phase': 'NAVIGATE', 'err_at_fall_mm': 24.8, 'err_before_mm': 368.6, 'yaw_err_before_deg': 0.7, 'source': 'corner_position:c0', 'sightings': 6, 'err_after_mm': 38.7, 'yaw_err_after_deg': 0.79, 'attempts': 1, 'protocol_s': 3.6, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.15}
+      reloc: {'t_fall': 96.78, 'phase': 'NAVIGATE', 'err_at_fall_mm': 67.6, 'err_before_mm': 288.8, 'yaw_err_before_deg': -0.32, 'source': 'corner_position:c1', 'sightings': 3, 'err_after_mm': 24.3, 'yaw_err_after_deg': -0.46, 'attempts': 1, 'protocol_s': 4.4, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.94}
+      reloc: {'t_fall': 135.52, 'phase': 'NAVIGATE', 'err_at_fall_mm': 80.5, 'err_before_mm': 339.8, 'yaw_err_before_deg': 2.68, 'source': 'corner_position:c1', 'sightings': 6, 'err_after_mm': 138.5, 'yaw_err_after_deg': 3.1, 'attempts': 1, 'protocol_s': 3.7, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.7}
+  run 29 attack -x: GOALS 1  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal 218.0 s | falls 5 getup-fail 0 relocs 5 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 9.9 mm | decisions ['GOAL'] kicks/ball [2] | aborts {}
+      reloc: {'t_fall': 5.64, 'phase': 'NAVIGATE', 'err_at_fall_mm': 21.5, 'err_before_mm': 248.2, 'yaw_err_before_deg': -0.15, 'source': 'multi:+x+c0', 'sightings': 12, 'err_after_mm': 15.1, 'yaw_err_after_deg': 0.14, 'attempts': 1, 'protocol_s': 6.8, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.68}
+      reloc: {'t_fall': 29.76, 'phase': 'NAVIGATE', 'err_at_fall_mm': 61.9, 'err_before_mm': 212.4, 'yaw_err_before_deg': -1.13, 'source': 'goal+x', 'sightings': 9, 'err_after_mm': 10.9, 'yaw_err_after_deg': -0.25, 'attempts': 1, 'protocol_s': 10.3, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.33}
+      reloc: {'t_fall': 67.4, 'phase': 'NAVIGATE', 'err_at_fall_mm': 81.1, 'err_before_mm': 240.3, 'yaw_err_before_deg': -1.22, 'source': 'goal-x', 'sightings': 9, 'err_after_mm': 62.8, 'yaw_err_after_deg': -1.98, 'attempts': 1, 'protocol_s': 9.4, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 1.39}
+      reloc: {'t_fall': 94.24, 'phase': 'NAVIGATE', 'err_at_fall_mm': 75.3, 'err_before_mm': 303.6, 'yaw_err_before_deg': -1.09, 'source': 'multi:-x+c2', 'sightings': 15, 'err_after_mm': 7.5, 'yaw_err_after_deg': 0.6, 'attempts': 1, 'protocol_s': 3.5, 'falls_during': 0, 'yaw_fixed': True, 'range_m': 1.82}
+      reloc: {'t_fall': 125.72, 'phase': 'NAVIGATE', 'err_at_fall_mm': 49.2, 'err_before_mm': 138.6, 'yaw_err_before_deg': 4.0, 'source': 'corner_position:c3', 'sightings': 3, 'err_after_mm': 123.5, 'yaw_err_after_deg': 3.12, 'attempts': 1, 'protocol_s': 5.2, 'falls_during': 0, 'yaw_fixed': False, 'range_m': 2.43}
+
+PLAY SUMMARY: 30 runs x 240 s cap, right foot, pose odom, ball decel 0.03 m/s^2, kick cap 6/ball, mission cap 90 s
+  goals (attacked end): total 31, per run median 1.0 (min 0, max 2); runs with >= 1 goal 24/30
+  out of bounds (4 m field, retrieval): 28 outs -> retrieved 16, respawned 5 (window 2, too far 3), other 7; retrieval kicks 3
+  goals in the OTHER end: 0; out of bounds 28; kick-cap restarts 0; unplayable restarts 0
+  kicks to score (per scored ball): 0: 1, 1: 6, 2: 7, 3: 11, 4: 6 (median 3)
+  time to first goal: median 158 s over 24 runs; runs hitting the time cap without a goal 6
+  camera kicks 83: |aim err| median 0.5, max 2.0 deg; per-kick outcomes {'goal': 6, 'post': 6, 'miss': 3, 'no_cross': 66}
+  map    kicks 52: |aim err| median 3.0, max 46.7 deg; per-kick outcomes {'goal': 0, 'post': 11, 'miss': 3, 'no_cross': 35}
+  GET-UP FAILURES 0 (runs ended getup_failed 0)
+  falls 150 (during the protocol 0); re-localizations 150; kicks while NOT localized 0
+  protocol: fixed 150/150 (sources {'corner_position:c0': 6, 'corner_position:c1': 7, 'corner_position:c2': 14, 'corner_position:c3': 4, 'goal+x': 15, 'goal-x': 11, 'multi:+x+c0': 17, 'multi:+x+c0+c1': 14, 'multi:+x+c1': 16, 'multi:-x+c2': 24, 'multi:-x+c2+c3': 6, 'multi:-x+c3': 16}); error before fix median 288 mm (max 549), after median 16 mm (max 202); protocol time median 6 s
+  fixes [full] 2: error before median 35 mm (max 67), after median 11 mm (max 13); heading fixed too in 2; |yaw err| before median 1.4 -> after 0.4 deg
+  fixes [heading] 23: error before median 30 mm (max 211), after median 30 mm (max 211); heading fixed too in 23; |yaw err| before median 2.0 -> after 0.7 deg
+  fixes [multi] 63: error before median 30 mm (max 256), after median 22 mm (max 78); heading fixed too in 63; |yaw err| before median 1.7 -> after 0.6 deg
+  fixes [prekick:full] 2: error before median 85 mm (max 110), after median 5 mm (max 6); heading fixed too in 2; |yaw err| before median 1.6 -> after 0.0 deg
+  fixes [prekick:heading] 23: error before median 21 mm (max 272), after median 21 mm (max 272); heading fixed too in 23; |yaw err| before median 1.0 -> after 0.4 deg
+  fixes [prekick:multi] 4: error before median 35 mm (max 70), after median 30 mm (max 53); heading fixed too in 4; |yaw err| before median 1.8 -> after 0.4 deg
+  fixes [timer:heading] 34: error before median 28 mm (max 135), after median 28 mm (max 135); heading fixed too in 34; |yaw err| before median 1.2 -> after 0.9 deg
+  fixes [timer:multi] 41: error before median 18 mm (max 152), after median 15 mm (max 74); heading fixed too in 41; |yaw err| before median 0.7 -> after 0.4 deg
+  60 s TIMER FIX: fired 90, landed 75 (83 %), no usable sighting 15; landed fixes by kind {'timer:heading': 34, 'timer:multi': 41}; landed using a corner post 67, using a goal 49; fired with a corner in view 72, with a goal in view 49
+  run ends: {'time_cap': 30}; pose error at the end median 19 mm, max 203 mm
+Exception ignored in: <function Renderer.__del__ at 0x7c62675e00e0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 131, in free
+    EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE,
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglMakeCurrent,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7c626753e0d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7c626753e0d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c626753dfd0>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7c626758f9c0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 131, in free
+    EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE,
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglMakeCurrent,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7c626753e0d0>,
+		<OpenGL._opaque.EGLSurface_pointer object at 0x7c626753e0d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c626753dfd0>,
+	),
+	result = 0
+)
+Exception ignored in: <function Renderer.__del__ at 0x7c62675e00e0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/platform/baseplatform.py", line 487, in __call__
+    return self(*args, **named)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c61355bc0d0>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7c626758f9c0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c61355bc0d0>,
+	),
+	result = 0
+)
+Exception ignored in: <function Renderer.__del__ at 0x7c62675e00e0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 343, in __del__
+    self.close()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/rendering/classic/renderer.py", line 329, in close
+    self._gl_context.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c61355bf4d0>,
+	),
+	result = 0
+)
+Exception ignored in: <function GLContext.__del__ at 0x7c626758f9c0>
+Traceback (most recent call last):
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+    self.free()
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+    EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+  File "/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+    raise self._errorClass(
+OpenGL.raw.EGL._errors.EGLError: EGLError(
+	err = EGL_NOT_INITIALIZED,
+	baseOperation = eglDestroyContext,
+	cArguments = (
+		<OpenGL._opaque.EGLDisplay_pointer object at 0x7c62211ef8d0>,
+		<OpenGL._opaque.EGLContext_pointer object at 0x7c61355bf4d0>,
+	),
+	result = 0
+)

@@ -63,6 +63,9 @@ DROPOUT_EDGES = (0.25, 0.50, 0.75, 1.00, 1.50, 2.00, 3.00, 4.00)
 DROPOUT_VALID = (0.955, 0.940, 0.680, 0.400, 0.355, 0.240, 0.225, 0.345)
 
 
+_RAY_GROUPS = np.array([1, 1, 1, 1, 1, 0], dtype=np.uint8)   # see Tof.frame: group 5 = visual-only markers
+
+
 @dataclass(frozen=True)
 class TofFlaws:
     axial_range: bool = True
@@ -141,9 +144,10 @@ class Tof:
         if not np.isfinite(world).all() or np.linalg.norm(world) < 1e-9:
             return distance_mm, status
 
-        # One mj_multiRay call, with the same per-zone semantics as a mj_ray loop: every geom
-        # group, static geoms included, nothing excluded. A miss is -1.
-        mujoco.mj_multiRay(self.model, data, origin, np.ascontiguousarray(world.T).reshape(-1), None, 1, -1,
+        # One mj_multiRay call, with the same per-zone semantics as a mj_ray loop: geom groups 0-4,
+        # static geoms included. Group 5 is excluded: it holds VISUAL-ONLY markers that do not exist
+        # on a real field (field4.xml's transparent boundary wall). A miss is -1.
+        mujoco.mj_multiRay(self.model, data, origin, np.ascontiguousarray(world.T).reshape(-1), _RAY_GROUPS, 1, -1,
                            self._geomid, self._dist, None, ZONES, MAX_RANGE + 1.0)
         for zone in range(ZONES):
             hit = self._dist[zone]

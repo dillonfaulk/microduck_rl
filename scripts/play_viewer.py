@@ -1,7 +1,8 @@
 """Continuous-play viewer (play.py --viewer). Same runs as the battery, real time, with keys.
 
 Keys (type in THIS terminal): C = duck-cam / V = free view, P = push (1 m/s), F = knock it over (2 m/s
-sideways, the fall protocol then runs), N = next run, Q = quit.
+sideways, the fall protocol then runs), R = pick a STUCK duck up (after a get-up failure: viewer only, counted),
+N = next run, Q = quit.
 Overlays (free view): blue disk = where the supervisor thinks the duck is (RED while not localized after a
 fall); yellow arrow = the intended kick line; cyan line = the perceived goal; green disk = stance target.
 Launch WITHOUT the PRIME-offload variables (the viewer renders on GPU1; with them the window stays blank).
@@ -34,6 +35,7 @@ def run(args):
     head_cam = mujoco.mj_name2id(sim.model, mujoco.mjtObj.mjOBJ_CAMERA, "head_camera")
     out = km.unique_dir(f"logs/play/{time.strftime('%Y-%m-%d_%H-%M-%S')}_viewer")
     print(f"\nKeys (type in THIS terminal): C = duck-cam / V = free view, P = push, F = knock over (fall protocol), "
+          f"R = pick up a stuck duck (viewer only), "
           f"N = next run, Q = quit\ntime cap {args.time_cap:.0f} s per run, attack {args.attack}, pose {args.pose}, "
           f"ball decel {args.ball_decel} m/s^2\nlogs -> {out}/\n", flush=True)
     st = {"quit": False, "next": False, "cam": False, "seen": (0, 0, 0, 0, 0, 0)}
@@ -42,6 +44,7 @@ def run(args):
         viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
         viewer.cam.trackbodyid = sim.trunk_body
         viewer.cam.distance, viewer.cam.elevation, viewer.cam.azimuth = 1.6, -35, 135
+        viewer.opt.geomgroup[5] = 1              # the 4 m field's transparent boundary wall (hidden from the duck's camera)
 
         def set_view(on):
             with viewer.lock():
@@ -68,11 +71,22 @@ def run(args):
                     a = np.random.uniform(0, 2 * math.pi)
                     sim.push(math.cos(a), math.sin(a))
                     sup.log.event({"t": round(sim.t, 3), "event": "PUSH"})
+                elif key == "r" and sup.state == "STUCK":
+                    pl.stand_up_in_place(sim)          # VIEWER ONLY: the human pick-up (counted)
+                    sup.picked_up()
+                    print(f"  t {sim.t:6.1f} s  picked up and stood in place (viewer reset #{sup.viewer_resets}; "
+                          f"the get-up failure stays counted)", flush=True)
                 elif key == "f":
                     (_, _, yaw), _, _ = sim.pose()
                     a = yaw + math.pi / 2 * (1 if np.random.rand() < 0.5 else -1)
                     sim.push(2.0 * math.cos(a), 2.0 * math.sin(a))
                     sup.log.event({"t": round(sim.t, 3), "event": "KNOCK_OVER"})
+            if sup.state == "STUCK" and not st.get("stuck_said"):
+                st["stuck_said"] = True
+                print(f"  t {sim.t:6.1f} s  GET-UP FAILURE (down > {pl.GETUP_FAIL_S:.0f} s; counted). Press R to pick it up.",
+                      flush=True)
+            elif sup.state != "STUCK":
+                st["stuck_said"] = False
             seen = (rec["goals_for"], rec["goals_against"], rec["out"], len(sup.kicks), len(sup.relocs), len(sup.routine))
             if seen != st["seen"]:
                 if seen[:3] != st["seen"][:3]:

@@ -35,7 +35,7 @@ def _render_ok():
 def field():
     if not HAVE_POLICIES:
         pytest.skip("policies not present")
-    args = SimpleNamespace(velstand=VELSTAND, foot="right")
+    args = SimpleNamespace(velstand=VELSTAND, foot="right", field="6")
     return pl.setup_play(args)
 
 
@@ -113,6 +113,7 @@ def _sup(true_pose, est_pose):
         def get(self, t):
             return SimpleNamespace(pose=applied.get("p", est_pose))
     s.pose_src, s.landmarks, s.routine = PS(), {"+x": (3.0, 0.0, 0.0), "-x": (-3.0, 0.0, math.pi)}, []
+    s.corner_look, s.corners = None, []
     s.sim = SimpleNamespace(pose=lambda: (true_pose, 0.0, 0.12), t=0.0)
     s.log = SimpleNamespace(event=lambda e: None)
     return s, applied
@@ -178,10 +179,11 @@ def test_a_guarded_play_run_kicks_on_estimated_inputs_and_survives_a_fall():
     from camera_ball import CameraBall
     from camera_goal import CameraGoal
     km.apply_calibration("v2")
-    args = SimpleNamespace(velstand=VELSTAND, foot="right", attack="+x", seed=0, dropout=None, verbose=False,
+    args = SimpleNamespace(velstand=VELSTAND, foot="right", field="4", attack="+x", seed=0, dropout=None, verbose=False,
                            estimated_only=True, hide_goal=None, no_routine_fix=False, fall_in="NAVIGATE", push_v=2.0,
                            time_cap=70.0, hide_ball_after_respawn=False)
     sim, goals, lm = pl.setup_play(args)
+    os.makedirs(os.path.join(REPO, "logs", "play", "_pytest"), exist_ok=True)
     pose = pp.make_provider("odom", sim, calib="stride_v1")
     rec = pl.run_one(args, 1, sim, goals, lm, ort.InferenceSession(KICK_R), ort.InferenceSession(PRECISION), pose,
                      CameraBall(sim, pose), CameraGoal(sim, pose), np.random.default_rng([0, 1]),
@@ -203,3 +205,129 @@ def test_a_fix_may_not_turn_the_heading_implausibly():
         sup._collect(est, S, 5.0)
     rec = sup._landmark_fix(0.0, SimpleNamespace(pose=est), S, 3, "routine")
     assert rec is None or abs(applied["p"][2] - est[2]) <= pl.MAX_YAW_JUMP + 1e-9
+
+
+# --- the 4 m field (2026-11-18): corner posts, no boards, lines, retrieval ------------------------------
+
+@pytest.fixture(scope="module")
+def field4():
+    if not HAVE_POLICIES:
+        pytest.skip("policies not present")
+    return pl.setup_play(SimpleNamespace(velstand=VELSTAND, foot="right", field="4"))
+
+
+def test_field4_spec_corner_posts_goals_and_a_wall_the_camera_cannot_see(field4):
+    sim, goals, lm = field4
+    m = sim.model
+    assert sim.field == pytest.approx((-2.0, 2.0, -2.0, 2.0))
+    assert sim.arena == pytest.approx((-2.25, 2.25, -2.25, 2.25))      # geofence: the lines moved out 0.25 m
+    assert (goals["+x"].cx, goals["-x"].cx) == pytest.approx((2.0, -2.0))
+    corners = [g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_corner")]
+    assert len(corners) == 4
+    for g in corners:
+        assert m.geom_size[g][0] == pytest.approx(0.0375) and m.geom_size[g][1] == pytest.approx(0.20)
+        assert abs(abs(m.geom_pos[g][0]) - 2.0) < 1e-9 and abs(abs(m.geom_pos[g][1]) - 2.0) < 1e-9
+    walls = [g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_wall")]
+    assert len(walls) == 4
+    for g in walls:
+        assert m.geom_contype[g] == 0 and m.geom_conaffinity[g] == 0     # the ball and duck pass through
+        assert m.geom_group[g] == 5 and mujoco.MjvOption().geomgroup[5] == 0   # not drawn by the duck's camera
+    assert sim.board_geoms == set(corners)                             # contact objects = the corner posts
+
+
+def test_field4_referee_goal_out_retrieved_and_respawns(field4):
+    sim, goals, _ = field4
+    ref = pl.PlayReferee(sim, goals, retrieval=True)
+
+    def put(x, y):
+        sim.data.qpos[sim.bqa:sim.bqa + 7] = [x, y, 0.035, 1, 0, 0, 0]
+        sim.data.qvel[sim.bva:sim.bva + 6] = 0
+        mujoco.mj_forward(sim.model, sim.data)
+        return ref.update()
+
+    assert put(1.95, 0.0) is None
+    assert put(2.02, 0.01)["event"] == "goal"                          # crossed between the posts
+    ref.reset()
+    assert put(1.0, 1.98) is None and put(1.0, 2.02) is None           # on the line: not yet WHOLLY over
+    ev = put(1.0, 2.05)
+    assert ev["event"] == "out" and ref.state == "out"
+    assert put(1.0, 2.6) is None                                       # out, within the retrieval zone
+    assert put(1.0, 1.9)["event"] == "retrieved" and ref.state == "in_play"
+    put(1.0, 2.1)                                                      # out again
+    assert put(1.0, 3.1)["why"] == "too_far"
+    ref.reset()
+    put(1.0, 2.1)
+    sim.t += pl.RETRIEVE_WINDOW_S + 1
+    assert put(1.0, 2.2)["why"] == "window"
+    ref.reset()
+    put(-1.95, 1.0)
+    assert put(-2.3, 1.0)["event"] == "out"                            # behind the end line, outside the mouth: out
+    assert put(-2.3, 0.0) is None                                      # and wandering behind the goal is no goal
+
+
+def test_map_aim_points_into_the_goal_and_skips_an_edge_on_goal():
+    import kick_mission as km
+    m = km.Mission.__new__(km.Mission)
+    m.play = pl.PlayConfig(goal_map=(-2.0, 0.0), goal_into=math.pi, goal_aim=(-2.3, 0.0))
+    m.aim_mode, m.sim = "map", SimpleNamespace(t=0.0)
+    h = m._heading_from_goal(np.array([-1.99, 0.0]))                  # a ball resting ON the goal line
+    assert abs(pl.wrap_angle(h - math.pi)) < math.radians(1)
+    assert m._goal_far(np.array([-1.7, 1.88]))                         # a corner ball: goal seen edge-on -> map aim
+    assert not m._goal_far(np.array([-0.8, 0.3]))                      # straight on, in range: the camera goal
+
+
+def test_two_landmarks_give_a_full_fix_without_trusting_the_old_estimate():
+    """WS3: a goal and a corner post seen in one standing survey -> a rigid fit onto the map (Procrustes)."""
+    true = (1.0, 0.8, 0.5)
+    est = (1.25, 0.65, 0.5 + math.radians(6))       # 290 mm and 6 deg off
+    sup, applied = _sup(true, est)
+    sup.landmarks = {"+x": (2.0, 0.0, 0.0), "-x": (-2.0, 0.0, math.pi)}
+    sup.corners = [(2.0, 2.0), (2.0, -2.0), (-2.0, 2.0), (-2.0, -2.0)]
+    rng = np.random.default_rng(1)
+
+    def rel_of(P):
+        c, s_ = math.cos(true[2]), math.sin(true[2])
+        d = (P[0] - true[0], P[1] - true[1])
+        return (c * d[0] + s_ * d[1] + rng.normal(0, 0.01), -s_ * d[0] + c * d[1] + rng.normal(0, 0.01))
+    S = []
+    for _ in range(3):
+        g = _sighting(true, sup.landmarks["+x"], "+x", (rng.normal(0, 0.01), rng.normal(0, 0.01), 0.0))
+        r_c = rel_of(sup.corners[0])
+        sup.goal_src = SimpleNamespace(landmark_sightings=lambda g=g: [g])
+        sup.corner_look = lambda r_c=r_c: [{"rel": r_c, "rng": math.hypot(*r_c)}]
+        sup._collect(est, S, 5.0)
+    assert {x["key"] for x in S} == {"+x", "c0"}
+    rec = sup._landmark_fix(0.0, SimpleNamespace(pose=est), S, 3, "reloc")
+    assert rec["kind"].endswith("multi") and rec["corners"] == 1 and rec["goals"] == 1
+    p = applied["p"]
+    assert math.hypot(p[0] - true[0], p[1] - true[1]) < 0.03 and abs(p[2] - true[2]) < math.radians(1.5)
+
+
+def test_a_single_corner_post_fixes_the_heading_by_its_bearing():
+    true = (0.0, 0.0, 0.7)
+    est = (0.05, -0.03, 0.7 + math.radians(5))
+    sup, applied = _sup(true, est)
+    sup.landmarks = {"+x": (2.0, 0.0, 0.0), "-x": (-2.0, 0.0, math.pi)}
+    sup.corners = [(2.0, 2.0), (2.0, -2.0), (-2.0, 2.0), (-2.0, -2.0)]
+    sup.goal_src = SimpleNamespace(landmark_sightings=lambda: [])
+    c, s_ = math.cos(true[2]), math.sin(true[2])
+    rel = (c * 2.0 + s_ * 2.0, -s_ * 2.0 + c * 2.0)
+    sup.corner_look = lambda: [{"rel": rel, "rng": math.hypot(*rel)}]
+    S = []
+    for _ in range(3):
+        sup._collect(est, S, 5.0)
+    rec = sup._landmark_fix(0.0, SimpleNamespace(pose=est), S, 3, "routine")
+    assert rec["kind"] == "heading" and applied["p"][:2] == est[:2]
+    assert abs(applied["p"][2] - true[2]) < math.radians(1.5)       # 5 deg -> ~position error / range
+
+
+def test_play_routes_detour_around_map_posts():
+    import kick_mission as km
+    m = km.Mission.__new__(km.Mission)
+    m.play = pl.PlayConfig(goal_map=(-2.0, 0.0), obstacles=((-2.0, -0.115, 0.01), (-2.0, 0.115, 0.01), (-2.0, -2.0, 0.0375)))
+    route = m._clear_posts(np.array([-2.4, -0.11]), [(-1.2, -0.1)])     # from behind the goal, straight through a post
+    assert len(route) == 2
+    for a, b in zip([(-2.4, -0.11)] + route[:-1], route):
+        for o in m.play.obstacles:
+            assert km.Mission._seg_dist(np.array(a), np.array(b), np.array(o[:2])) >= 0.2 + o[2] - 1e-9
+    assert m._clear_posts(np.array([0.0, 0.0]), [(1.0, 0.5)]) == [(1.0, 0.5)]   # clear legs untouched

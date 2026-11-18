@@ -71,10 +71,17 @@ from pose_provider import ODOM_CALIBS, make_provider, pose_error  # noqa: E402
 from soccer_referee import Goal  # noqa: E402
 from truth_guard import TruthGuard  # noqa: E402
 
-BALL_DECEL = 0.03            # m/s^2 rolling resistance (play only): a ~0.4 m/s kick rolls ~1.2 m
-PLAY_INSET_M = 0.20          # the duck's geofence in play: the field inset by this (Stage 4 missions: 0.5)
-SPAWN_INSET_M = 0.60         # a respawned ball lands this far inside the boards (a ball nearer a board than
-                             # ~0.5 m may need a stance spot outside the geofence) ...
+BALL_DECEL = 0.03            # m/s^2 rolling resistance (play only; HELD at 0.03 until the real ball is measured)
+# Fields. "4" = THE field from 2026-11-18 (field4.xml: 4 m, no boards, corner posts, retrieval); "6" = the 6 m
+# board field of the 2026-11-16 continuous-play report, kept for its numbers and replays.
+FIELDS = {
+    "4": {"scene": "field4", "geofence_m": +0.25, "spawn_inset_m": 0.40, "retrieval": True},
+    # geofence_m: the duck's geofence = the field lines moved OUT by this (4 m: a player may stand just over the
+    # line to play a ball near it; 6 m: 0.2 m INSIDE the boards, which are physical)
+    "6": {"scene": "field", "geofence_m": -0.20, "spawn_inset_m": 0.60, "retrieval": False},
+}
+PLAY_INSET_M = 0.20          # (6 m field: the geofence 0.2 m inside the boards)
+SPAWN_INSET_M = 0.60         # 6 m field: a respawned ball lands this far inside the boards ...
 SPAWN_CLEAR_M = 0.60         # ... and this far from the duck
 TIME_CAP_S = 240.0
 BALL_KICK_CAP = 6
@@ -83,6 +90,8 @@ GOAL_CAM_RANGE_M = 2.5
 WATCH_MAX_S, WATCH_GAP_S, WATCH_STILL_M = 10.0, 0.6, 0.02
 WATCH_LOST_S = 2.0
 FALL_TILT, FALL_Z, UP_TILT, UP_Z, UP_SETTLE_S = 35.0, 0.06, 25.0, 0.09, 1.0   # GotoConfig's fall rule
+GETUP_FAIL_S = 15.0          # not upright (estimate) this long = a GET-UP FAILURE (normal get-ups: median 1.0 s,
+                             # max 5.4 s over 119 falls). A failure in every number; batteries end the run on it.
 RELOC_SETTLE_S = 0.5
 RELOC_LOOK_RANGE = 1.3       # farther than this from the landmark (estimated): walk to 0.2 m inside it
 RELOC_MAX_RANGE = 2.6        # sightings farther than this are not used
@@ -110,6 +119,20 @@ ROUTINE_MAX_JUMP_M = 0.5     # a routine (no-fall) fix may not move the position
 SIGHT_MIN_RANGE = 0.9        # and not too close: below ~0.9 m a post sits near the frame edge and the fitted
                              # facing goes wrong (measured: 4 of 25 fixes from 0.58-0.87 m moved the estimate
                              # to 156-340 mm off; Stage 4 ranging: 2/15 not found at 0.6 m)
+# Retrieval (4 m field): an out ball may be kicked back in by the duck, which then leaves the field.
+RETRIEVE_WINDOW_S = 45.0     # from the out call: back in play by then, or the referee respawns it
+RETRIEVE_ZONE_M = 1.0        # a ball more than this beyond a line is not retrievable: respawn at once
+RETRIEVE_ARENA_M = 1.45      # the duck's geofence while retrieving: the lines moved out by this
+# Corner posts (4 m field) as camera landmarks: measured (camera_corner_check.py) bearing error <= 1 deg
+# (<= 0.2 deg past 2 m), range error <= 39 mm to 2.5 m, 60-115 mm at 3-3.5 m; 0 false detections.
+CORNER_MAX_RANGE = 3.0
+CORNER_MIN_RANGE = 0.5
+CORNER_GATE_M = 1.0          # a sighting must land within this of a map corner (by the estimate)
+CORNER_HEADING_MIN_RANGE = 1.5   # a single corner's bearing fixes the heading only from this far
+MULTI_MIN_SPREAD_M = 1.0     # two or more DISTINCT landmarks this far apart: a full (Procrustes) fix
+MULTI_MAX_RESID_M = 0.15     # ... whose worst residual (+3 % of range) must stay under this
+TIMER_FIX_S = 60.0           # Dillon's addition: every 60 s, a standing landmark survey + fix attempt
+FIX_HEAD_YAWS = (0.0, 0.6, -0.6)
 WATCH_HEAD_YAWS = (0.0, -0.6, 0.6)   # the kicked ball can leave the view: sweep while watching
 WATCH_HEAD_STEP_S = 0.8
 
@@ -119,6 +142,19 @@ class PlayConfig:
     goal_map: tuple                      # the attacked goal's field-map spot (goal-line centre)
     goal_cam_range: float = GOAL_CAM_RANGE_M
     tap_in_m: float = 0.60
+    goal_into: float | None = None       # the goal's facing (into the goal), field map
+    goal_oblique: float = math.radians(50)   # seen more edge-on than this, the posts cannot be paired: map aim
+    pre_kick_fix: object = None          # supervisor callback: landmark look + fix before a map-aimed kick
+    obstacles: tuple = ()                # map posts (x, y, radius) a route must clear (4 m field: goal + corner posts)
+    goal_aim: tuple | None = None        # where a map-aimed kick points: 0.3 m INTO the goal (a ball resting on the
+                                         # line made ball -> line-centre a 2 cm vector: a 66 deg "heading" into a post)
+
+    @classmethod
+    def retrieval(cls, field):
+        """Kick an out ball back toward the centre spot: always a map-aimed kick (no goal involved)."""
+        fx0, fx1, fy0, fy1 = field
+        c = ((fx0 + fx1) / 2, (fy0 + fy1) / 2)
+        return cls(goal_map=c, goal_cam_range=0.0, tap_in_m=0.0, goal_aim=c)
 
 
 # --- field, environment side -----------------------------------------------------------------------
@@ -139,6 +175,21 @@ def field_landmarks(sim):
     definition (field.xml's board faces), never from the goal bodies."""
     fx0, fx1, _, _ = km.field_from_model(sim.model)
     return {"+x": (fx1, 0.0, 0.0), "-x": (fx0, 0.0, math.pi)}
+
+
+def field_obstacles(sim):
+    """The posts a duck's route must clear, from the FIELD MAP: on the 4 m field the four goal posts (their
+    map spots: the goal-line centres +- 0.115 m) and the four corner posts. (6 m field: none -- its goals sit
+    in board mouths the duck cannot get behind.)"""
+    m = sim.model
+    corners = [g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_corner")]
+    if not corners:
+        return []
+    out = [(float(m.geom(g).pos[0]), float(m.geom(g).pos[1]), float(m.geom_size[g][0])) for g in corners]
+    for L in field_landmarks(sim).values():
+        for side in (1.0, -1.0):
+            out.append((L[0], L[1] + side * 0.115, 0.010))
+    return out
 
 
 class BallDrag:
@@ -163,14 +214,56 @@ class BallDrag:
 class PlayReferee:
     """Ground truth, environment side: goals at either end, out of bounds (ball on a board)."""
 
-    def __init__(self, sim, goals):
+    def __init__(self, sim, goals, retrieval=False):
         self.sim, self.goals = sim, goals
         m = sim.model
-        self.boards = {g for g in sim.board_geoms if not (m.geom(g).name or "").startswith("field_goalbox")}
+        self.boards = {g for g in sim.board_geoms if (m.geom(g).name or "").startswith("field_board")}
         self.ball_geom = m.geom("ball_geom").id
+        self.ball_r = float(m.geom_size[self.ball_geom][0])
         self.field = sim.field
+        self.retrieval = retrieval            # the 4 m field: no boards, lines, retrieval window
+        self.reset()
+
+    def reset(self):
+        """A fresh ball in play (after a respawn)."""
+        self.state, self.t_out, self.prev_along = "in_play", None, {}
 
     def update(self):
+        if self.retrieval:
+            return self._update_lines()
+        return self._update_boards()
+
+    def _update_lines(self):
+        """4 m field. In play: a GOAL is the ball's centre crossing a goal line between the posts; OUT is
+        the whole ball over a line (soccer rule) anywhere else. Out: back in play when the whole ball is
+        back inside (RETRIEVED); RESPAWN when the window runs out or it goes RETRIEVE_ZONE_M beyond a line.
+        Goals do not count while the ball is out."""
+        b, _ = self.sim.ball()
+        x, y, r = float(b[0]), float(b[1]), self.ball_r
+        fx0, fx1, fy0, fy1 = self.field
+        t = self.sim.t
+        if self.state == "in_play":
+            for key, g in self.goals.items():
+                along, lat = g.to_frame(x, y)
+                prev = self.prev_along.get(key)
+                self.prev_along[key] = along
+                if prev is not None and prev < 0.0 <= along and abs(lat) < g.half_opening + g.post_radius:
+                    return {"event": "goal", "end": key, "lateral_mm": round(lat * 1000, 1)}
+            if x < fx0 - r or x > fx1 + r or y < fy0 - r or y > fy1 + r:
+                self.state, self.t_out = "out", t
+                return {"event": "out", "board": "line", "at": [round(x, 3), round(y, 3)]}
+            return None
+        beyond = max(fx0 - x, x - fx1, fy0 - y, y - fy1)          # distance of the centre past the nearest line
+        if x > fx0 + r and x < fx1 - r and y > fy0 + r and y < fy1 - r:
+            self.state, self.prev_along = "in_play", {}
+            return {"event": "retrieved", "after_s": round(t - self.t_out, 1)}
+        if beyond > RETRIEVE_ZONE_M:
+            return {"event": "out_respawn", "why": "too_far", "after_s": round(t - self.t_out, 1)}
+        if t - self.t_out > RETRIEVE_WINDOW_S:
+            return {"event": "out_respawn", "why": "window", "after_s": round(t - self.t_out, 1)}
+        return None
+
+    def _update_boards(self):
         b, _ = self.sim.ball()
         for key, g in self.goals.items():
             along, lat = g.to_frame(float(b[0]), float(b[1]))
@@ -189,18 +282,52 @@ class PlayReferee:
         return None
 
 
-def spawn_ball(sim, rng, field):
+def spawn_ball(sim, rng, field, inset=SPAWN_INSET_M):
     """A fresh ball anywhere in the field (inset), clear of the duck. Environment side: truth is fine."""
     fx0, fx1, fy0, fy1 = field
     (x, y, _), _, _ = sim.pose()
     for _ in range(200):
-        b = (rng.uniform(fx0 + SPAWN_INSET_M, fx1 - SPAWN_INSET_M), rng.uniform(fy0 + SPAWN_INSET_M, fy1 - SPAWN_INSET_M))
+        b = (rng.uniform(fx0 + inset, fx1 - inset), rng.uniform(fy0 + inset, fy1 - inset))
         if math.hypot(b[0] - x, b[1] - y) >= SPAWN_CLEAR_M:
             break
     sim.data.qpos[sim.bqa:sim.bqa + 7] = [b[0], b[1], 0.035, 1, 0, 0, 0]
     sim.data.qvel[sim.bva:sim.bva + 6] = 0
     mujoco.mj_forward(sim.model, sim.data)
     return b
+
+
+def stand_up_in_place(sim):
+    """VIEWER ONLY: the human pick-up. The duck is set upright in its standing idle pose where it lies
+    (heading kept), at rest; the sim clock runs on. No battery calls this."""
+    (x, y, yaw), _, _ = sim.pose()
+    d, qa, p = sim.data, sim.qa, sim.policy
+    d.qpos[qa:qa + 3] = [x, y, 0.125]
+    d.qpos[qa + 3:qa + 7] = [math.cos(yaw / 2), 0, 0, math.sin(yaw / 2)]
+    for i, q in enumerate(p.joint_qpos_indices):
+        d.qpos[q] = p.default_pose[i]
+    ball_v = d.qvel[sim.bva:sim.bva + 6].copy()
+    d.qvel[:] = 0
+    d.qvel[sim.bva:sim.bva + 6] = ball_v
+    p.last_action[:] = 0
+    if p.action_buffer is not None:
+        for a in p.action_buffer:
+            a[:] = 0
+    sim.bam.reset(d.qpos)
+    p.set_position_targets(p.default_pose)
+    mujoco.mj_forward(sim.model, d)
+
+
+def bad_bounce(sim, field):
+    """Environment event for the retrieval battery: set the ball rolling straight out over the nearer SIDE
+    line, fast enough to stop ~0.45 m beyond it under the drag (a pure rolling ball: v^2 = 2 a d)."""
+    fx0, fx1, fy0, fy1 = field
+    b, _ = sim.ball()
+    side = 1.0 if (fy1 - b[1]) < (b[1] - fy0) else -1.0
+    d = (fy1 - b[1]) if side > 0 else (b[1] - fy0)
+    v = float(np.clip(math.sqrt(2 * BALL_DECEL * (d + 0.45)), 0.1, 0.9))
+    r = 0.035
+    sim.data.qvel[sim.bva:sim.bva + 6] = [0.0, side * v, 0.0, -side * v / r, 0.0, 0.0]
+    return {"side": "+y" if side > 0 else "-y", "speed": round(v, 2), "from": [round(float(b[0]), 3), round(float(b[1]), 3)]}
 
 
 # --- the duck's supervisor: estimated inputs only ---------------------------------------------------
@@ -211,7 +338,7 @@ class PlaySupervisor:
 
     def __init__(self, sim, kick, precision, foot, pose_src, ball_src, goal_src, attack_goal, attack_key,
                  landmarks, log, estimated_only=True, hide_goal=None, routine_fix=True, single=False, target=None,
-                 mission_play=True):
+                 mission_play=True, corner_look=None, corners=(), timer_fix=False, pre_kick_fix=False):
         """single (Stage 4 replay, kick_mission.py --reloc): one ball, one kick, then OVER; the missions are
         Stage 4 missions (mission_play=False) aimed at `target` (the placed goal's assignment)."""
         self.sim, self.kick, self.precision, self.foot = sim, kick, precision, foot
@@ -219,8 +346,19 @@ class PlaySupervisor:
         self.attack_goal, self.attack_key, self.landmarks = attack_goal, attack_key, landmarks
         self.cfg = PlayConfig(goal_map=landmarks[attack_key][:2] if attack_key in landmarks else
                               (attack_goal.cx, attack_goal.cy))   # single (replay): the placed goal
+        self.obstacles = tuple(field_obstacles(sim))
+        self.cfg.obstacles = self.obstacles
+        if attack_key in landmarks:
+            L = landmarks[attack_key]
+            self.cfg.goal_aim = (L[0] + 0.3 * math.cos(L[2]), L[1] + 0.3 * math.sin(L[2]))
+            self.cfg.goal_into = L[2]
         self.log, self.estimated_only, self.hide_goal = log, estimated_only, hide_goal
         self.routine_fix, self.routine = routine_fix, []
+        self.corner_look, self.corners = corner_look, list(corners)   # (WS3) corner-post camera + the map's corners
+        self.timer_fix, self.timer = timer_fix, []                    # Dillon's 60 s fix: attempts, landed or not
+        self._t_timer, self._timer_due = 0.0, None
+        if pre_kick_fix:
+            self.cfg.pre_kick_fix = self._pre_kick_fix
         self.pending_refs = []           # (GoalReferee, kick record): fed by the ENVIRONMENT (play loop), not here
         self.walk_session = sim.policy.ort_session
         self.localized = True
@@ -235,6 +373,10 @@ class PlaySupervisor:
         self._was_kick = False
         self.single, self.target, self.mission_play = single, target, mission_play
         self.last_result = None
+        self.retrieving, self.retrieval_kicks, self._pending_whistle = False, 0, None
+        self.getup_failures, self.viewer_resets, self._not_up_since = 0, 0, None
+        self.end_on_getup_failure = True     # batteries: the run ends; the viewer waits for a human pick-up (R)
+        self.play_arena = getattr(sim, "arena", None)
         self._new_mission(survey=True)
 
     def _truth(self):
@@ -250,10 +392,19 @@ class PlaySupervisor:
         self.sim.policy.head_offset[:] = 0.0
         self.ball_src.reset()
         self.goal_src.reset(target=self.target or assign_target(self.cfg.goal_map), hide=self.hide_goal)
+        cfg, goal = self.cfg, self.attack_goal
+        if self.retrieving:                    # out ball: leave the field, kick it back toward the centre spot
+            fx0, fx1, fy0, fy1 = self.sim.field
+            m_ = RETRIEVE_ARENA_M
+            self.sim.arena = (fx0 - m_, fx1 + m_, fy0 - m_, fy1 + m_)
+            cfg, goal = PlayConfig.retrieval(self.sim.field), None
+            cfg.obstacles = self.obstacles
+        elif self.play_arena is not None:
+            self.sim.arena = self.play_arena
         self.mission = km.Mission(self.sim, self.kick, None, self.log, foot=self.foot, precision_session=self.precision,
-                                  goal=self.attack_goal, pose_src=self.pose_src, ball_src=self.ball_src,
+                                  goal=goal, pose_src=self.pose_src, ball_src=self.ball_src,
                                   goal_src=self.goal_src, estimated_only=self.estimated_only,
-                                  play=self.cfg if self.mission_play else None,
+                                  play=cfg if self.mission_play else None,
                                   survey=survey and getattr(self.pose_src, "name", "") == "mapd")
         self.missions += 1
         self.t_mission = self.sim.t
@@ -266,10 +417,21 @@ class PlaySupervisor:
         self.mission = None
 
     def whistle(self, event):
-        """The referee restarted play (goal / out / dead ball): the ball is somewhere new."""
-        self.ball_kicks = 0
+        """The referee's call. Restart (goal / respawn / dead ball): the ball is somewhere new. "out" on the
+        4 m field: the ball is out, the retrieval window is open -> retrieve it. "retrieved": back in play,
+        same ball. A call that lands while the kick policy is mid-kick waits for the kick to finish."""
+        if self.state == "MISSION" and self.mission is not None and self.mission.state == "KICK":
+            self._pending_whistle = event
+            return
+        why = event.get("why")
+        if why == "out_window":
+            self.retrieving = True
+        else:
+            self.retrieving = False
+            if why != "retrieved":
+                self.ball_kicks = 0
         self._ev("WHISTLE", **event)
-        if self.state in ("MISSION", "WATCH"):
+        if self.state in ("MISSION", "WATCH", "SEARCH", "AWAIT", "FIX"):
             self._cancel_mission()
             self._new_mission()
         # DOWN / RELOC: the protocol finishes first, then a fresh mission starts anyway
@@ -287,6 +449,24 @@ class PlaySupervisor:
                 self.over, self.state = "pose_lost", "OVER"
             return (0.0, 0.0, 0.0)
         self._pose_lost_t = None
+        if est.pose is not None and est.tilt_deg is not None and self.state != "STUCK":
+            up = est.tilt_deg < UP_TILT and est.trunk_z > UP_Z
+            self._not_up_since = None if up else (self._not_up_since if self._not_up_since is not None else t)
+            if self._not_up_since is not None and t - self._not_up_since > GETUP_FAIL_S:
+                self.getup_failures += 1
+                with self._truth():
+                    _, tilt_true, z_true = sim.pose()
+                self._ev("GETUP_FAILURE", down_s=round(t - self._not_up_since, 1), tilt_deg=round(tilt_true, 1),
+                         trunk_z=round(z_true, 3), phase=self.state)
+                self._cancel_mission()
+                self.need_reloc = False
+                if self.end_on_getup_failure:
+                    self.over, self.state = "getup_failed", "OVER"
+                else:
+                    self.state = "STUCK"
+                return (0.0, 0.0, 0.0)
+        if self.state == "STUCK":
+            return (0.0, 0.0, 0.0)
         if est.pose is not None and est.tilt_deg is not None:
             fallen = est.tilt_deg > FALL_TILT or est.trunk_z < FALL_Z
             if fallen and self.state != "DOWN" and not self.need_reloc:
@@ -306,6 +486,14 @@ class PlaySupervisor:
                 else:
                     self._cancel_mission()
                     self.state, self._up_since = "DOWN", None
+        if self.timer_fix and self._timer_due is None and t - self._t_timer >= TIMER_FIX_S:
+            self._timer_due = t                      # due: carried out at the next safe moment
+        if self._timer_due is not None and self.state == "MISSION" and self.mission is not None \
+                and self.mission.state in ("SCAN", "NAVIGATE") and not self.retrieving:
+            self._cancel_mission()
+            self._start_fix(t, "mission")
+        if self.state == "FIX":
+            return self._tick_fix(t, est)
         if self.state == "MISSION":
             return self._tick_mission(t)
         if self.state == "WATCH":
@@ -316,7 +504,28 @@ class PlaySupervisor:
             return self._tick_reloc(t, est)
         if self.state == "SEARCH":
             return self._tick_search(t, est)
+        if self.state == "AWAIT":
+            if t - self.t_await > 3.0:               # no out call: the ball is in, but it cannot be played
+                self.request = "unplayable"
+                self._new_mission()
+            return (0.0, 0.0, 0.0)
         return (0.0, 0.0, 0.0)
+
+    def picked_up(self):
+        """VIEWER ONLY (R key): a human stood the stuck duck up where it lay. Counted; the pose is then
+        suspect, so the fall protocol runs before any kick."""
+        self.viewer_resets += 1
+        self._not_up_since = None
+        self.localized = False
+        self._fall = {"t_fall": round(self.sim.t, 2), "phase": "STUCK", "err_at_fall_mm": None}
+        self._ev("VIEWER_PICKUP")
+        self.state, self._up_since = "DOWN", None
+
+    def _near_line(self, b, margin=0.15):
+        if b is None:
+            return False
+        fx0, fx1, fy0, fy1 = self.sim.field
+        return min(b[0] - fx0, fx1 - b[0], b[1] - fy0, fy1 - b[1]) < margin
 
     def _tick_mission(self, t):
         m = self.mission
@@ -327,6 +536,10 @@ class PlaySupervisor:
             self._new_mission()
             return (0.0, 0.0, 0.0)
         twist = m.tick()
+        if self._pending_whistle is not None and m.state != "KICK":
+            ev, self._pending_whistle = self._pending_whistle, None
+            self.whistle(ev)
+            return (0.0, 0.0, 0.0)
         if m.state == "KICK" and not self._was_kick:
             self._was_kick = True
             if not self.localized:
@@ -337,9 +550,13 @@ class PlaySupervisor:
         self.last_result = r
         kicked = "t_swap" in r
         if kicked:
-            self.ball_kicks += 1
-            rec = {k: r.get(k) for k in ("t_swap", "aim_mode", "aim_why", "aim_err_deg", "pose_err_yaw_deg", "pose_err_mm", "kick_dir_err_deg",
-                                         "peak_ball_fwd", "approach_mode", "falls")}
+            if self.retrieving:
+                self.retrieval_kicks += 1
+            else:
+                self.ball_kicks += 1
+            rec = {"retrieval": self.retrieving}
+            rec.update({k: r.get(k) for k in ("t_swap", "aim_mode", "aim_why", "aim_err_deg", "pose_err_yaw_deg", "pose_err_mm", "kick_dir_err_deg",
+                                         "peak_ball_fwd", "approach_mode", "falls")})
             self.kicks.append(rec)
             if m.referee is not None:
                 if m.referee.done:
@@ -358,9 +575,16 @@ class PlaySupervisor:
         why = r.get("aborted")
         if why:
             self.mission_aborts[why] = self.mission_aborts.get(why, 0) + 1
-            if why == "ball_unplayable":
+            if why == "ball_unplayable" and self._near_line(m.ball0) and not self.retrieving \
+                    and getattr(self.sim, "field_cfg", {}).get("retrieval"):
+                # a ball on/over a line (by the duck's estimate) is the referee's to call: wait for "out"
+                self.state, self.t_await = "AWAIT", t
+                self._ev("AWAIT_CALL")
+            elif why == "ball_unplayable":
                 self.request = "unplayable"
                 self._new_mission()
+            elif why == "ball_not_found" and self.retrieving:
+                self._new_mission()              # an out ball not in view: keep looking; the window bounds it
             elif why == "ball_not_found":
                 if self.searches >= 1:
                     self.over = "ball_not_found"
@@ -408,11 +632,70 @@ class PlaySupervisor:
             self._ev("WATCH_DONE", why="still" if still else ("lost" if lost else "cap"), after_s=round(t - self.t_watch, 2))
             if self.routine_fix and est.pose is not None:
                 self._landmark_fix(t, est, self.watch_sightings, ROUTINE_MIN_SIGHTINGS, "routine")
+            if self._timer_due is not None:
+                self._start_fix(t, "watch")
+                return (0.0, 0.0, 0.0)
             self._new_mission()
         return (0.0, 0.0, 0.0)
 
+    # --- Dillon's 60 s fix (WS3) ---
+    def _start_fix(self, t, where):
+        self.state = "FIX"
+        self.fix_s = {"t0": t, "where": where, "phase": "settle", "t_phase": t, "i": 0, "looks": 0, "S": []}
+        self.sim.policy.head_offset[:] = 0.0
+        self._ev("TIMER_FIX_START", where=where, due_s=round(t - self._timer_due, 1))
+
+    def _tick_fix(self, t, est):
+        """Stand, sweep the head 0 / +0.6 / -0.6 rad, 3 looks at each (goals + corner posts), then the fix,
+        inside the same gates as every routine fix. Landed or not, it is recorded."""
+        F = self.fix_s
+        if est.pose is None:
+            return (0.0, 0.0, 0.0)
+        if F["phase"] == "settle":
+            if t - F["t_phase"] >= (0.5 if F["i"] == 0 else RELOC_HEAD_SETTLE_S):
+                F["phase"], F["t_phase"], F["looks"] = "look", t, 0
+            return (0.0, 0.0, 0.0)
+        if t - F["t_phase"] >= 0.1 * F["looks"] - 1e-9:
+            F["looks"] += 1
+            if est.tilt_deg < SIGHT_MAX_TILT and (est.v_xy is None or np.linalg.norm(est.v_xy) < SIGHT_MAX_V):
+                self._collect(est.pose, F["S"], CORNER_MAX_RANGE)
+        if F["looks"] < RELOC_LOOKS:
+            return (0.0, 0.0, 0.0)
+        F["i"] += 1
+        if F["i"] < len(FIX_HEAD_YAWS):
+            self.sim.policy.head_offset[:] = [0.0, 0.0, FIX_HEAD_YAWS[F["i"]], 0.0]
+            F["phase"], F["t_phase"] = "settle", t
+            return (0.0, 0.0, 0.0)
+        self.sim.policy.head_offset[:] = 0.0
+        fix = self._landmark_fix(t, est, F["S"], ROUTINE_MIN_SIGHTINGS, "timer")
+        keys = {s_["key"] for s_ in F["S"]}
+        rec = {"t_due": round(self._timer_due, 1), "t": round(t, 1), "where": F["where"], "landed": fix is not None,
+               "sighted_corners": sum(k.startswith("c") for k in keys), "sighted_goals": sum(not k.startswith("c") for k in keys),
+               "fix": None if fix is None else fix["kind"], "corners_used": None if fix is None else fix.get("corners"),
+               "goals_used": None if fix is None else fix.get("goals")}
+        self.timer.append(rec)
+        self._ev("TIMER_FIX_DONE", **rec)
+        self._timer_due, self._t_timer = None, t
+        self._new_mission()
+        return (0.0, 0.0, 0.0)
+
+    def _pre_kick_fix(self, t, phase):
+        """Mission callback before a map-aimed kick (WS3): phase "look" collects one look's sightings, "fix"
+        applies the fix (routine gates). The kick heading is then refreshed from the corrected pose."""
+        est = self.pose_src.get(t)
+        if est.pose is None:
+            return None
+        if phase == "start":
+            self._pk = []
+            return None
+        if phase == "look":
+            if est.tilt_deg < SIGHT_MAX_TILT and (est.v_xy is None or np.linalg.norm(est.v_xy) < SIGHT_MAX_V):
+                self._collect(est.pose, self._pk, CORNER_MAX_RANGE)
+            return None
+        return self._landmark_fix(t, est, self._pk, ROUTINE_MIN_SIGHTINGS, "prekick")
+
     # --- landmark fixes (C, and the routine fix) ---
-    def _heading_fix(self, t, est, S):
+    def _heading_fix(self, t, est, S, kind="routine"):
         """Routine, no close goal: heading only, from the bearings to a fixed goal through its map spot
         (median of >= ROUTINE_MIN_SIGHTINGS agreeing within RELOC_YAW_MAD). Position unchanged."""
         if len(S) < ROUTINE_MIN_SIGHTINGS:
@@ -430,10 +713,9 @@ class PlaySupervisor:
         rec = {"t": round(t, 1), "kind": "heading", "landmark": S[0]["key"], "n": len(S),
                "range_m": round(float(np.median([s_["rng"] for s_ in S])), 2), "yaw_fixed": True, "jump_mm": 0.0,
                "err_before_mm": round(before[0] * 1000, 1), "err_after_mm": round(after[0] * 1000, 1),
-               "yaw_err_before_deg": round(math.degrees(before[1]), 2), "yaw_err_after_deg": round(math.degrees(after[1]), 2)}
-        self.routine.append(rec)
-        self._ev("ROUTINE_FIX", **rec)
-        return rec
+               "yaw_err_before_deg": round(math.degrees(before[1]), 2), "yaw_err_after_deg": round(math.degrees(after[1]), 2),
+               "corners": 0, "goals": 1}
+        return self._log_fix(rec, kind)
 
     def _collect(self, pose, out, max_range, only=None):
         """One goal look: every FIXED goal in view (identified by its facing through the IMU heading),
@@ -453,6 +735,22 @@ class PlaySupervisor:
                 if math.hypot(p[0] - x, p[1] - y) <= RELOC_GATE_M:
                     out.append({"key": key, "p": p, "rng": rng, "yaw_g": wrap_angle(L[2] - g["into"]), "rel": (cx, cy),
                                 "yaw_est": yaw, "yaw_b": wrap_angle(math.atan2(L[1] - y, L[0] - x) - math.atan2(cy, cx))})
+        if self.corner_look is None or (only is not None and not str(only).startswith("c")):
+            return
+        c, s_ = math.cos(yaw), math.sin(yaw)
+        for m in self.corner_look():
+            cx, cy = m["rel"]
+            rng = m["rng"]
+            if rng > CORNER_MAX_RANGE or rng < CORNER_MIN_RANGE:
+                continue
+            w = (x + c * cx - s_ * cy, y + s_ * cx + c * cy)
+            i = min(range(len(self.corners)), key=lambda j: math.hypot(self.corners[j][0] - w[0], self.corners[j][1] - w[1]))
+            L = self.corners[i]
+            if math.hypot(L[0] - w[0], L[1] - w[1]) > CORNER_GATE_M:
+                continue
+            out.append({"key": f"c{i}", "corner": True, "rng": rng, "rel": (cx, cy), "yaw_est": yaw,
+                        "p": (L[0] - (c * cx - s_ * cy), L[1] - (s_ * cx + c * cy)),
+                        "yaw_b": wrap_angle(math.atan2(L[1] - y, L[0] - x) - math.atan2(cy, cx))})
 
     def _landmark_fix(self, t, est, S, min_n, kind):
         """Median of the sightings of the most-seen landmark -> the fix: heading from the goal's measured
@@ -462,10 +760,18 @@ class PlaySupervisor:
         40 -> 110 mm off). Returns the record or None."""
         if not S:
             return None
+        multi = self._multi_fix(t, est, S, kind)
+        if multi is not None:
+            return multi
+        goals_s = [s_ for s_ in S if not s_.get("corner")]
+        corners_s = [s_ for s_ in S if s_.get("corner")]
+        if not goals_s:
+            return self._corner_heading_fix(t, est, corners_s, kind) if kind != "reloc" else self._corner_position_fix(t, est, corners_s)
+        S = goals_s
         key = max({s_["key"] for s_ in S}, key=lambda k: sum(1 for s_ in S if s_["key"] == k))
         S = [s_ for s_ in S if s_["key"] == key]
         if len(S) < min_n:
-            return None
+            return self._corner_heading_fix(t, est, corners_s, kind) if kind != "reloc" else None
         yaw = est.pose[2]
         near = [s_ for s_ in S if s_["rng"] <= RELOC_YAW_RANGE]
         yaw_fixed = False
@@ -476,9 +782,9 @@ class PlaySupervisor:
                 # heading from the goal's facing; positions re-derived with it (the duck stood still)
                 yaw = float(wrap_angle(med))
                 yaw_fixed = True
-        if kind == "routine" and not yaw_fixed:
-            return self._heading_fix(t, est, S)
-        if kind == "routine":
+        if kind != "reloc" and not yaw_fixed:
+            return self._heading_fix(t, est, S, kind)
+        if kind != "reloc":
             S = [s_ for s_ in S if s_["rng"] <= ROUTINE_MAX_RANGE]
         L = self.landmarks[key]
         ps = []
@@ -487,7 +793,7 @@ class PlaySupervisor:
             c, sn = math.cos(yaw), math.sin(yaw)
             ps.append((L[0] - (c * cx - sn * cy), L[1] - (sn * cx + c * cy)))
         fx, fy = float(np.median([p[0] for p in ps])), float(np.median([p[1] for p in ps]))
-        if kind == "routine" and math.hypot(fx - est.pose[0], fy - est.pose[1]) > ROUTINE_MAX_JUMP_M:
+        if kind != "reloc" and math.hypot(fx - est.pose[0], fy - est.pose[1]) > ROUTINE_MAX_JUMP_M:
             self._ev("ROUTINE_FIX_REFUSED", jump_mm=round(1000 * math.hypot(fx - est.pose[0], fy - est.pose[1]), 1))
             return None
         with self._truth():
@@ -496,14 +802,87 @@ class PlaySupervisor:
         jump = math.hypot(fx - est.pose[0], fy - est.pose[1])
         self.pose_src.apply_fix((fx, fy, yaw))
         after = pose_error(self.pose_src.get(t).pose, true_pose)
-        rec = {"t": round(t, 1), "kind": kind, "landmark": key, "n": len(S), "range_m": round(float(np.median([s_["rng"] for s_ in S])), 2),
+        rec = {"t": round(t, 1), "kind": "full", "goals": 1, "corners": 0, "landmark": key, "n": len(S), "range_m": round(float(np.median([s_["rng"] for s_ in S])), 2),
                "yaw_fixed": yaw_fixed, "jump_mm": round(jump * 1000, 1),
                "err_before_mm": round(before[0] * 1000, 1), "err_after_mm": round(after[0] * 1000, 1),
                "yaw_err_before_deg": round(math.degrees(before[1]), 2), "yaw_err_after_deg": round(math.degrees(after[1]), 2)}
-        if kind == "routine":
+        return self._log_fix(rec, kind)
+
+    def _log_fix(self, rec, kind):
+        rec["kind"] = rec.get("kind") if kind == "routine" else f"{kind}:{rec.get('kind')}"
+        if kind in ("routine", "timer", "prekick"):
             self.routine.append(rec)
             self._ev("ROUTINE_FIX", **rec)
         return rec
+
+    def _apply(self, t, est, pose, rec):
+        with self._truth():
+            true_pose, _, _ = self.sim.pose()
+        before = pose_error(est.pose, true_pose)
+        self.pose_src.apply_fix(pose)
+        after = pose_error(self.pose_src.get(t).pose, true_pose)
+        rec.update(t=round(t, 1), jump_mm=round(1000 * math.hypot(pose[0] - est.pose[0], pose[1] - est.pose[1]), 1),
+                   err_before_mm=round(before[0] * 1000, 1), err_after_mm=round(after[0] * 1000, 1),
+                   yaw_err_before_deg=round(math.degrees(before[1]), 2), yaw_err_after_deg=round(math.degrees(after[1]), 2))
+        return rec
+
+    def _multi_fix(self, t, est, S, kind):
+        """Two or more DISTINCT landmarks (goal centres, corner posts) seen while standing: a rigid 2D fit
+        (weighted Procrustes, weight 1/range^2) of their measured positions (duck frame) onto the map. Does not
+        lean on the old estimate except to say which landmark is which."""
+        keys = sorted({s_["key"] for s_ in S})
+        if len(keys) < 2:
+            return None
+        Q, P, W = [], [], []
+        for k in keys:
+            ss = [s_ for s_ in S if s_["key"] == k]
+            Q.append(np.median([s_["rel"] for s_ in ss], axis=0))
+            P.append(np.array(self.corners[int(k[1:])] if k.startswith("c") else self.landmarks[k][:2], float))
+            W.append(1.0 / max(float(np.median([s_["rng"] for s_ in ss])), 0.5) ** 2)
+        Q, P, W = np.array(Q), np.array(P), np.array(W)
+        if max(np.linalg.norm(P[i] - P[j]) for i in range(len(P)) for j in range(i + 1, len(P))) < MULTI_MIN_SPREAD_M:
+            return None
+        qc, pc = (W[:, None] * Q).sum(0) / W.sum(), (W[:, None] * P).sum(0) / W.sum()
+        H = ((W[:, None] * (Q - qc)).T @ (P - pc))
+        yaw = math.atan2(H[0, 1] - H[1, 0], H[0, 0] + H[1, 1])
+        R = np.array([[math.cos(yaw), -math.sin(yaw)], [math.sin(yaw), math.cos(yaw)]])
+        pos = pc - R @ qc
+        rngs = np.linalg.norm(Q, axis=1)
+        resid = np.linalg.norm((R @ Q.T).T + pos - P, axis=1)
+        if np.any(resid > MULTI_MAX_RESID_M + 0.03 * rngs) or abs(wrap_angle(yaw - est.pose[2])) > MAX_YAW_JUMP:
+            self._ev("MULTI_FIX_REFUSED", keys=keys, resid_mm=[round(1000 * float(r), 1) for r in resid],
+                     yaw_jump_deg=round(math.degrees(wrap_angle(yaw - est.pose[2])), 1))
+            return None
+        if kind != "reloc" and math.hypot(pos[0] - est.pose[0], pos[1] - est.pose[1]) > ROUTINE_MAX_JUMP_M:
+            return None
+        rec = {"kind": "multi", "landmark": "+".join(keys), "n": len(S), "range_m": round(float(np.median(rngs)), 2),
+               "yaw_fixed": True, "corners": sum(k.startswith("c") for k in keys), "goals": sum(not k.startswith("c") for k in keys)}
+        return self._log_fix(self._apply(t, est, (float(pos[0]), float(pos[1]), float(yaw)), rec), kind)
+
+    def _corner_heading_fix(self, t, est, S, kind):
+        """One corner post (or several, all far): heading only, from the bearing(s) through the map spots."""
+        S = [s_ for s_ in S if s_["rng"] >= CORNER_HEADING_MIN_RANGE]
+        if len(S) < ROUTINE_MIN_SIGHTINGS:
+            return None
+        ys = np.unwrap([s_["yaw_b"] for s_ in S])
+        med = float(np.median(ys))
+        x, y, yaw0 = est.pose
+        if float(np.median(np.abs(ys - med))) > RELOC_YAW_MAD or abs(wrap_angle(med - yaw0)) > MAX_YAW_JUMP:
+            return None
+        rec = {"kind": "heading", "landmark": "+".join(sorted({s_["key"] for s_ in S})), "n": len(S),
+               "range_m": round(float(np.median([s_["rng"] for s_ in S])), 2), "yaw_fixed": True, "corners": 1, "goals": 0}
+        return self._log_fix(self._apply(t, est, (x, y, float(wrap_angle(med))), rec), kind)
+
+    def _corner_position_fix(self, t, est, S):
+        """After a fall, one corner post only: position from it with the IMU heading (as the goal path does)."""
+        if len(S) < RELOC_MIN_SIGHTINGS:
+            return None
+        key = max({s_["key"] for s_ in S}, key=lambda k: sum(1 for s_ in S if s_["key"] == k))
+        ps = [s_["p"] for s_ in S if s_["key"] == key]
+        rec = {"kind": "corner_position", "landmark": key, "n": len(ps), "range_m": round(float(np.median(
+            [s_["rng"] for s_ in S if s_["key"] == key])), 2), "yaw_fixed": False}
+        return self._apply(t, est, (float(np.median([p_[0] for p_ in ps])), float(np.median([p_[1] for p_ in ps])),
+                                    est.pose[2]), rec)
 
     def _start_search(self, t):
         """Ball not found by a full turn: walk toward the field centre (estimated) and look again."""
@@ -618,7 +997,8 @@ class PlaySupervisor:
         if R["phase"] == "survey_look":
             if t - R["t_phase"] >= 0.1 * R["looks"] - 1e-9:
                 R["looks"] += 1
-                self._collect(est.pose, R["sightings"], RELOC_MAX_RANGE, only=R["target"])
+                # every landmark in view (WS3): the targeted goal, the other goal, corner posts
+                self._collect(est.pose, R["sightings"], RELOC_MAX_RANGE, only=None if self.corner_look else R["target"])
             if R["looks"] < RELOC_LOOKS:
                 return (0.0, 0.0, 0.0)
             R["head_i"] += 1
@@ -629,7 +1009,7 @@ class PlaySupervisor:
             self.sim.policy.head_offset[:] = 0.0
             fix = self._landmark_fix(t, est, R["sightings"], RELOC_MIN_SIGHTINGS, "reloc")
             if fix is not None:
-                self._reloc_done(t, est, f"goal{R['target']}", fix["n"], fix)
+                self._reloc_done(t, est, (f"goal{R['target']}" if fix.get("kind", "").endswith("full") else fix.get("kind", "").split(":")[-1] + ":" + str(fix.get("landmark"))), fix["n"], fix)
                 return (0.0, 0.0, 0.0)
             R["attempt"] += 1
             self._ev("RELOC_NO_FIX", target=R["target"], sightings=len(R["sightings"]), attempt=R["attempt"])
@@ -653,17 +1033,24 @@ class FallScript:
     `phase` for `after_s` (or the play state is `phase`), push the trunk sideways at push_v until it falls
     (re-pushing up to 3 times). Environment side: truth is fine."""
 
-    def __init__(self, phase, push_v=2.0, after_s=0.5, not_before_s=5.0):
+    def __init__(self, phase, push_v=2.0, after_s=0.5, not_before_s=5.0, n_falls=1, rearm_s=15.0):
         self.phase, self.push_v, self.after_s, self.not_before = phase, push_v, after_s, not_before_s
         self.done, self.t_in, self.pushes, self.t_push = False, None, 0, None
+        self.n_falls, self.rearm_s, self.caused, self.t_rearm = n_falls, rearm_s, 0, None   # WS4: many falls per run
 
     def tick(self, sim, sup):
+        if self.done and self.caused < self.n_falls and sup.state == "MISSION" and sup.localized:
+            self.t_rearm = self.t_rearm if self.t_rearm is not None else sim.t
+            if sim.t - self.t_rearm >= self.rearm_s:          # re-arm once back in play for a while
+                self.done, self.t_in, self.pushes, self.t_push, self.t_rearm = False, None, 0, None, None
+                self._falls0 = sup.falls
         if self.done or sim.t < self.not_before:
             return
         ph = sup.mission.state if sup.state == "MISSION" and sup.mission is not None else sup.state
         if self.t_push is not None:
-            if sup.falls > 0 or sup.state == "DOWN":
+            if sup.falls > getattr(self, "_falls0", 0) or sup.state == "DOWN":
                 self.done = True
+                self.caused += 1
             elif sim.t - self.t_push > 1.5 and self.pushes < 3:
                 self._push(sim)
             elif self.pushes >= 3 and sim.t - self.t_push > 1.5:
@@ -685,13 +1072,16 @@ class FallScript:
 
 
 def setup_play(args):
-    sim = KickSim(args.velstand, SCENES["field"])
+    fc = FIELDS[getattr(args, "field", "4")]
+    sim = KickSim(args.velstand, SCENES[fc["scene"]])
     sim.reset(0, 0, 0)
     km.set_feet(sim, args.foot)
     km.setup_goal(sim)
-    km.setup_field(sim)                                  # goal_a -> +x mouth, goal_b -> -x mouth: LOCKED
+    km.setup_field(sim)                                  # goal_a -> +x line, goal_b -> -x line: LOCKED
+    sim.field_cfg = fc
     fx0, fx1, fy0, fy1 = sim.field
-    sim.arena = (fx0 + PLAY_INSET_M, fx1 - PLAY_INSET_M, fy0 + PLAY_INSET_M, fy1 - PLAY_INSET_M)
+    g = fc["geofence_m"]
+    sim.arena = (fx0 - g, fx1 + g, fy0 - g, fy1 + g)
     m = sim.model                                       # post contacts: both goals' posts
     sim.post_geoms = {m.geom(f"{g}_post_{s}").id for g in ("goal_a", "goal_b") for s in ("left", "right")}
     goals = fixed_goals(sim)
@@ -710,7 +1100,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
         sim.set_twist((0.0, 0.0, 0.0))
         sim.step()
     sim.t = 0.0
-    b0 = spawn_ball(sim, rng, sim.field)
+    fc = sim.field_cfg
+    b0 = spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"])
     pose_src.reset(sim, seed=args.seed * 1000 + k)
     pose_src.dropouts = [] if not args.dropout else [tuple(float(v) for v in args.dropout.split(","))]
     ball_cam.pose_src = pose_src
@@ -719,17 +1110,37 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
     ball_rgba = sim.model.geom_rgba[ball_geom].copy()
     log = RunLog(echo=args.verbose)
     guard = TruthGuard(sim) if args.estimated_only else sim
+    new = args.field == "4"                   # WS3 features: the 4 m field (corner posts), each switchable
+    corner_look, corners = None, ()
+    if new and not getattr(args, "no_corners", False):
+        from camera_landmarks import CornerCamera, corner_map
+        if getattr(sim, "_corner_cam", None) is None:
+            sim._corner_cam = CornerCamera(sim.model, getattr(args, "profile", "face-board-v1"))
+        cc = sim._corner_cam
+        corner_look, corners = (lambda: cc.measure(sim.data)), corner_map(sim.model)
     sup = PlaySupervisor(guard, kick, precision, args.foot, pose_src, ball_cam, goal_cam, goals[attack], attack, lm, log,
-                         estimated_only=args.estimated_only, hide_goal=args.hide_goal, routine_fix=not args.no_routine_fix)
-    ref = PlayReferee(sim, goals)
-    falls_script = FallScript(args.fall_in, args.push_v) if args.fall_in else None
-    rec = {"run": k, "attack": attack, "goals_for": 0, "goals_against": 0, "out": 0, "kick_cap": 0, "unplayable": 0,
-           "t_first_goal": None, "balls": 1}
+                         estimated_only=args.estimated_only, hide_goal=args.hide_goal, routine_fix=not args.no_routine_fix,
+                         corner_look=corner_look, corners=corners,
+                         timer_fix=new and not getattr(args, "no_timer_fix", False),
+                         pre_kick_fix=new and not getattr(args, "no_pre_kick_fix", False))
+    ref = PlayReferee(sim, goals, retrieval=fc["retrieval"])
+    if viewer is not None:
+        sup.end_on_getup_failure = False      # the viewer waits for a human pick-up (R); batteries end the run
+    falls_script = FallScript(args.fall_in, args.push_v, n_falls=getattr(args, "falls_per_run", 1)) if args.fall_in else None
+    rec = {"run": k, "attack": attack, "field": args.field, "goals_for": 0, "goals_against": 0, "out": 0, "retrieved": 0,
+           "out_respawn": 0, "kick_cap": 0, "unplayable": 0, "t_first_goal": None, "balls": 1}
     spawns = [b0]
     events = []
     log.event({"t": 0.0, "event": "PLAY_START", "attack": attack, "ball": [round(v, 3) for v in b0]})
     t_wall = time.time()
+    t_bounce = 0.0
     while sim.t < args.time_cap and sup.state != "OVER":
+        if getattr(args, "ball_out_every", 0) and ref.state == "in_play" and sim.t - t_bounce >= args.ball_out_every \
+                and np.linalg.norm(sim.ball()[1]) < 0.02 \
+                and np.linalg.norm(sim.ball()[0] - np.array(sim.pose()[0][:2])) > 0.6:
+            t_bounce = sim.t
+            ev_b = bad_bounce(sim, sim.field)              # retrieval battery: roll the ball out over a side line
+            log.event({"t": round(sim.t, 3), "event": "BAD_BOUNCE", **ev_b})
         drag.apply()
         if falls_script is not None:
             falls_script.tick(sim, sup)
@@ -757,10 +1168,23 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
                     item[1].update(item[0].result)
                     sup.pending_refs.remove(item)
         ev = ref.update()
-        if ev is None and sup.request:
-            ev = {"event": sup.request}
+        if (ev is None or ev["event"] in ("retrieved",)) and sup.request:
+            ev = {"event": sup.request}                        # the duck's restart request wins over a retrieval
         sup.request = None
+        if ev is not None and ev["event"] in ("out", "retrieved") and fc["retrieval"]:
+            # 4 m field: an out ball stays where it is and the retrieval window opens; back in = play on
+            ev["t"] = round(sim.t, 2)
+            rec[ev["event"]] += 1
+            t_bounce = sim.t
+            if ev["event"] == "out":
+                for item in sup.pending_refs:
+                    item[1].update(item[0].result or {"goal_outcome": "out"})
+                sup.pending_refs.clear()
+            log.event({"t": round(sim.t, 3), "event": "REFEREE", **ev})
+            sup.whistle({"why": "out_window" if ev["event"] == "out" else "retrieved"})
+            ev = None
         if ev is not None:
+            t_bounce = sim.t
             ev["t"] = round(sim.t, 2)
             ev["kicks_at_ball"] = sup.ball_kicks
             if ev["event"] == "goal":
@@ -778,7 +1202,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
             sup.pending_refs.clear()
             events.append(ev)
             log.event({"t": round(sim.t, 3), "event": "REFEREE", **ev})
-            b = spawn_ball(sim, rng, sim.field)
+            b = spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"])
+            ref.reset()
             spawns.append(b)
             rec["balls"] += 1
             if args.hide_ball_after_respawn:
@@ -796,11 +1221,12 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
     end_err = None if e.pose is None else round(pose_error(e.pose, tp)[0] * 1000, 1)
     gm = lm[attack][:2]
     rec.update(t_end=round(sim.t, 1), over=sup.over or "time_cap", kicks=len(sup.kicks), kicks_unlocalized=sup.kicks_unlocalized,
-               falls=sup.falls, reloc_falls=sup.reloc_falls, relocs=sup.relocs, routine=sup.routine, missions=sup.missions,
+               timer=sup.timer, falls=sup.falls, getup_failures=sup.getup_failures, viewer_resets=sup.viewer_resets, reloc_falls=sup.reloc_falls, relocs=sup.relocs, routine=sup.routine, missions=sup.missions,
                mission_aborts=sup.mission_aborts, pose_err_end_mm=end_err,
                kicks_per_ball=[ev["kicks_at_ball"] for ev in events],
-               decisions=[(ev["event"] if ev["event"] != "goal" else ("GOAL" if ev["end"] == attack else "own_end"))
-                          for ev in events],
+               decisions=[(("out" if ev["event"] == "out_respawn" else ev["event"]) if ev["event"] != "goal"
+                           else ("GOAL" if ev["end"] == attack else "own_end")) for ev in events],
+               retrieval_kicks=sup.retrieval_kicks,
                spawn_dist_to_goal=[round(math.hypot(b[0] - gm[0], b[1] - gm[1]), 2) for b in spawns],
                aim_modes={m: sum(1 for kk in sup.kicks if kk.get("aim_mode") == m) for m in ("camera", "map")},
                wall_s=round(time.time() - t_wall, 0))
@@ -813,9 +1239,11 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
 
 
 def fmt_run(r):
-    return (f"  run {r['run']:2d} attack {r['attack']}: GOALS {r['goals_for']}  other-end {r['goals_against']}  out {r['out']}  "
-            f"kick-cap {r['kick_cap']}  unplayable {r['unplayable']} | kicks {r['kicks']} (cam {r['aim_modes']['camera']}, "
-            f"map {r['aim_modes']['map']}) | first goal {r['t_first_goal']} s | falls {r['falls']} relocs {len(r['relocs'])} "
+    return (f"  run {r['run']:2d} attack {r['attack']}: GOALS {r['goals_for']}  other-end {r['goals_against']}  out {r['out']}"
+            + (f" (retrieved {r.get('retrieved', 0)}, respawned {r.get('out_respawn', 0)}, retrieval kicks {r.get('retrieval_kicks', 0)})"
+               if r.get("field") == "4" else "") + "  "
+            + f"kick-cap {r['kick_cap']}  unplayable {r['unplayable']} | kicks {r['kicks']} (cam {r['aim_modes']['camera']}, "
+            f"map {r['aim_modes']['map']}) | first goal {r['t_first_goal']} s | falls {r['falls']} getup-fail {r.get('getup_failures', 0)} relocs {len(r['relocs'])} "
             f"unlocalized kicks {r['kicks_unlocalized']} routine fixes {len(r['routine'])} | end {r['over']} at {r['t_end']} s, pose err {r['pose_err_end_mm']} mm "
             f"| decisions {r['decisions']} kicks/ball {r['kicks_per_ball']} | aborts {r['mission_aborts']}"
             + (f" | mapd relocs {r.get('mapd_relocalizations')}" if "mapd_relocalizations" in r else "")
@@ -830,6 +1258,13 @@ def summarize(rows, args):
           f"{args.ball_decel} m/s^2, kick cap {BALL_KICK_CAP}/ball, mission cap {MISSION_CAP_S:.0f} s")
     print(f"  goals (attacked end): total {sum(gf)}, per run median {np.median(gf):.1f} (min {min(gf)}, max {max(gf)}); "
           f"runs with >= 1 goal {sum(g > 0 for g in gf)}/{n}")
+    if rows and rows[0].get("field") == "4":
+        print(f"  out of bounds (4 m field, retrieval): {sum(r['out'] for r in rows)} outs -> retrieved "
+              f"{sum(r['retrieved'] for r in rows)}, respawned {sum(r['out_respawn'] for r in rows)} (window "
+              f"{sum(1 for r in rows for e in r['events'] if e.get('why') == 'window')}, too far "
+              f"{sum(1 for r in rows for e in r['events'] if e.get('why') == 'too_far')}), other "
+              f"{sum(r['out'] - r['retrieved'] - r['out_respawn'] for r in rows)}; retrieval kicks "
+              f"{sum(r['retrieval_kicks'] for r in rows)}")
     print(f"  goals in the OTHER end: {sum(r['goals_against'] for r in rows)}; out of bounds {sum(r['out'] for r in rows)}; "
           f"kick-cap restarts {sum(r['kick_cap'] for r in rows)}; unplayable restarts {sum(r['unplayable'] for r in rows)}")
     if kpg:
@@ -845,6 +1280,8 @@ def summarize(rows, args):
         print(f"  {mode:6s} kicks {len(ks)}: |aim err| median {np.median(ae) if ae else float('nan'):.1f}, max "
               f"{max(ae) if ae else float('nan'):.1f} deg; per-kick outcomes "
               + str({o: sum(1 for x in ks if x.get('goal_outcome') == o) for o in ('goal', 'post', 'miss', 'no_cross')}))
+    print(f"  GET-UP FAILURES {sum(r.get('getup_failures', 0) for r in rows)} (runs ended getup_failed "
+          f"{sum(r['over'] == 'getup_failed' for r in rows)})")
     print(f"  falls {sum(r['falls'] for r in rows)} (during the protocol {sum(r['reloc_falls'] for r in rows)}); "
           f"re-localizations {sum(len(r['relocs']) for r in rows)}; kicks while NOT localized "
           f"{sum(r['kicks_unlocalized'] for r in rows)}")
@@ -858,15 +1295,26 @@ def summarize(rows, args):
                  f"{np.median([x['err_after_mm'] for x in ok]) if ok else float('nan'):.0f} mm (max "
                  f"{max([x['err_after_mm'] for x in ok]) if ok else float('nan'):.0f}); protocol time median "
                  f"{np.median([x['protocol_s'] for x in rl]):.0f} s"))
-    for kind in ("routine", "heading"):
-        ro = [x for r in rows for x in r["routine"] if x.get("kind", "routine") == kind]
+    allfix = [x for r in rows for x in r["routine"]]
+    kinds = sorted({x.get("kind") for x in allfix})
+    for kind in kinds:
+        ro = [x for x in allfix if x.get("kind") == kind]
         if not ro:
             continue
-        print(f"  routine {'FULL' if kind == 'routine' else 'HEADING-ONLY'} fixes {len(ro)}: error before median {np.median([x['err_before_mm'] for x in ro]):.0f} mm (max "
+        print(f"  fixes [{kind}] {len(ro)}: error before median {np.median([x['err_before_mm'] for x in ro]):.0f} mm (max "
               f"{max(x['err_before_mm'] for x in ro):.0f}), after median {np.median([x['err_after_mm'] for x in ro]):.0f} mm "
               f"(max {max(x['err_after_mm'] for x in ro):.0f}); heading fixed too in {sum(x['yaw_fixed'] for x in ro)}; "
               f"|yaw err| before median {np.median([abs(x['yaw_err_before_deg']) for x in ro]):.1f} -> after "
               f"{np.median([abs(x['yaw_err_after_deg']) for x in ro]):.1f} deg")
+    tm = [x for r in rows for x in r.get("timer", [])]
+    if tm:
+        landed = [x for x in tm if x["landed"]]
+        print(f"  60 s TIMER FIX: fired {len(tm)}, landed {len(landed)} ({100 * len(landed) / len(tm):.0f} %), no usable sighting "
+              f"{len(tm) - len(landed)}; landed fixes by kind " + str({k: sum(1 for x in landed if x['fix'] == k)
+                                                                       for k in sorted({x['fix'] for x in landed})})
+              + f"; landed using a corner post {sum(1 for x in landed if (x.get('corners_used') or 0) > 0)}, using a goal "
+              f"{sum(1 for x in landed if (x.get('goals_used') or 0) > 0)}; fired with a corner in view "
+              f"{sum(1 for x in tm if x['sighted_corners'])}, with a goal in view {sum(1 for x in tm if x['sighted_goals'])}")
     ends = {}
     for r in rows:
         ends[r["over"]] = ends.get(r["over"], 0) + 1
@@ -881,6 +1329,8 @@ def main():
     ap.add_argument("--foot", choices=("right", "left"), default="right")
     ap.add_argument("--calib", choices=tuple(km.CALIBRATIONS), default="v2")
     ap.add_argument("--precision", required=True)
+    ap.add_argument("--field", choices=tuple(FIELDS), default="4",
+                    help="4 = THE field (4 m, corner posts, no boards, retrieval); 6 = the old 6 m board field")
     ap.add_argument("--runs", type=int, default=30)
     ap.add_argument("--only-runs", default=None, help="comma list of run indices to play (the rng stream is kept)")
     ap.add_argument("--seed", type=int, default=0)
@@ -894,9 +1344,15 @@ def main():
     ap.add_argument("--ball-decel", type=float, default=BALL_DECEL)
     ap.add_argument("--fall-in", default=None, help="scripted fall once per run in this phase (NAVIGATE, PRECISE, LOOK, WATCH, ...)")
     ap.add_argument("--push-v", type=float, default=2.0)
+    ap.add_argument("--falls-per-run", type=int, default=1, help="scripted falls per run (re-armed 15 s after the duck is back in play)")
     ap.add_argument("--hide-goal", choices=("all", "look"), default=None)
     ap.add_argument("--hide-ball-after-respawn", action="store_true")
+    ap.add_argument("--ball-out-every", type=float, default=0.0,
+                    help="retrieval battery: every this many s of play, the environment rolls the ball out over a side line")
     ap.add_argument("--no-routine-fix", action="store_true", help="landmark fixes only after a fall (the brief, literally)")
+    ap.add_argument("--no-corners", action="store_true", help="4 m field: do not use the corner posts as camera landmarks")
+    ap.add_argument("--no-timer-fix", action="store_true", help="4 m field: no 60 s timer fix")
+    ap.add_argument("--no-pre-kick-fix", action="store_true", help="4 m field: no landmark look before a map-aimed kick")
     ap.add_argument("--dropout", default=None, help='"T0,DUR": pose link down from T0 s into each run for DUR s')
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--out", default=None)

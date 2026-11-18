@@ -342,7 +342,7 @@ class Mission:
         """Stage 4: the kick heading from the ball to the perceived goal centre (both camera-relative).
         Play, advance kick (aim_mode "map"): to the goal's field-map spot, through the estimated pose."""
         if self.aim_mode == "map" or (self.play is not None and not self.goal_src.found):
-            g = self.play.goal_map                   # (camera mode before the goal look: the plan only)
+            g = self.play.goal_aim or self.play.goal_map   # (camera mode before the goal look: the plan only)
         else:
             g, _, _ = self.goal_src.get(self.sim.t)
         return math.atan2(g[1] - b[1], g[0] - b[0])
@@ -354,7 +354,11 @@ class Mission:
         if self.play is None or b is None:
             return False
         d = math.hypot(self.play.goal_map[0] - b[0], self.play.goal_map[1] - b[1])
-        return d > self.play.goal_cam_range or d < self.play.tap_in_m
+        if d > self.play.goal_cam_range or d < self.play.tap_in_m:
+            return True
+        into = getattr(self.play, "goal_into", None)          # edge-on (a corner ball): the posts overlap
+        return into is not None and abs(wrap_angle(math.atan2(self.play.goal_map[1] - b[1], self.play.goal_map[0] - b[0])
+                                                   - into)) > self.play.goal_oblique
 
     def _move_tol(self, b, pose):
         """Look-to-look ball jitter that is NOT a bump. Play: camera noise grows with range (measured
@@ -372,13 +376,16 @@ class Mission:
         return allow() if allow is not None else _NoGuard()
 
     def _plan(self, b, t):
+        if self.play is not None and self.camera:
+            self.sim.policy.head_offset[:] = 0.0         # (the scan may have left the head pitched down)
         if self.goal_src is not None:
             if self.play is not None:
                 self.aim_mode = "map" if self._goal_far(b) else "camera"
                 self.result["aim_mode"] = self.aim_mode
                 if self.aim_mode == "map":
                     d = math.hypot(self.play.goal_map[0] - b[0], self.play.goal_map[1] - b[1])
-                    self.result["aim_why"] = "tap_in" if d < self.play.tap_in_m else "far"
+                    self.result["aim_why"] = ("tap_in" if d < self.play.tap_in_m else
+                                              "far" if d > self.play.goal_cam_range else "oblique")
             self._set_heading(self._heading_from_goal(b))
         sim, log, goal, foot, kick_heading = self.sim, self.log, self.goal, self.foot, self.kh_goal
         self.ball0 = b.copy()
@@ -399,6 +406,8 @@ class Mission:
             side = np.array([-k[1], k[0]])
             side = side if (np.array([x, y]) - b) @ side > 0 else -side
             route.insert(0, tuple(b + 0.45 * side - 0.1 * k))
+        if self.play is not None and getattr(self.play, "obstacles", ()):
+            route = self._clear_posts(np.array([x, y]), route)
         self.nav = GotoSupervisor(route, getattr(sim, "arena", ARENA), GotoConfig(arrival_radius=0.06), log=log.event)
         self.state, self.t_state = "NAVIGATE", t
         if self.play is not None and len(route) in self.nav.rejected:   # the pre-stance spot is off the field
@@ -421,6 +430,33 @@ class Mission:
             log.event({"t": round(t, 3), "event": "GOAL_PLACED", "centre": [round(goal.cx, 3), round(goal.cy, 3)],
                        "into_deg": round(math.degrees(goal.yaw), 1), "opening_mm": round(goal.opening * 1000, 1),
                        "ball_to_goal_m": round(float(math.hypot(goal.cx - b[0], goal.cy - b[1])), 3)})
+
+    def _clear_posts(self, start, route, clear=0.20, side_m=0.35):
+        """Play, 4 m field: a straight leg passing within `clear` of a map post (goal posts, corner posts) gets
+        a waypoint beside the post first (measured: a duck walking back in from behind a goal stood on a goal
+        post, stepping in place for 150 s while its odometry walked 0.9 m)."""
+        out, a = [], np.asarray(start, float)
+        for wp in route:
+            b = np.asarray(wp, float)
+            for _ in range(3):
+                hits = [(np.array(o[:2]), o[2]) for o in self.play.obstacles
+                        if self._seg_dist(a, b, np.array(o[:2])) < clear + o[2]]
+                if not hits:
+                    break
+                o, r = min(hits, key=lambda h: np.linalg.norm(h[0] - a))
+                ab = b - a
+                n = np.array([-ab[1], ab[0]]) / max(np.linalg.norm(ab), 1e-9)
+
+                def cost(v):                         # length, plus a big penalty per leg still hitting a post
+                    bad = sum(self._seg_dist(p0, p1, np.array(q[:2])) < clear + q[2] - 1e-9
+                              for q in self.play.obstacles for p0, p1 in ((a, v), (v, b)))
+                    return np.linalg.norm(v - a) + np.linalg.norm(b - v) + 10.0 * bad
+                via = min((o + (side_m + r) * n, o - (side_m + r) * n), key=cost)
+                out.append(tuple(via))
+                a = via
+            out.append(tuple(b))
+            a = b
+        return out
 
     def stance_point(self, ball_xy):
         """Duck position that puts the ball at the trained offset when facing the kick heading."""
@@ -479,6 +515,17 @@ class Mission:
     def _start_look(self, t):
         if self.goal_src is not None and not getattr(self, "goal_fresh", False) and self.aim_mode != "map":
             self._start_goal_look(t)
+            return
+        if self.aim_mode == "map" and getattr(self.play, "pre_kick_fix", None) is not None \
+                and not getattr(self, "pk_done", False):
+            # play (WS3): before a map-aimed kick, a head-neutral landmark look (goals + corner posts) and a fix;
+            # the kick heading is refreshed from the corrected pose after the ball look
+            self.pk_done = True
+            self.sim.policy.head_offset[:] = 0.0
+            self.play.pre_kick_fix(t, "start")
+            self.look_phase, self.look_t, self.pk_looks = "pk_settle", t, 0
+            self.log.event({"t": round(t, 3), "event": "PRE_KICK_LOOK_START"})
+            self._goto("LOOK")
             return
         self.look_phase, self.look_t, self.look_hits = "down", t, []
         head = list(LOOK_HEAD)
@@ -550,6 +597,22 @@ class Mission:
         sim = self.sim
         if self.look_phase in ("goal_settle", "goal_looking"):
             return self._goal_look(t)
+        if self.look_phase in ("pk_settle", "pk_looking"):
+            if self.look_phase == "pk_settle":
+                if t - self.look_t >= GOAL_SETTLE_S:
+                    self.look_phase, self.look_t = "pk_looking", t
+                return (0.0, 0.0, 0.0)
+            if t - self.look_t >= LOOK_SPACING_S * self.pk_looks - 1e-9 and self.pk_looks < 3:
+                self.pk_looks += 1
+                self.play.pre_kick_fix(t, "look")
+            if self.pk_looks < 3:
+                return (0.0, 0.0, 0.0)
+            fix = self.play.pre_kick_fix(t, "fix")
+            self.result["pre_kick_fix"] = None if fix is None else fix.get("kind")
+            self.log.event({"t": round(t, 3), "event": "PRE_KICK_FIX", "landed": fix is not None,
+                            "kind": None if fix is None else fix.get("kind")})
+            self._start_look(t)
+            return (0.0, 0.0, 0.0)
         if self.look_phase == "down":
             if t - self.look_t >= LOOK_SETTLE_S:
                 self.look_phase, self.look_t = "looking", t
@@ -740,6 +803,11 @@ class Mission:
             b, bv = self.ball_src.get(t)
         if self.state == "SCAN" and not self.camera:
             return self._scan(t, b)
+        if self.camera and self.play is not None and self.state == "SCAN":
+            # play: a ball can lie closer than the level head sees (~0.4 m), e.g. after a fall next to it:
+            # alternate level / pitched-down (LOOK_HEAD) every 1.2 s while scanning
+            down = int((t - self.t_state) / 1.2) % 2 == 1
+            self.sim.policy.head_offset[:] = LOOK_HEAD if down else (0.0, 0.0, 0.0, 0.0)
         if self.camera and self.state in ("SCAN", "NAVIGATE"):    # head neutral: 5 Hz looks
             if self.ball_src.look(t):
                 b, bv = self.ball_src.get(t)
@@ -764,13 +832,25 @@ class Mission:
             # it rests (ALIGN re-navigates if the new stance is out of reach). Chasing a
             # rolling ball with pulses never converges.
             move_tol, speed_tol = self._move_tol(b, pose)
-            if np.linalg.norm(bv) > speed_tol or np.linalg.norm(b - self.ball0) > move_tol:
+            fast = np.linalg.norm(bv) > speed_tol
+            if self.play is not None:
+                # play (WS5, false bumps): the camera's look-to-look speed of a RESTING ball reads high while the
+                # duck walks within 1 m (head bob, estimate jitter) -- 18-35 false calls per 30 runs, all at
+                # 0.75-1.0 m. A real roll persists from look to look: the speed test needs 2 consecutive fast looks.
+                ts = getattr(self.ball_src, "t_seen", None)
+                if ts is not None and ts != getattr(self, "_bump_t_seen", None):
+                    self._bump_t_seen = ts
+                    self._fast_looks = getattr(self, "_fast_looks", 0) + 1 if fast else 0
+                fast = fast and getattr(self, "_fast_looks", 0) >= 2
+            moved = np.linalg.norm(b - self.ball0) > move_tol
+            if fast or moved:
                 if not getattr(self, "ball_rolling", False):
                     self.ball_rolling, self.t_bump = True, t
                     self.pulse_left, self.approaching = 0, False
                     self.result["ball_disturbed"] = self.result.get("ball_disturbed", 0) + 1
                     sim.policy.ort_session = self.walk_session   # (a no-op unless the step policy had it)
-                    self.log.event({"t": round(t, 3), "event": "BALL_DISTURBED", "phase": self.state})
+                    self.log.event({"t": round(t, 3), "event": "BALL_DISTURBED", "phase": self.state,
+                                    **({"why": "speed" if fast else "moved"} if self.play is not None else {})})
                 if np.linalg.norm(bv) > speed_tol:
                     if t - self.t_bump < BALL_WAIT_S:
                         return (0.0, 0.0, 0.0)
@@ -1086,12 +1166,16 @@ FIELD_INSET_M = 0.5   # the duck's geofence sits this far inside the boards
 
 
 def field_from_model(m):
-    """The field's inner faces (x_min, x_max, y_min, y_max), read back from field.xml's board geoms."""
+    """The field's lines (x_min, x_max, y_min, y_max): the boards' inner faces (field.xml, 6 m) or the
+    visual boundary walls' centre planes (field4.xml, 4 m), read back from the compiled model."""
     def face(name, axis, sign):
         g = m.geom(name)
         return float(g.pos[axis] - sign * g.size[axis])
-    return (face("field_board_end_neg_left", 0, -1), face("field_board_end_pos_left", 0, 1),
-            face("field_board_side_right", 1, -1), face("field_board_side_left", 1, 1))
+    if mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "field_board_end_neg_left") >= 0:
+        return (face("field_board_end_neg_left", 0, -1), face("field_board_end_pos_left", 0, 1),
+                face("field_board_side_right", 1, -1), face("field_board_side_left", 1, 1))
+    return (float(m.geom("field_wall_end_neg").pos[0]), float(m.geom("field_wall_end_pos").pos[0]),
+            float(m.geom("field_wall_side_right").pos[1]), float(m.geom("field_wall_side_left").pos[1]))
 
 
 def setup_field(sim):
@@ -1099,7 +1183,9 @@ def setup_field(sim):
     +x, goal_b at -x, each facing out of the field). Call after setup_goal (which restores the
     render statistics). Returns the geofence = the field inset by FIELD_INSET_M."""
     m, d = sim.model, sim.data
-    sim.board_geoms = {g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_")}
+    # contact objects: the field's COLLIDABLE geoms (6 m: boards + goal boxes; 4 m: the corner posts --
+    # its boundary wall is visual only)
+    sim.board_geoms = {g for g in range(m.ngeom) if (m.geom(g).name or "").startswith("field_") and m.geom_contype[g]}
     fx0, fx1, fy0, fy1 = field_from_model(m)
     for name, x, yaw in (("goal_a", fx1, 0.0), ("goal_b", fx0, math.pi)):
         mid = int(m.body_mocapid[m.body(name).id])
@@ -1157,9 +1243,9 @@ def run_viewer(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
-    if args.goal_dist is not None or args.scene == "field":
+    if args.goal_dist is not None or args.scene in ("field", "field4"):
         setup_goal(sim)
-    if args.scene == "field":
+    if args.scene in ("field", "field4"):
         sim.arena = setup_field(sim)
     pose_src = None if args.pose == "gt" else make_provider(args.pose, sim, imu_error=not args.no_imu_error, calib=args.odom_calib)
     rng = np.random.default_rng(args.seed)
@@ -1308,9 +1394,9 @@ def run_headless(args):
     precision = ort.InferenceSession(args.precision) if args.precision else None
     sim.reset(0, 0, 0)
     set_feet(sim, args.foot)
-    if args.goal_dist is not None or args.scene == "field":
+    if args.goal_dist is not None or args.scene in ("field", "field4"):
         setup_goal(sim)
-    if args.scene == "field":
+    if args.scene in ("field", "field4"):
         sim.arena = setup_field(sim)
         print(f"field: boards {sim.field}, geofence {sim.arena}")
     pose_src = None if (args.pose == "gt" and not args.dropout) else make_provider(args.pose, sim, imu_error=not args.no_imu_error, calib=args.odom_calib)
@@ -1571,7 +1657,7 @@ def main():
     ap.add_argument("--reloc", action="store_true",
                     help="wrap the mission in play.py's fall re-localization protocol (landmark: the field's fixed goal_b)")
     args = ap.parse_args()
-    if args.goal_dist is not None and args.scene not in ("allcollisions_ball_goal", "field"):
+    if args.goal_dist is not None and args.scene not in ("allcollisions_ball_goal", "field", "field4"):
         args.scene = "allcollisions_ball_goal"
     apply_calibration(args.calib)
     run_viewer(args) if args.viewer else run_headless(args)

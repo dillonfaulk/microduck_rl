@@ -1,0 +1,36 @@
+<mujoco model="microduck_field4">
+    <!-- THE field spec from 2026-11-18 (brief microduck-field-change-rung6-closing-brief.md): Dillon's
+         lab field for d10de, and the future 2v2 field. 4 m x 4 m, centre at the origin, lines at
+         x, y = +-2.0 m. NO boards: the boundary is a software geofence; the duck and the ball both
+         cross it freely, and out-of-bounds is the referee's call (scripts/play.py), as before.
+
+         Boundary wall: VISUAL ONLY (transparent blue, contype/conaffinity 0) and in geom group 5,
+         which mujoco's default render option hides: the duck's camera never sees it (the detectors
+         are unchanged); the viewer turns group 5 on to show the line.
+
+         Corner posts: one at each corner, centred on the corner. 75 mm diameter, 0.40 m tall, matte
+         blue = 3-inch PVC pipe, painted, on a weighted base. 0.40 m so the ToF's middle rows (axis
+         ~0.25 m up at rest) return off it and the camera sees its top at range; blue so neither the
+         white-post goal detector nor the orange-ball detector fires on it. Full collision (a real
+         post stops a ball and a duck). Scripts read every number back from the compiled model. -->
+    <default>
+        <default class="field_wall">
+            <geom type="box" contype="0" conaffinity="0" group="5" rgba="0.2 0.45 1.0 0.18"/>
+        </default>
+        <default class="field_corner">
+            <geom type="cylinder" size="0.0375 0.20" contype="1" conaffinity="1" friction="0.5 0.005 0.0001"
+                  rgba="0.10 0.25 0.85 1"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <geom name="field_wall_end_pos" class="field_wall" pos="2.0 0 0.15" size="0.0005 2.0 0.15"/>
+        <geom name="field_wall_end_neg" class="field_wall" pos="-2.0 0 0.15" size="0.0005 2.0 0.15"/>
+        <geom name="field_wall_side_left" class="field_wall" pos="0 2.0 0.15" size="2.0 0.0005 0.15"/>
+        <geom name="field_wall_side_right" class="field_wall" pos="0 -2.0 0.15" size="2.0 0.0005 0.15"/>
+        <geom name="field_corner_pp" class="field_corner" pos="2.0 2.0 0.20"/>
+        <geom name="field_corner_pn" class="field_corner" pos="2.0 -2.0 0.20"/>
+        <geom name="field_corner_np" class="field_corner" pos="-2.0 2.0 0.20"/>
+        <geom name="field_corner_nn" class="field_corner" pos="-2.0 -2.0 0.20"/>
+    </worldbody>
+</mujoco>

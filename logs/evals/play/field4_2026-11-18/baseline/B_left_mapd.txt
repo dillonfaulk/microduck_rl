@@ -1,0 +1,64 @@
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+continuous play: field (-2.0, 2.0, -2.0, 2.0), geofence (-2.25, 2.25, -2.25, 2.25), goals +x (2.000, 0.000) into 0 deg, -x (-2.000, 0.000) into 180 deg
+  foot left calib v2, pose mapd (stride_v1), estimated-only True, ball decel 0.03 m/s^2, time cap 240 s, kick cap 6/ball, routine landmark fix on
+  logs -> logs/evals/play/field4_2026-11-18/baseline/logs/B_left_mapd/
+  run  0 attack +x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 9 (cam 5, map 4) | first goal 76.1 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 11.3 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [3, 4, 1] | aborts {} | mapd relocs 0
+  run  1 attack -x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 6, map 2) | first goal 68.8 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 54.4 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 4] | aborts {} | mapd relocs 0
+  run  2 attack +x: GOALS 1  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 7 (cam 4, map 3) | first goal 231.3 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 16.0 mm | decisions ['out', 'GOAL'] kicks/ball [4, 3] | aborts {'ball_not_found': 3} | mapd relocs 0
+  run  3 attack -x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 11 (cam 7, map 4) | first goal 72.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 114.3 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [4, 2, 3] | aborts {} | mapd relocs 0
+  run  4 attack +x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 10 (cam 7, map 3) | first goal 56.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 23.8 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [3, 3, 3] | aborts {} | mapd relocs 0
+  run  5 attack -x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 5, map 3) | first goal 56.3 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 101.0 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [2, 3, 2] | aborts {} | mapd relocs 0
+  run  6 attack +x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 10 (cam 7, map 3) | first goal 70.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 144.3 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [4, 2, 2] | aborts {} | mapd relocs 0
+  run  7 attack -x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 5, map 1) | first goal 123.6 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 92.5 mm | decisions ['GOAL', 'GOAL'] kicks/ball [4, 2] | aborts {} | mapd relocs 0
+  run  8 attack +x: GOALS 4  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 9 (cam 8, map 1) | first goal 57.1 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 4.9 mm | decisions ['GOAL', 'GOAL', 'GOAL', 'GOAL'] kicks/ball [2, 3, 2, 2] | aborts {} | mapd relocs 0
+  run  9 attack -x: GOALS 1  other-end 0  out 1 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 4, map 4) | first goal 88.3 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 112.9 mm | decisions ['GOAL'] kicks/ball [4] | aborts {'ball_not_found': 2} | mapd relocs 0
+  run 10 attack +x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 10 (cam 6, map 4) | first goal 69.7 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 19.3 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [3, 3, 4] | aborts {} | mapd relocs 0
+  run 11 attack -x: GOALS 3  other-end 0  out 2 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 4, map 4) | first goal 33.7 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 11.3 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [1, 3, 3] | aborts {} | mapd relocs 0
+  run 12 attack +x: GOALS 2  other-end 0  out 3 (retrieved 2, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 7 (cam 4, map 3) | first goal 134.1 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 104.0 mm | decisions ['GOAL', 'GOAL'] kicks/ball [2, 3] | aborts {} | mapd relocs 0
+  run 13 attack -x: GOALS 3  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 9 (cam 7, map 2) | first goal 20.9 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 392.3 mm | decisions ['GOAL', 'GOAL', 'out', 'GOAL'] kicks/ball [1, 2, 3, 3] | aborts {} | mapd relocs 0
+  run 14 attack +x: GOALS 2  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 9 (cam 5, map 4) | first goal 79.8 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 84.6 mm | decisions ['GOAL', 'GOAL'] kicks/ball [4, 2] | aborts {'ball_not_found': 1} | mapd relocs 0
+  run 15 attack -x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 169.0 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 3 | end time_cap at 240.0 s, pose err 464.7 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 1] | aborts {'ball_not_found': 1} | mapd relocs 0
+  run 16 attack +x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 6 (cam 4, map 2) | first goal 44.6 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 93.8 mm | decisions ['GOAL', 'GOAL'] kicks/ball [2, 1] | aborts {} | mapd relocs 0
+  run 17 attack -x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 7 (cam 4, map 3) | first goal 122.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 108.5 mm | decisions ['GOAL', 'GOAL'] kicks/ball [4, 1] | aborts {'ball_not_found': 1} | mapd relocs 0
+  run 18 attack +x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 10 (cam 6, map 4) | first goal 57.8 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 8 | end time_cap at 240.0 s, pose err 39.8 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [3, 3, 2] | aborts {} | mapd relocs 0
+  run 19 attack -x: GOALS 3  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 10 (cam 6, map 4) | first goal 50.9 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 4.4 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [3, 3, 1] | aborts {} | mapd relocs 0
+  run 20 attack +x: GOALS 0  other-end 0  out 1 (retrieved 0, respawned 1, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 3 (cam 2, map 1) | first goal None s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 2 | end time_cap at 240.0 s, pose err 994.0 mm | decisions ['out'] kicks/ball [3] | aborts {'mission_cap': 1} | mapd relocs 0
+  run 21 attack -x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 9 (cam 6, map 3) | first goal 81.7 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 7 | end time_cap at 240.0 s, pose err 41.5 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [4, 3, 2] | aborts {} | mapd relocs 0
+  run 22 attack +x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 78.1 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 86.9 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 2] | aborts {'ball_not_found': 1} | mapd relocs 0
+  run 23 attack -x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 7 (cam 3, map 4) | first goal 67.5 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 60.6 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 2] | aborts {'ball_not_found': 1} | mapd relocs 0
+  run 24 attack +x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 5, map 3) | first goal 74.5 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 65.5 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 4] | aborts {} | mapd relocs 0
+  run 25 attack -x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 55.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 4 | end time_cap at 240.0 s, pose err 145.9 mm | decisions ['GOAL', 'GOAL'] kicks/ball [2, 2] | aborts {} | mapd relocs 0
+  run 26 attack +x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 5 (cam 3, map 2) | first goal 42.7 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 5 | end time_cap at 240.0 s, pose err 47.4 mm | decisions ['GOAL', 'GOAL'] kicks/ball [1, 2] | aborts {} | mapd relocs 0
+  run 27 attack -x: GOALS 2  other-end 0  out 1 (retrieved 1, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 10 (cam 6, map 4) | first goal 54.4 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 298.6 mm | decisions ['GOAL', 'GOAL'] kicks/ball [3, 4] | aborts {} | mapd relocs 0
+  run 28 attack +x: GOALS 2  other-end 0  out 2 (retrieved 2, respawned 0, retrieval kicks 1)  kick-cap 0  unplayable 0 | kicks 4 (cam 2, map 2) | first goal 171.1 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 3 | end time_cap at 240.0 s, pose err 73.6 mm | decisions ['GOAL', 'GOAL'] kicks/ball [1, 2] | aborts {'ball_lost': 1} | mapd relocs 0
+  run 29 attack -x: GOALS 3  other-end 0  out 0 (retrieved 0, respawned 0, retrieval kicks 0)  kick-cap 0  unplayable 0 | kicks 8 (cam 6, map 2) | first goal 50.2 s | falls 0 relocs 0 unlocalized kicks 0 routine fixes 6 | end time_cap at 240.0 s, pose err 130.6 mm | decisions ['GOAL', 'GOAL', 'GOAL'] kicks/ball [2, 3, 2] | aborts {} | mapd relocs 0
+
+PLAY SUMMARY: 30 runs x 240 s cap, left foot, pose mapd, ball decel 0.03 m/s^2, kick cap 6/ball, mission cap 90 s
+  goals (attacked end): total 70, per run median 2.0 (min 0, max 4); runs with >= 1 goal 29/30
+  out of bounds (4 m field, retrieval): 28 outs -> retrieved 22, respawned 3 (window 1, too far 2), other 3; retrieval kicks 7
+  goals in the OTHER end: 0; out of bounds 28; kick-cap restarts 0; unplayable restarts 0
+  kicks to score (per scored ball): 1: 9, 2: 23, 3: 26, 4: 12 (median 3)
+  time to first goal: median 70 s over 29 runs; runs hitting the time cap without a goal 1
+  camera kicks 146: |aim err| median 0.5, max 1.7 deg; per-kick outcomes {'goal': 12, 'post': 5, 'miss': 0, 'no_cross': 127}
+  map    kicks 85: |aim err| median 3.6, max 31.2 deg; per-kick outcomes {'goal': 0, 'post': 10, 'miss': 5, 'no_cross': 62}
+  falls 0 (during the protocol 0); re-localizations 0; kicks while NOT localized 0
+  routine FULL fixes 32: error before median 34 mm (max 170), after median 7 mm (max 14); heading fixed too in 32; |yaw err| before median 1.2 -> after 1.2 deg
+  routine HEADING-ONLY fixes 135: error before median 41 mm (max 430), after median 41 mm (max 430); heading fixed too in 135; |yaw err| before median 2.2 -> after 1.6 deg
+  run ends: {'time_cap': 30}; pose error at the end median 86 mm, max 994 mm

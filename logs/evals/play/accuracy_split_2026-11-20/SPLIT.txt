@@ -1,0 +1,346 @@
+kicks at a goal (shipping rows B_right_odom, B_left_odom, B_right_mapd, B_left_mapd): 1207 kept, 19 dropped (ball moved < 0.10 m)
+validation: plan_err vs logged aim_err_deg on 844 kicks: median diff +0.00 deg, p95 |diff| 0.19
+validation: map/camera classification agrees with logged aim_mode on 100.0% of 844
+validation: lat_mm vs logged true_align_ey_mm (right): r +0.98, n 396
+validation: lat_mm vs logged true_align_ey_mm (left): r +0.98, n 448
+kicks with no MISSION_DONE (mission cut by a whistle, mostly goals): 326  (on target 44%)
+
+Components: total = plan + exec. plan = the aim line the duck executes (pose heading for map aim, perception for camera aim); exec = ball vs the duck's body (alignment + kick).
+  overall                    n   median   IQR   mean|e|  p90|e|
+    total                 1207   -1.55   9.02  15.69  40.09
+    plan                  1207   -0.08   2.37   9.47  35.55
+    exec                  1207   -1.65   5.24  12.16  12.79
+    yaw_err               1207   +0.17   2.58   1.60   3.32
+
+### 1a. elapsed time in run at kick (s)
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     337   -1.43   5.91   9.54  15.98    51.0%
+    60-120                   286   -2.24  11.54  18.19  48.93    47.9%
+    120-180                  284   -0.88  11.15  17.43  42.47    48.2%
+    180-240                  300   -1.43  10.89  18.56  50.76    50.0%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     337   -0.05   1.40   4.21  11.51   
+    60-120                   286   -0.44   6.96  11.13  40.77   
+    120-180                  284   -0.10   3.67  12.01  43.10   
+    180-240                  300   -0.01   2.77  11.40  42.12   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     337   -1.18   4.12   7.44   9.88   
+    60-120                   286   -1.81   5.60  14.36  19.18   
+    120-180                  284   -1.46   5.99  13.89  19.50   
+    180-240                  300   -1.79   6.03  13.73  13.45   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     337   +0.34   2.18   1.32   2.69   
+    60-120                   286   -0.03   2.75   1.63   3.38   
+    120-180                  284   +0.09   2.89   1.72   3.50   
+    180-240                  300   +0.11   2.69   1.77   3.73   
+
+### 1b. time since last landed landmark fix (s)
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   -1.94   7.91  13.28  24.93    56.4%
+    10-20                     85   +1.10  23.33  27.46  70.26    47.1%
+    20-40                    173   -0.14  15.57  25.19  66.62    40.5%
+    40-60                    107   -3.02  12.29  23.85  76.56    32.7%
+    >60                       45   -1.16  10.39  13.16  41.88    40.0%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   -0.12   2.05   6.85  21.64   
+    10-20                     85   -0.14  18.54  18.44  49.13   
+    20-40                    173   +0.01   6.55  17.84  52.69   
+    40-60                    107   +0.07   4.84  16.38  54.53   
+    >60                       45   -0.08   3.93   9.95  35.37   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   +0.29   2.18   1.36   2.92   
+    10-20                     85   +0.00   2.06   1.24   2.50   
+    20-40                    173   -0.17   3.50   1.94   3.94   
+    40-60                    107   -0.17   4.07   2.25   4.32   
+    >60                       45   -0.86   5.10   3.31   6.64   
+    (no landed fix yet: 152 kicks; |total| mean 3.52)
+
+### 1c. time since last yaw-correcting fix (s)
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   -1.94   7.91  13.28  24.93    56.4%
+    10-20                     85   +1.10  23.33  27.46  70.26    47.1%
+    20-40                    173   -0.14  15.57  25.19  66.62    40.5%
+    40-60                    107   -3.02  12.29  23.85  76.56    32.7%
+    >60                       45   -1.16  10.39  13.16  41.88    40.0%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   -0.12   2.05   6.85  21.64   
+    10-20                     85   -0.14  18.54  18.44  49.13   
+    20-40                    173   +0.01   6.55  17.84  52.69   
+    40-60                    107   +0.07   4.84  16.38  54.53   
+    >60                       45   -0.08   3.93   9.95  35.37   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     645   +0.29   2.18   1.36   2.92   
+    10-20                     85   +0.00   2.06   1.24   2.50   
+    20-40                    173   -0.17   3.50   1.94   3.94   
+    40-60                    107   -0.17   4.07   2.25   4.32   
+    >60                       45   -0.86   5.10   3.31   6.64   
+  trend vs t: |total| slope +0.0492/unit (95% CI +0.0243..+0.0724), r +0.11, n 1207;  |plan| slope +0.0383/unit (95% CI +0.0252..+0.0536), r +0.15, n 1207
+  trend vs t_fix: |total| slope +0.1257/unit (95% CI +0.0456..+0.2234), r +0.07, n 1055;  |plan| slope +0.1362/unit (95% CI +0.0774..+0.2052), r +0.15, n 1055
+  trend vs t_fix, camera-aimed only: |plan| slope +0.2675/unit (95% CI +0.1813..+0.3665), r +0.33, n 593
+  trend vs t_fix, map-aimed only: |plan| slope -0.0015/unit (95% CI -0.0808..+0.1059), r -0.00, n 462
+
+### 1d. CONTRAST (not shipping): right odom, NO 60 s fix, NO pre-kick look - elapsed time
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                      84   -1.60  10.31  12.33  13.98    32.1%
+    60-120                    73   -0.42  18.07  22.02  57.75    37.0%
+    120-180                   71   +0.92  14.30  18.27  55.00    32.4%
+    180-240                   67   -0.94  15.77  15.64  35.86    41.8%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                      84   -0.18   1.45   4.77  11.92   
+    60-120                    73   +0.04   7.14  14.83  48.16   
+    120-180                   71   -0.05   3.91  12.91  49.74   
+    180-240                   67   +0.20   6.94  11.77  40.25   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                      84   +0.06   1.82   1.21   2.27   
+    60-120                    73   -1.15   2.41   1.82   3.50   
+    120-180                   71   -0.52   3.15   2.53   5.96   
+    180-240                   67   -1.26   4.33   3.20   6.78   
+  trend vs t (contrast): |total| slope +0.0149/unit (95% CI -0.0303..+0.0567), r +0.04, n 295;  |yaw_err| slope +0.0114/unit (95% CI +0.0079..+0.0147), r +0.37, n 295
+
+### 2a. ball distance to the nearest post of the attacked goal
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    ball <0.25 m             208   +2.46  90.96  61.27  146.13    31.2%
+    0.25-0.5                 117   -0.08  27.53  17.38  36.15    52.1%
+    0.5-1.0                  207   -2.30   6.35   6.37  14.97    72.9%
+    1.0-2.0                  369   -1.94   5.01   4.23   9.61    58.3%
+    >2.0                     306   -1.08   6.14   4.17   8.72    34.0%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    ball <0.25 m             208   -8.41  75.77  37.49  60.60   
+    0.25-0.5                 117   -0.12  24.03  16.17  30.75   
+    0.5-1.0                  207   -0.11   1.77   3.90  12.51   
+    1.0-2.0                  369   -0.09   1.07   1.33   1.60   
+    >2.0                     306   +0.09   2.22   1.46   3.24   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    ball <0.25 m             208   -1.63  17.85  52.04  175.76   
+    0.25-0.5                 117   -1.64   6.26   4.30   8.51   
+    0.5-1.0                  207   -2.21   4.51   4.07   8.66   
+    1.0-2.0                  369   -1.81   4.43   3.79   8.46   
+    >2.0                     306   -0.99   4.58   3.63   9.12   
+
+### 2b. ball angle off the attacked goal's axis (deg; >50 = map-aimed edge-on)
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-15                     334   -1.35   6.15   6.14   9.48    60.2%
+    15-30                    429   -1.51   6.42   8.75  12.49    58.0%
+    30-50                    215   -2.11   9.05  16.88  28.01    48.8%
+    50-70                     94   +1.15  41.63  43.94  125.69     9.6%
+    >70                      135   +4.88  66.30  39.79  71.94    23.7%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-15                     334   +0.01   1.51   1.57   3.82   
+    15-30                    429   +0.03   1.84   3.09   8.28   
+    30-50                    215   -0.31   1.43   7.52  25.21   
+    50-70                     94  -11.57  52.14  31.55  50.77   
+    >70                      135   +2.08  76.59  37.04  64.19   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-15                     334   -1.67   5.11   5.93   9.13   
+    15-30                    429   -1.64   4.19   7.40   9.90   
+    30-50                    215   -1.90   4.96  14.62  13.29   
+    50-70                     94   -0.12  40.00  48.92  169.22   
+    >70                      135   -1.51   7.48  13.19  23.83   
+  near-post (<0.5 m) kicks, how far off is 'off': |total| / goal half-angle from the ball:
+    0-0.25 m: n 208, half-angle median 31.9 deg, on-target 31%, map-aimed 82%, oblique median 60 deg
+    0.25-0.5 m: n 117, half-angle median 14.5 deg, on-target 52%, map-aimed 79%, oblique median 31 deg
+
+### 2c. duck (trunk) distance to the nearest goal post
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    duck <0.25 m             161   +0.26  122.59  72.61  153.81    23.6%
+    0.25-0.5                 122   +2.52  34.65  20.58  44.13    54.9%
+    0.5-1.0                  271   -2.22   7.82   7.29  17.95    61.6%
+    1.0-2.0                  583   -1.45   5.50   4.20   9.46    50.8%
+    >2.0                      70   -1.73   5.15   4.40  10.14    40.0%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    duck <0.25 m             161  -15.03  86.59  42.23  62.18   
+    0.25-0.5                 122   +3.63  34.53  19.20  35.94   
+    0.5-1.0                  271   -0.05   2.48   5.17  16.17   
+    1.0-2.0                  583   -0.09   1.37   1.43   3.02   
+    >2.0                      70   +0.16   1.17   0.81   1.68   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    duck <0.25 m             161   -1.32  66.84  65.87  188.60   
+    0.25-0.5                 122   -1.76   6.23   4.58   9.94   
+    0.5-1.0                  271   -1.81   4.55   3.80   8.04   
+    1.0-2.0                  583   -1.44   4.56   3.71   8.49   
+    >2.0                      70   -1.88   4.58   4.65  11.14   
+
+### 3. foot x aim mode
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             324   -0.44  10.55   9.48  20.54    42.6%
+    right map                258   +0.09  20.73  28.82  100.91    31.4%
+    left camera              360   -1.98   3.06   6.72   7.38    76.1%
+    left map                 265   -2.22  14.93  22.68  64.42    38.9%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             324   -0.09   1.34   5.45  19.15   
+    right map                258   +0.24  17.40  16.14  45.86   
+    left camera              360   -0.04   1.13   5.18   6.69   
+    left map                 265   -1.63  15.99  13.74  43.66   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             324   -0.35   9.57   6.29  12.57   
+    right map                258   +0.01  12.39  26.59  114.11   
+    left camera              360   -1.99   2.52   2.45   4.33   
+    left map                 265   -1.66   3.47  18.49  48.91   
+
+### 4. true lateral placement at contact, right foot (de-meaned, mm)
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                   93  -10.06   6.10  17.19  21.24   
+    -4..-2                    74   -4.14   5.70  10.58  10.82   
+    -2..0                    124   -1.95   5.29  10.41  10.41   
+    0..2                     110   +1.78   5.06  15.48  16.37   
+    2..4                      95   +3.93   4.76  20.16  30.00   
+    > 4 mm                    86   +7.50   6.32  18.68  22.93   
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                   93   -9.78   9.19  16.91  32.21    20.4%
+    -4..-2                    74   -4.34   9.51  15.06  37.42    29.7%
+    -2..0                    124   -2.37   8.42  17.00  46.29    45.2%
+    0..2                     110   +1.47   8.54  17.93  31.43    51.8%
+    2..4                      95   +3.44   6.97  20.66  59.40    50.5%
+    > 4 mm                    86   +7.33  10.13  20.66  52.98    19.8%
+  right: exec_err = +1.17 deg/mm x lat + -1.84  (R^2 0.01, lateral std 4.0 mm, n 582)
+
+### 4. true lateral placement at contact, left foot (de-meaned, mm)
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                  102   -1.51   2.35   7.29   3.94   
+    -4..-2                    82   -2.15   2.67   9.75   5.62   
+    -2..0                    116   -2.10   3.07   8.32   5.31   
+    0..2                     121   -2.22   2.73  12.08   5.88   
+    2..4                     104   -1.92   2.96   5.39   4.71   
+    > 4 mm                   100   -1.71   3.82  12.52   6.32   
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                  102   -1.33   4.21  12.49  26.60    68.6%
+    -4..-2                    82   -2.95   5.58  15.25  46.96    62.2%
+    -2..0                    116   -2.13   4.78  11.76  23.66    61.2%
+    0..2                     121   -2.32   4.20  13.42  21.93    63.6%
+    2..4                     104   -1.74   6.60  12.55  31.95    51.0%
+    > 4 mm                   100   -1.61   7.95  16.11  46.74    55.0%
+  left: exec_err = +0.50 deg/mm x lat + +1.25  (R^2 0.00, lateral std 4.3 mm, n 625)
+
+================ PASS 2: stratified ================
+near-post (ball or duck < 0.5 m from a goal post): 325 kicks; open field (neither, no post contact): 865; open-field kicks that still touched a post: 17
+
+### near-post share by elapsed time (the confound check for the time-decay read)
+    0-60       n  337  near-post  11.6%  map-aimed  35.9%  first-kick-of-run-ball  38.0% (ball >2 m from posts)
+    60-120     n  286  near-post  32.5%  map-aimed  47.2%  first-kick-of-run-ball  20.6% (ball >2 m from posts)
+    120-180    n  284  near-post  33.8%  map-aimed  46.8%  first-kick-of-run-ball  22.2% (ball >2 m from posts)
+    180-240    n  300  near-post  32.3%  map-aimed  44.7%  first-kick-of-run-ball  18.7% (ball >2 m from posts)
+
+### P2-1a. OPEN FIELD only: elapsed time
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     295   -1.52   5.17   4.07   9.38    51.9%
+    60-120                   187   -2.06   5.09   4.81  10.57    54.0%
+    120-180                  183   -1.33   5.87   4.82   9.54    53.0%
+    180-240                  200   -1.72   6.31   5.06  10.06    53.5%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     295   -0.05   1.23   1.15   2.58   
+    60-120                   187   -0.17   1.51   2.14   5.62   
+    120-180                  183   -0.15   1.69   2.31   4.75   
+    180-240                  200   -0.01   1.53   2.21   6.46   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     295   -1.27   4.09   3.58   8.35   
+    60-120                   187   -1.81   4.92   3.87   8.82   
+    120-180                  183   -1.48   4.60   3.68   8.58   
+    180-240                  200   -1.81   4.47   4.15   9.71   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-60                     295   +0.34   2.14   1.32   2.64   
+    60-120                   187   +0.29   2.98   1.69   3.46   
+    120-180                  183   +0.01   2.84   1.73   3.40   
+    180-240                  200   +0.14   2.75   1.80   3.90   
+
+### P2-1b. OPEN FIELD only: time since last landed fix
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     471   -1.80   5.40   4.62  10.39    58.0%
+    10-20                     31   -0.86   5.45   4.37   8.52    64.5%
+    20-40                    101   -0.78   6.28   4.99   9.98    50.5%
+    40-60                     73   -3.02   5.40   5.27  10.26    39.7%
+    >60                       37   -1.96   7.71   7.00  18.10    43.2%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     471   -0.05   1.26   1.76   3.22   
+    10-20                     31   -0.02   2.25   2.28   4.41   
+    20-40                    101   -0.16   1.65   2.69   4.98   
+    40-60                     73   -0.18   2.38   2.05   3.64   
+    >60                       37   -0.19   1.56   3.29   6.40   
+  [yaw_err_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    0-10                     471   +0.34   2.04   1.36   2.97   
+    10-20                     31   -0.06   2.66   1.38   2.46   
+    20-40                    101   -0.46   3.27   1.98   4.07   
+    40-60                     73   -0.06   4.01   2.10   3.83   
+    >60                       37   -1.55   5.44   3.35   6.55   
+  open-field trend vs t: |total| slope +0.0045/unit (95% CI +0.0000..+0.0083), r +0.07, n 865
+  open-field trend vs t: |plan| slope +0.0045/unit (95% CI +0.0015..+0.0076), r +0.09, n 865
+  open-field trend vs t: |yaw_err| slope +0.0029/unit (95% CI +0.0015..+0.0044), r +0.14, n 865
+  open-field trend vs t_fix: |total| slope +0.0237/unit (95% CI +0.0048..+0.0452), r +0.10, n 713
+  open-field trend vs t_fix: |plan| slope +0.0097/unit (95% CI -0.0059..+0.0285), r +0.05, n 713
+  open-field trend vs t_fix: |yaw_err| slope +0.0237/unit (95% CI +0.0160..+0.0317), r +0.34, n 713
+  open-field trend vs t_fix, camera-aimed: |plan| slope +0.0417/unit (95% CI +0.0200..+0.0686), r +0.24, n 523
+  open-field trend vs t_fix, map-aimed: |plan| slope -0.0548/unit (95% CI -0.0786..-0.0374), r -0.27, n 190
+    near-post by time 0-60     n  39 on-target  41.0%
+    near-post by time 60-120   n  93 on-target  36.6%
+    near-post by time 120-180  n  96 on-target  37.5%
+    near-post by time 180-240  n  97 on-target  41.2%
+
+### P2-2. near-post outcomes (ball or duck < 0.5 m from a goal post)
+    ball on/over the goal line (no direct shot)      95 (29.2%)  map-aimed  35%  oblique median  111 deg  |plan| median  47.6  |exec| median   4.5
+    on target, clean                                 71 (21.8%)  map-aimed 100%  oblique median   13 deg  |plan| median   6.5  |exec| median   3.5
+    hit a post (wide line)                           70 (21.5%)  map-aimed 100%  oblique median   59 deg  |plan| median  36.9  |exec| median   9.4
+    wide, no post contact                            47 (14.5%)  map-aimed 100%  oblique median   42 deg  |plan| median  27.8  |exec| median 106.5
+    on target, touched a post                        42 (12.9%)  map-aimed 100%  oblique median   32 deg  |plan| median  19.0  |exec| median   4.1
+    near-post   map     n  230 on-target  49.1%  |plan| median 19.00  |exec| median  5.25  yaw_err |median| 1.26
+    open field  camera  n  587 on-target  64.4%  |plan| median  0.50  |exec| median  2.73  yaw_err |median| 1.26
+    open field  map     n  251 on-target  25.9%  |plan| median  2.33  |exec| median  2.52  yaw_err |median| 1.32
+  near-post, not behind the line: oblique bins
+    oblique   0-30  n 101 on-target  84.2%  post hit   22%  map 100%  |total| median   8.6  mouth half-angle median 21.0 (head-on; edge-on it is smaller)
+    oblique  30-50  n  59 on-target  33.9%  post hit   66%  map 100%  |total| median  23.0  mouth half-angle median 22.1 (head-on; edge-on it is smaller)
+    oblique  50-70  n  56 on-target  14.3%  post hit   77%  map 100%  |total| median  32.7  mouth half-angle median 37.0 (head-on; edge-on it is smaller)
+    oblique  70-181 n  14 on-target   0.0%  post hit   57%  map 100%  |total| median  55.1  mouth half-angle median 27.9 (head-on; edge-on it is smaller)
+
+### P2-3. OPEN FIELD foot x aim mode
+  [total_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             285   -0.63   9.63   5.72  11.71    44.6%
+    right map                119   +0.13  10.59   6.87  13.34    21.8%
+    left camera              329   -2.10   2.81   2.81   4.85    80.9%
+    left map                 132   -1.06   7.10   4.73   9.78    29.5%
+  [plan_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             285   -0.12   1.10   1.18   1.46   
+    right map                119   +0.31   4.44   3.70  11.25   
+    left camera              329   -0.07   1.09   1.02   1.37   
+    left map                 132   +0.07   4.69   3.74  10.59   
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    right camera             285   -0.26   9.11   5.59  11.65   
+    right map                119   +0.00   9.20   5.37  10.54   
+    left camera              329   -2.08   2.37   2.34   4.32   
+    left map                 132   -1.13   2.93   2.13   3.83   
+
+### P2-4. OPEN FIELD lateral placement vs exec_err (robust: |exec| < 30 deg)
+
+### P2-4 right foot
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                   66  -10.14   5.00  10.52  17.27   
+    -4..-2                    58   -4.80   4.79   5.11   9.33   
+    -2..0                     83   -1.82   4.10   2.93   5.43   
+    0..2                      73   +1.61   4.22   3.20   6.84   
+    2..4                      63   +3.61   4.17   4.11   7.23   
+    > 4 mm                    60   +7.74   4.98   7.94  12.76   
+  right: exec = +1.47 deg/mm x lat -0.68  R^2 0.75  lateral std 4.1 mm  exec std 6.96 -> 3.50 deg if lateral were zero  (n 403, dropped |exec|>=30: 1)
+  right: open-field goal half-angle median 3.7 deg (ball 1.64 m out)
+
+### P2-4 left foot
+  [exec_err, deg]                 n   median   IQR   mean|e|  p90|e|   on-target
+    < -4 mm                   74   -1.25   2.15   1.99   3.71   
+    -4..-2                    60   -2.01   2.52   2.30   4.27   
+    -2..0                     86   -1.99   2.43   2.22   4.42   
+    0..2                      90   -2.23   2.11   2.33   4.12   
+    2..4                      77   -2.04   2.74   2.30   4.44   
+    > 4 mm                    74   -1.84   2.81   2.52   4.48   
+  left: exec = +0.04 deg/mm x lat -1.59  R^2 0.01  lateral std 4.3 mm  exec std 2.20 -> 2.20 deg if lateral were zero  (n 461, dropped |exec|>=30: 0)
+  left: open-field goal half-angle median 3.5 deg (ball 1.70 m out)
+
+### P2-5. what the open-field misses are made of (on-target fails, open field, not behind)
+  right: n 404  std total 8.04  plan 4.34  exec 7.11  yaw_err 2.00 | robust (MAD*1.48): total 7.22  plan 1.09  exec 6.73  yaw 1.70
+  left: n 461  std total 4.49  plan 3.82  exec 2.20  yaw_err 2.14 | robust (MAD*1.48): total 2.52  plan 1.04  exec 1.87  yaw 1.87
+
+### P2-6. near-post map aim geometry: where the INTENDED line (true ball -> the 0.3 m-deep aim point) crosses the goal line, i.e. with perfect execution
+    oblique   0-30  n 101  |y at line| median   36 mm  clean (<70 mm)   91%  inside posts (<105 mm)  100%  actual on-target   84%
+    oblique  30-50  n  59  |y at line| median   97 mm  clean (<70 mm)   32%  inside posts (<105 mm)   58%  actual on-target   34%
+    oblique  50-70  n  56  |y at line| median  106 mm  clean (<70 mm)   14%  inside posts (<105 mm)   50%  actual on-target   14%
+    oblique  70-181 n  14  |y at line| median  167 mm  clean (<70 mm)    0%  inside posts (<105 mm)    0%  actual on-target    0%
+  balls on/over the goal line: 95 kicks (7.9% of all kicks), camera-aimed 65%
+
+### variance of total_err carried by each component (var(total) = var(plan) + var(exec) + 2cov)
+  right: std total 36.56, plan 19.53, exec 39.35, cov -297.19
+  left: std total 32.28, plan 19.50, exec 33.69, cov -237.06

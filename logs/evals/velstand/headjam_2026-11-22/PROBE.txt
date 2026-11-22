@@ -1,0 +1,1524 @@
+exact stall state, 20 s, zero command, head neutral
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  round3        clamp=False tilt 5/10/20 s  43.2 /  42.9 /  42.7  min  42.7  got up NO         neck target min -3.49 rad (range -1.57..+1.05)
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  round3        clamp=True  tilt 5/10/20 s  49.7 /  50.1 /  50.7  min  43.9  got up NO         neck target min -3.56 rad (range -1.57..+1.05)
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  stand_expert  clamp=False tilt 5/10/20 s  42.6 /  42.4 /  42.3  min  42.3  got up NO         neck target min -3.49 rad (range -1.57..+1.05)
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  stand_expert  clamp=True  tilt 5/10/20 s  48.5 /  48.8 /  49.3  min  43.9  got up NO         neck target min -3.49 rad (range -1.57..+1.05)
+20 perturbed stall states (joint noise +-0.1 rad), 15 s each: got up / 20
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  round3        clamp=False got up  7/20  (median 5.3 s)  neck target min -3.66
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  round3        clamp=True  got up  2/20  (median 1.2 s)  neck target min -3.73
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  stand_expert  clamp=False got up  7/20  (median 3.7 s)  neck target min -3.53
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+BAM m6 actuators on 14 joints: kt=0.3660 R=2.8114 vin=7.40V kp_fw=200 vin_drop_gain=0.1 vin_min=6.0 max_current=None forcerange=+/-0.963Nm armature=1.81e-03
+Loading walking policy from: logs/evals/velstand/headjam_2026-11-22/stand_expert_spincap_model_11000.onnx
+Walking policy input: obs, shape: [1, 61]
+Walking policy output: actions, shape: [1, 14]
+Sensors found:
+  imu_ang_vel: id=2
+Body IDs:
+  trunk_base: id=1
+Number of actuators: 14
+Default pose: [ 0.     -0.0873 -0.4579 -0.0049  0.453   0.3491  0.3491  0.      0.
+  0.      0.0873  0.4579  0.0049 -0.453 ]
+Action scale: 1.0
+
+Actuator delay enabled:
+  Min lag: 1 timesteps
+  Max lag: 1 timesteps
+  Sampled lag: 1 timesteps
+  Buffer size: 2
+  stand_expert  clamp=True  got up  2/20  (median 1.2 s)  neck target min -3.71
+round3 neck target min after 0.1 s: -3.48 rad tilt20 42.7
+stand_expert neck target min after 0.1 s: -3.35 rad tilt20 42.3

@@ -78,9 +78,12 @@ def kicks_of(row):
                 map_mode = True            # the pre-kick look runs only before map-aimed kicks (and is ON here)
             elif k == "HEADING_FROM_GOAL":
                 kh = e["kick_heading_deg"]
-            elif k == "out":
+            # out state: the out call, then WHISTLE out_window OPENS the retrieval window (a kick in it is a
+            # retrieval kick toward the centre spot); retrieved / out_respawn / any other whistle closes it.
+            # (2026-11-22 fix: the first version closed it on out_window and counted retrieval kicks as shots.)
+            elif k == "out" or (k == "WHISTLE" and e.get("why") == "out_window"):
                 ball_out = True
-            elif k in ("retrieved", "out_respawn") or (k == "WHISTLE" and e.get("why") != "goal"):
+            elif k in ("retrieved", "out_respawn") or k == "WHISTLE":
                 ball_out = False
             elif k == "MISSION_DONE" and pending is not None:
                 pending["md"] = e

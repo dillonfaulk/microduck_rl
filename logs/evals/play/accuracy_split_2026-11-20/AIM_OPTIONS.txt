@@ -1,0 +1,13 @@
+near-post map-aimed kicks with a shot: 230
+  oblique   0-30  n 101 | clean half-window median 13.9 deg | deep0.3: intended clean  91%, w/ actual dev on-target  84% clean  70% | centre: intended clean 100%, w/ actual dev on-target  88% clean  84% | bisect: intended clean 100%, w/ actual dev on-target  87% clean  85% |
+  oblique  30-50  n  59 | clean half-window median 12.8 deg | deep0.3: intended clean  32%, w/ actual dev on-target  34% clean  17% | centre: intended clean 100%, w/ actual dev on-target  75% clean  68% | bisect: intended clean 100%, w/ actual dev on-target  73% clean  69% |
+  oblique  50-70  n  56 | clean half-window median 14.4 deg | deep0.3: intended clean  14%, w/ actual dev on-target  14% clean  12% | centre: intended clean 100%, w/ actual dev on-target  27% clean  21% | bisect: intended clean 100%, w/ actual dev on-target  27% clean  18% |
+  oblique  70-181 n  14 | clean half-window median  5.3 deg | deep0.3: intended clean   0%, w/ actual dev on-target   0% clean   0% | centre: intended clean 100%, w/ actual dev on-target  64% clean  29% | bisect: intended clean 100%, w/ actual dev on-target  64% clean  29% |
+  oblique   0-181 n 230 | clean half-window median 12.7 deg | deep0.3: intended clean  52%, w/ actual dev on-target  49% clean  38% | centre: intended clean 100%, w/ actual dev on-target  68% clean  61% | bisect: intended clean 100%, w/ actual dev on-target  67% clean  61% |
+  deviation from intended, near-post map kicks: median -3.2, MAD*1.48 9.1, |dev|>30 deg 27% (misfires)
+  right: n 115 dev MAD*1.48 11.4 deg, misfire 29%
+  left: n 115 dev MAD*1.48 4.0 deg, misfire 24%
+  misfires: n 61, duck<0.25 m from a post 100%, post contact 61%, oblique median 57
+
+ball on/over the goal line: 33 kicks; |y| from the goal axis median 180 mm, over the line by median -18 mm; camera-aimed 0%
+near-post map kicks per 240 s run: 1.92; behind-line kicks per run: 0.28

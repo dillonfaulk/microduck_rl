@@ -1172,8 +1172,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
                          corner_look=corner_look, corners=corners,
                          timer_fix=new and not getattr(args, "no_timer_fix", False),
                          pre_kick_fix=new and not getattr(args, "no_pre_kick_fix", False),
-                         near_post={"aim": not getattr(args, "no_np_aim", False), "setup": not getattr(args, "no_np_setup", False),
-                                    "line": not getattr(args, "no_np_line", False),
+                         near_post={"aim": not getattr(args, "no_np_aim", False), "setup": getattr(args, "np_setup", False),
+                                    "line": getattr(args, "np_line", False),
                                     "oblique_deg": getattr(args, "np_oblique_deg", 50.0)} if new else None)
     ref = PlayReferee(sim, goals, retrieval=fc["retrieval"])
     if viewer is not None:
@@ -1415,8 +1415,10 @@ def main():
     ap.add_argument("--no-timer-fix", action="store_true", help="4 m field: no 60 s timer fix")
     ap.add_argument("--no-pre-kick-fix", action="store_true", help="4 m field: no landmark look before a map-aimed kick")
     ap.add_argument("--no-np-aim", action="store_true", help="4 m field: NP1 off (map aim 0.3 m into the goal, as before)")
-    ap.add_argument("--no-np-setup", action="store_true", help="4 m field: NP2 off (no oblique / stance-clearance setup tap)")
-    ap.add_argument("--no-np-line", action="store_true", help="4 m field: NP3 off (no setup tap for a ball on/over the goal line)")
+    # Defaults (Dillon 2026-11-22, after the near-post batteries): NP1 ON; NP2/NP3 OFF (setup taps cost goals in every
+    # variant measured: shipping rows 224 -> 327 goals with NP1 alone vs 232 with NP1-3). Kept, opt-in.
+    ap.add_argument("--np-setup", action="store_true", help="4 m field: NP2 ON (oblique / stance-clearance setup tap; default off)")
+    ap.add_argument("--np-line", action="store_true", help="4 m field: NP3 ON (setup tap for a ball on/over the goal line; default off)")
     ap.add_argument("--np-oblique-deg", type=float, default=50.0, help="NP2: off-axis angle above which a near-post ball is tapped")
     ap.add_argument("--no-near-post", action="store_true", help="NP1-NP3 all off (the closing-work behaviour)")
     ap.add_argument("--spawn-near-post", action="store_true",
@@ -1428,7 +1430,7 @@ def main():
     ap.add_argument("--viewer", action="store_true")
     args = ap.parse_args()
     if args.no_near_post:
-        args.no_np_aim = args.no_np_setup = args.no_np_line = True
+        args.no_np_aim, args.np_setup, args.np_line = True, False, False
     km.apply_calibration(args.calib)
     if args.viewer:
         import play_viewer

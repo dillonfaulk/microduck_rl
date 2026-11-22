@@ -165,6 +165,9 @@ CALIBRATIONS = {  # (stance shift m, aim offset deg) per kicking foot
     "v1": {"right": (0.010, -17.9), "left": (0.0, 11.2)},
     "v2": {"right": (0.0, -6.7), "left": (0.0, 12.2)},
 }
+# EVAL ONLY (BallKick v3 lateral-sensitivity sweep, 2026-11-22): shift the precision stance SIDEWAYS (+ = duck to
+# its left, so the ball sits further right of the trained spot). Default 0 = unchanged; no mission/play sets it.
+EVAL_LATERAL_SHIFT_M = float(os.environ.get("KICK_LATERAL_SHIFT", "0.0"))
 PRECISE_STANCE_SHIFT_M = {"right": float(os.environ.get("KICK_STANCE_SHIFT", "0.010")),
                           "left": float(os.environ.get("KICK_STANCE_SHIFT_LEFT", "0.0"))}
 # Aim offset for BallKick v1's (right foot, ts0.25 model_1000) left drift. The duck lines up
@@ -793,7 +796,8 @@ class Mission:
 
     def precise_stance(self, ball_xy):
         """Stance target for the step policy: the trained stance, PRECISE_STANCE_SHIFT_M further along the kick line."""
-        return self.stance_point(ball_xy) + PRECISE_STANCE_SHIFT_M[self.foot] * np.array([math.cos(self.kh), math.sin(self.kh)])
+        k = np.array([math.cos(self.kh), math.sin(self.kh)])
+        return self.stance_point(ball_xy) + PRECISE_STANCE_SHIFT_M[self.foot] * k + EVAL_LATERAL_SHIFT_M * np.array([-k[1], k[0]])
 
     def precise_offset(self, pose, ball_xy):
         """Option-A command: remaining offset to the stance pose in the trunk yaw frame, clipped to training range."""

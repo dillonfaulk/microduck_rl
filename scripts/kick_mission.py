@@ -164,6 +164,9 @@ PRECISE_MAX_YAW = math.radians(15)
 CALIBRATIONS = {  # (stance shift m, aim offset deg) per kicking foot
     "v1": {"right": (0.010, -17.9), "left": (0.0, 11.2)},
     "v2": {"right": (0.0, -6.7), "left": (0.0, 12.2)},
+    # v3 (2026-11-22): right = BallKick v3 right fine-tune model_1875 (uncal drift +4.3 deg, flat; stance 0);
+    # left unchanged = BallKick v2 left model_500's v2 calibration (v3 is right-foot only)
+    "v3": {"right": (0.0, -4.3), "left": (0.0, 12.2)},
 }
 # EVAL ONLY (BallKick v3 lateral-sensitivity sweep, 2026-11-22): shift the precision stance SIDEWAYS (+ = duck to
 # its left, so the ball sits further right of the trained spot). Default 0 = unchanged; no mission/play sets it.

@@ -82,3 +82,53 @@ def test_v2_env_sets_overshoot_start_noise_and_experiment(monkeypatch):
         monkeypatch.delenv("MICRODUCK_BALLKICK_V2")
         monkeypatch.delenv("MICRODUCK_KICK_FOOT")
         importlib.reload(bk)
+
+
+def test_v3_default_off_has_no_lateral_term(monkeypatch):
+    monkeypatch.delenv("MICRODUCK_BALLKICK_V3", raising=False)
+    monkeypatch.setenv("MICRODUCK_BALLKICK_V2", "1")
+    try:
+        mod = importlib.reload(bk)
+        cfg = mod.make_microduck_ball_kick_env_cfg()
+        assert "ball_lateral_velocity" not in cfg.rewards
+        assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_v2_right"
+        assert mod.MicroduckBallKickRlCfg.save_interval == 250
+    finally:
+        monkeypatch.delenv("MICRODUCK_BALLKICK_V2")
+        importlib.reload(bk)
+
+
+def test_v3_env_is_v2_plus_only_the_lateral_penalty(monkeypatch):
+    monkeypatch.setenv("MICRODUCK_BALLKICK_V2", "1")
+    v2 = importlib.reload(bk).make_microduck_ball_kick_env_cfg()
+    monkeypatch.delenv("MICRODUCK_BALLKICK_V2")
+    monkeypatch.setenv("MICRODUCK_BALLKICK_V3", "1")
+    try:
+        mod = importlib.reload(bk)
+        cfg = mod.make_microduck_ball_kick_env_cfg()
+        assert set(cfg.rewards) - set(v2.rewards) == {"ball_lateral_velocity"}
+        assert set(v2.rewards) - set(cfg.rewards) == set()
+        for k in v2.rewards:
+            assert cfg.rewards[k].weight == v2.rewards[k].weight, k
+        t = cfg.rewards["ball_lateral_velocity"]
+        assert t.weight == -8.0 and t.func.__name__ == "ball_lateral_velocity_penalty"
+        assert cfg.rewards["ball_speed_overshoot"].weight == -8.0
+        assert cfg.events["reset_robot_joints"].params["position_range"] == (-0.08, 0.08)
+        assert mod.MicroduckBallKickRlCfg.experiment_name == "ball_kick_v3_right"
+        assert mod.MicroduckBallKickRlCfg.save_interval == 125
+    finally:
+        monkeypatch.delenv("MICRODUCK_BALLKICK_V3")
+        importlib.reload(bk)
+
+
+def test_lateral_penalty_is_the_perpendicular_speed():
+    import torch
+    from types import SimpleNamespace
+    from mjlab_microduck.tasks import mdp
+    env = SimpleNamespace(num_envs=3, device="cpu")
+    env._ball_kick_dir_w = torch.tensor([[1.0, 0.0], [0.0, 1.0], [0.6, 0.8]])
+    vel = torch.tensor([[0.3, 0.05, 0.0], [0.1, 0.4, 0.0], [0.6, 0.8, 0.0]])
+    ball = SimpleNamespace(data=SimpleNamespace(root_link_lin_vel_w=vel))
+    env.scene = {"ball": ball}
+    out = mdp.ball_lateral_velocity_penalty(env, "ball")
+    assert torch.allclose(out, torch.tensor([0.05, 0.1, 0.0]), atol=1e-6)

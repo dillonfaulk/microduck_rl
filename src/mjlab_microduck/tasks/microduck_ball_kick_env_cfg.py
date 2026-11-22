@@ -110,7 +110,12 @@ BALL_TARGET_SPEED = float(os.environ.get("MICRODUCK_BALL_TARGET_SPEED", "1.0"))
 #      still beats not kicking up to 0.625 m/s (2.5x) at a 0.25 target.
 #   2. Start-stance joint noise +-0.05 -> +-0.08 rad (PrecisionStep's own value;
 #      both v1 feet overfit the +-0.05 start stance after ~1000-1500 its).
-BALLKICK_V2 = os.environ.get("MICRODUCK_BALLKICK_V2", "0") == "1"
+# BallKick v3 (fork-local, run plan 2026-11-22): MICRODUCK_BALLKICK_V3=1 = the v2 recipe PLUS one variable:
+# a ball LATERAL-velocity penalty (weight LATERAL_WEIGHT, the overshoot's slope), so the ball-blind kick
+# learns a direction that does not follow the ball's lateral offset (v2 right: +1.5 deg/mm). Unset = v2/v1.
+BALLKICK_V3 = os.environ.get("MICRODUCK_BALLKICK_V3", "0") == "1"
+LATERAL_WEIGHT = -8.0
+BALLKICK_V2 = BALLKICK_V3 or os.environ.get("MICRODUCK_BALLKICK_V2", "0") == "1"
 OVERSHOOT_WEIGHT = -8.0 if BALLKICK_V2 else -4.0
 START_JOINT_NOISE = 0.08 if BALLKICK_V2 else 0.05
 
@@ -265,6 +270,12 @@ def make_microduck_ball_kick_env_cfg(
         weight=OVERSHOOT_WEIGHT,
         params={"asset_name": "ball", "target_speed": BALL_TARGET_SPEED},
     )
+    if BALLKICK_V3:
+        cfg.rewards["ball_lateral_velocity"] = RewardTermCfg(
+            func=microduck_mdp.ball_lateral_velocity_penalty,
+            weight=LATERAL_WEIGHT,
+            params={"asset_name": "ball", "max_speed": 1.0},
+        )
 
     # Support foot: binary +1 while the non-kicking foot touches the ground.
     # Always-on anti-hop — swinging the kicking leg is free, lifting the
@@ -673,9 +684,11 @@ MicroduckBallKickRlCfg = RslRlOnPolicyRunnerCfg(
         symmetry_cfg=SYMMETRY_CFG if ENABLE_SYMMETRY else None,
     ),
     wandb_project="mjlab_microduck",
-    experiment_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
-    run_name=f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2 else f"ball_kick_{KICK_FOOT}",
-    save_interval=250,
+    experiment_name=(f"ball_kick_v3_{KICK_FOOT}" if BALLKICK_V3 else f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2
+                     else f"ball_kick_{KICK_FOOT}"),
+    run_name=(f"ball_kick_v3_{KICK_FOOT}" if BALLKICK_V3 else f"ball_kick_v2_{KICK_FOOT}" if BALLKICK_V2
+              else f"ball_kick_{KICK_FOOT}"),
+    save_interval=125 if BALLKICK_V3 else 250,
     num_steps_per_env=24,
     max_iterations=10_000,
 )

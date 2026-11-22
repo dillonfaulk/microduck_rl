@@ -6234,6 +6234,25 @@ def ball_speed_overshoot_penalty(
     return over.clamp(0.0, max_penalty)
 
 
+def ball_lateral_velocity_penalty(
+    env: ManagerBasedRlEnv,
+    asset_name: str = "ball",
+    max_speed: float = 1.0,
+) -> torch.Tensor:
+    """|Ball XY velocity PERPENDICULAR to the per-env kick direction|, clamped to [0, max] (>= 0).
+
+    BallKick v3 (fork-local, 2026-11-22): ``ball_forward_velocity`` pays the forward component only, so the
+    ball-blind policy is never told WHERE the ball goes, and the right-foot v2 swing's direction follows the
+    ball's lateral offset (+1.5 deg/mm). With the spawn's lateral noise, this term's expected cost is
+    minimised by a swing whose ball direction does not depend on that offset (it also prices a constant drift).
+    """
+    ball: Entity = env.scene[asset_name]
+    vel_xy = ball.data.root_link_lin_vel_w[:, :2]
+    d = _ball_kick_dir(env)
+    lat = vel_xy[:, 0] * -d[:, 1] + vel_xy[:, 1] * d[:, 0]
+    return torch.nan_to_num(lat.abs(), nan=0.0).clamp(0.0, max_speed)
+
+
 def single_foot_grounded_reward(
     env: ManagerBasedRlEnv,
     sensor_name: str,

@@ -85,6 +85,7 @@ SPAWN_INSET_M = 0.60         # 6 m field: a respawned ball lands this far inside
 SPAWN_CLEAR_M = 0.60         # ... and this far from the duck
 TIME_CAP_S = 240.0
 BALL_KICK_CAP = 6
+SETUP_KICK_CAP = 6           # near-post setup taps (NP2/NP3) at one ball: a SEPARATE cap (Dillon 2026-11-22)
 MISSION_CAP_S = 90.0         # one mission (scan .. kick .. settle) longer than this is cancelled and restarted
 GOAL_CAM_RANGE_M = 2.5
 WATCH_MAX_S, WATCH_GAP_S, WATCH_STILL_M = 10.0, 0.6, 0.02
@@ -148,6 +149,10 @@ class PlayConfig:
     obstacles: tuple = ()                # map posts (x, y, radius) a route must clear (4 m field: goal + corner posts)
     goal_aim: tuple | None = None        # where a map-aimed kick points: 0.3 m INTO the goal (a ball resting on the
                                          # line made ball -> line-centre a 2 cm vector: a 66 deg "heading" into a post)
+    np_aim: bool = False                 # NP1: map aim through the middle of the clean window (not 0.3 m deep)
+    np_setup: bool = False               # NP2: near-post ball > np_oblique off axis, or stance < 0.25 m from a post: tap
+    np_line: bool = False                # NP3: ball on/over the goal line: tap it back out in front
+    np_oblique: float = math.radians(50)
 
     @classmethod
     def retrieval(cls, field):
@@ -296,6 +301,36 @@ def spawn_ball(sim, rng, field, inset=SPAWN_INSET_M):
     return b
 
 
+def spawn_near_post(sim, rng, goal_lm, field):
+    """Battery (--spawn-near-post): a fresh ball in the attacked goal's near-post zone -- within 0.5 m of a
+    post, 0-90 deg off the goal's axis, either side; 1 in 5 sits ON the goal line beside the posts. Clear of
+    the posts, of the duck, and inside the lines. Environment side: truth is fine."""
+    gx, gy, into = goal_lm
+    u = np.array([math.cos(into), math.sin(into)])
+    lat = np.array([-u[1], u[0]])
+    g = np.array([gx, gy])
+    posts = [g + s_ * 0.115 * lat for s_ in (1.0, -1.0)]
+    fx0, fx1, fy0, fy1 = field
+    (x, y, _), _, _ = sim.pose()
+    for _ in range(500):
+        if rng.uniform() < 0.2:                                      # on the line, beside the goal
+            b = g - 0.02 * u + rng.choice((-1.0, 1.0)) * rng.uniform(0.17, 0.5) * lat
+        else:
+            th = rng.uniform(-math.pi / 2, math.pi / 2)
+            r = rng.uniform(0.12, 0.6)
+            b = g + r * (-u * math.cos(th) + lat * math.sin(th))
+        if min(np.linalg.norm(b - p) for p in posts) > 0.5 or min(np.linalg.norm(b - p) for p in posts) < 0.07:
+            continue
+        if (b - g) @ u > -0.02 or not (fx0 + 0.04 < b[0] < fx1 - 0.04 and fy0 + 0.04 < b[1] < fy1 - 0.04):
+            continue
+        if math.hypot(b[0] - x, b[1] - y) >= SPAWN_CLEAR_M:
+            break
+    sim.data.qpos[sim.bqa:sim.bqa + 7] = [b[0], b[1], 0.035, 1, 0, 0, 0]
+    sim.data.qvel[sim.bva:sim.bva + 6] = 0
+    mujoco.mj_forward(sim.model, sim.data)
+    return (float(b[0]), float(b[1]))
+
+
 def stand_up_in_place(sim):
     """VIEWER ONLY: the human pick-up. The duck is set upright in its standing idle pose where it lies
     (heading kept), at rest; the sim clock runs on. No battery calls this."""
@@ -338,7 +373,8 @@ class PlaySupervisor:
 
     def __init__(self, sim, kick, precision, foot, pose_src, ball_src, goal_src, attack_goal, attack_key,
                  landmarks, log, estimated_only=True, hide_goal=None, routine_fix=True, single=False, target=None,
-                 mission_play=True, corner_look=None, corners=(), timer_fix=False, pre_kick_fix=False):
+                 mission_play=True, corner_look=None, corners=(), timer_fix=False, pre_kick_fix=False,
+                 near_post=None):
         """single (Stage 4 replay, kick_mission.py --reloc): one ball, one kick, then OVER; the missions are
         Stage 4 missions (mission_play=False) aimed at `target` (the placed goal's assignment)."""
         self.sim, self.kick, self.precision, self.foot = sim, kick, precision, foot
@@ -359,12 +395,16 @@ class PlaySupervisor:
         self._t_timer, self._timer_due = 0.0, None
         if pre_kick_fix:
             self.cfg.pre_kick_fix = self._pre_kick_fix
+        if near_post and attack_key in landmarks:         # NP1-NP3 (needs the goal's facing: the 4 m field map)
+            self.cfg.np_aim, self.cfg.np_setup, self.cfg.np_line = (bool(near_post.get(k)) for k in ("aim", "setup", "line"))
+            self.cfg.np_oblique = math.radians(near_post.get("oblique_deg", 50.0))
         self.pending_refs = []           # (GoalReferee, kick record): fed by the ENVIRONMENT (play loop), not here
         self.walk_session = sim.policy.ort_session
         self.localized = True
         self.need_reloc = False
         self.over = None                 # why the run ended early (None = still playing / time cap)
         self.kicks, self.kicks_unlocalized, self.ball_kicks = [], 0, 0
+        self.setup_kicks, self.setup_kicks_total = 0, 0       # near-post taps at this ball / in the run
         self.falls, self.reloc_falls, self.relocs = 0, 0, []
         self.request = None              # to the referee: "unplayable" | "kick_cap"
         self.missions = 0
@@ -430,6 +470,7 @@ class PlaySupervisor:
             self.retrieving = False
             if why != "retrieved":
                 self.ball_kicks = 0
+                self.setup_kicks = 0
         self._ev("WHISTLE", **event)
         if self.state in ("MISSION", "WATCH", "SEARCH", "AWAIT", "FIX"):
             self._cancel_mission()
@@ -552,10 +593,13 @@ class PlaySupervisor:
         if kicked:
             if self.retrieving:
                 self.retrieval_kicks += 1
+            elif r.get("kick_kind") == "setup":
+                self.setup_kicks += 1
+                self.setup_kicks_total += 1
             else:
                 self.ball_kicks += 1
             rec = {"retrieval": self.retrieving}
-            rec.update({k: r.get(k) for k in ("t_swap", "aim_mode", "aim_why", "aim_err_deg", "pose_err_yaw_deg", "pose_err_mm", "kick_dir_err_deg",
+            rec.update({k: r.get(k) for k in ("t_swap", "kick_kind", "aim_mode", "aim_why", "aim_err_deg", "pose_err_yaw_deg", "pose_err_mm", "kick_dir_err_deg",
                                          "peak_ball_fwd", "approach_mode", "falls")})
             self.kicks.append(rec)
             if m.referee is not None:
@@ -601,6 +645,10 @@ class PlaySupervisor:
         self.searches = 0
         if self.ball_kicks >= BALL_KICK_CAP:
             self.request = "kick_cap"
+            self._new_mission()
+            return (0.0, 0.0, 0.0)
+        if self.setup_kicks >= SETUP_KICK_CAP:
+            self.request = "setup_cap"
             self._new_mission()
             return (0.0, 0.0, 0.0)
         self.state, self.t_watch, self.watch, self.watch_sightings = "WATCH", t, [], []
@@ -1101,7 +1149,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
         sim.step()
     sim.t = 0.0
     fc = sim.field_cfg
-    b0 = spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"])
+    b0 = (spawn_near_post(sim, rng, lm[attack], sim.field) if getattr(args, "spawn_near_post", False) and attack in lm
+          else spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"]))
     pose_src.reset(sim, seed=args.seed * 1000 + k)
     pose_src.dropouts = [] if not args.dropout else [tuple(float(v) for v in args.dropout.split(","))]
     ball_cam.pose_src = pose_src
@@ -1122,13 +1171,16 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
                          estimated_only=args.estimated_only, hide_goal=args.hide_goal, routine_fix=not args.no_routine_fix,
                          corner_look=corner_look, corners=corners,
                          timer_fix=new and not getattr(args, "no_timer_fix", False),
-                         pre_kick_fix=new and not getattr(args, "no_pre_kick_fix", False))
+                         pre_kick_fix=new and not getattr(args, "no_pre_kick_fix", False),
+                         near_post={"aim": not getattr(args, "no_np_aim", False), "setup": not getattr(args, "no_np_setup", False),
+                                    "line": not getattr(args, "no_np_line", False),
+                                    "oblique_deg": getattr(args, "np_oblique_deg", 50.0)} if new else None)
     ref = PlayReferee(sim, goals, retrieval=fc["retrieval"])
     if viewer is not None:
         sup.end_on_getup_failure = False      # the viewer waits for a human pick-up (R); batteries end the run
     falls_script = FallScript(args.fall_in, args.push_v, n_falls=getattr(args, "falls_per_run", 1)) if args.fall_in else None
     rec = {"run": k, "attack": attack, "field": args.field, "goals_for": 0, "goals_against": 0, "out": 0, "retrieved": 0,
-           "out_respawn": 0, "kick_cap": 0, "unplayable": 0, "t_first_goal": None, "balls": 1}
+           "out_respawn": 0, "kick_cap": 0, "setup_cap": 0, "unplayable": 0, "t_first_goal": None, "balls": 1}
     spawns = [b0]
     events = []
     log.event({"t": 0.0, "event": "PLAY_START", "attack": attack, "ball": [round(v, 3) for v in b0]})
@@ -1202,7 +1254,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
             sup.pending_refs.clear()
             events.append(ev)
             log.event({"t": round(sim.t, 3), "event": "REFEREE", **ev})
-            b = spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"])
+            b = (spawn_near_post(sim, rng, lm[attack], sim.field) if getattr(args, "spawn_near_post", False) and attack in lm
+                 else spawn_ball(sim, rng, sim.field, fc["spawn_inset_m"]))
             ref.reset()
             spawns.append(b)
             rec["balls"] += 1
@@ -1226,7 +1279,7 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
                kicks_per_ball=[ev["kicks_at_ball"] for ev in events],
                decisions=[(("out" if ev["event"] == "out_respawn" else ev["event"]) if ev["event"] != "goal"
                            else ("GOAL" if ev["end"] == attack else "own_end")) for ev in events],
-               retrieval_kicks=sup.retrieval_kicks,
+               retrieval_kicks=sup.retrieval_kicks, setup_kicks=sup.setup_kicks_total,
                spawn_dist_to_goal=[round(math.hypot(b[0] - gm[0], b[1] - gm[1]), 2) for b in spawns],
                aim_modes={m: sum(1 for kk in sup.kicks if kk.get("aim_mode") == m) for m in ("camera", "map")},
                wall_s=round(time.time() - t_wall, 0))
@@ -1267,6 +1320,14 @@ def summarize(rows, args):
               f"{sum(r['retrieval_kicks'] for r in rows)}")
     print(f"  goals in the OTHER end: {sum(r['goals_against'] for r in rows)}; out of bounds {sum(r['out'] for r in rows)}; "
           f"kick-cap restarts {sum(r['kick_cap'] for r in rows)}; unplayable restarts {sum(r['unplayable'] for r in rows)}")
+    kk_ = [x for r in rows for x in r["kick_list"] if not x.get("retrieval")]
+    st = [x for x in kk_ if x.get("kick_kind") == "setup"]
+    if st:
+        why = {}
+        for x in st:
+            why[x.get("aim_why")] = why.get(x.get("aim_why"), 0) + 1
+        print(f"  near-post setup taps: {len(st)} ({', '.join(f'{k} {v}' for k, v in sorted(why.items()))}); shots {len(kk_) - len(st)}; "
+              f"setup-cap restarts {sum(r.get('setup_cap', 0) for r in rows)} (cap {SETUP_KICK_CAP}/ball, separate from the kick cap)")
     if kpg:
         print(f"  kicks to score (per scored ball): " + ", ".join(f"{v}: {kpg.count(v)}" for v in sorted(set(kpg)))
               + f" (median {np.median(kpg):.0f})")
@@ -1353,12 +1414,21 @@ def main():
     ap.add_argument("--no-corners", action="store_true", help="4 m field: do not use the corner posts as camera landmarks")
     ap.add_argument("--no-timer-fix", action="store_true", help="4 m field: no 60 s timer fix")
     ap.add_argument("--no-pre-kick-fix", action="store_true", help="4 m field: no landmark look before a map-aimed kick")
+    ap.add_argument("--no-np-aim", action="store_true", help="4 m field: NP1 off (map aim 0.3 m into the goal, as before)")
+    ap.add_argument("--no-np-setup", action="store_true", help="4 m field: NP2 off (no oblique / stance-clearance setup tap)")
+    ap.add_argument("--no-np-line", action="store_true", help="4 m field: NP3 off (no setup tap for a ball on/over the goal line)")
+    ap.add_argument("--np-oblique-deg", type=float, default=50.0, help="NP2: off-axis angle above which a near-post ball is tapped")
+    ap.add_argument("--no-near-post", action="store_true", help="NP1-NP3 all off (the closing-work behaviour)")
+    ap.add_argument("--spawn-near-post", action="store_true",
+                    help="battery: every ball spawns in the attacked goal's near-post zone (0-90 deg off axis, some on the line)")
     ap.add_argument("--dropout", default=None, help='"T0,DUR": pose link down from T0 s into each run for DUR s')
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--out", default=None)
     ap.add_argument("--tag", default="")
     ap.add_argument("--viewer", action="store_true")
     args = ap.parse_args()
+    if args.no_near_post:
+        args.no_np_aim = args.no_np_setup = args.no_np_line = True
     km.apply_calibration(args.calib)
     if args.viewer:
         import play_viewer

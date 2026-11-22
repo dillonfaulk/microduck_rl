@@ -71,6 +71,13 @@ ARENA = (-2.5, 2.5, -2.5, 2.5)
 PRE_STANCE_M = 0.12        # approach point this far behind the stance spot, on the kick line
 LINE_UP_M = 0.40           # a second waypoint further back, so the last leg runs down the kick line
 DETOUR_CLEAR_M = 0.25      # straight path closer than this to the ball -> side detour
+# near-post aim (NP1-NP3, 2026-11-22). Switched on per PlayConfig (np_aim / np_setup / np_line); off = unchanged.
+NP_BALL_R = 0.035          # ball radius
+NP_POST_Y = 0.115          # goal post centres: +-115 mm from the goal-line centre (inner edges at 105 mm)
+NP_CLEAN_M = 0.070         # the clean window: a ball centre within +-70 mm of the centre passes both posts
+NP_ZONE_M = 0.5            # "near-post": the ball within this of a post of the attacked goal (the split's bin)
+NP_STANCE_CLEAR_M = 0.25   # the kick stance closer than this to a goal post = a likely misfire (split: all were)
+NP_SPOT_M = 0.5            # the setup tap's shooting spot: this far out from the goal centre
 ALIGN_ZONE_M = 0.30        # ALIGN clamps only apply this close to the stance spot
 ALIGN_TOL = 0.012          # m, lateral: inside the kick policy's +-15 mm training noise
 ALIGN_X_WINDOW = (-0.020, 0.012)  # m, along the kick line (+ = ball farther than nominal), see Aligner.pulse
@@ -341,11 +348,101 @@ class Mission:
     def _heading_from_goal(self, b):
         """Stage 4: the kick heading from the ball to the perceived goal centre (both camera-relative).
         Play, advance kick (aim_mode "map"): to the goal's field-map spot, through the estimated pose."""
+        if getattr(self, "setup", None) is not None:          # NP2/NP3: the tap toward the shooting spot
+            g = self.setup["spot"]
+            return math.atan2(g[1] - b[1], g[0] - b[0])
         if self.aim_mode == "map" or (self.play is not None and not self.goal_src.found):
+            if getattr(self.play, "np_aim", False):           # NP1: through the clean window's middle
+                h = self._bisector_heading(b)
+                if h is not None:
+                    return h
             g = self.play.goal_aim or self.play.goal_map   # (camera mode before the goal look: the plan only)
         else:
             g, _, _ = self.goal_src.get(self.sim.t)
         return math.atan2(g[1] - b[1], g[0] - b[0])
+
+    # --- near-post aim (NP1-NP3, approved 2026-11-22; scope: microduck-near-post-aim-scope-2026-11-22.md) ---
+    # The accuracy split: the 0.3 m-deep map aim crosses the goal line AT the post from oblique balls; near-post
+    # misfires all had the duck < 0.25 m from a post; balls on the line have no direct shot.
+    def _goal_frame(self, b):
+        """(along, lateral) of a point in the attacked goal's frame: along < 0 = in front of the line (in the
+        field), lateral along the goal line. None when the field map has no goal facing (6 m field)."""
+        into = getattr(self.play, "goal_into", None)
+        if into is None:
+            return None
+        g = np.asarray(self.play.goal_map[:2], float)
+        u = np.array([math.cos(into), math.sin(into)])
+        lat = np.array([-u[1], u[0]])
+        d = np.asarray(b[:2], float) - g
+        return float(d @ u), float(d @ lat), g, u, lat
+
+    def _bisector_heading(self, b):
+        """NP1: the heading through the middle of the CLEAN window (inner post edges minus the ball radius:
+        +-NP_CLEAN_M on the goal line), seen from the ball. None for a ball on/over the line."""
+        f = self._goal_frame(b)
+        if f is None or f[0] > -NP_BALL_R:
+            return None
+        _, _, g, u, lat = f
+        a = [math.atan2(*(np.flip(g + s * NP_CLEAN_M * lat - np.asarray(b[:2], float)))) for s in (1.0, -1.0)]
+        return math.atan2(math.sin(a[0]) + math.sin(a[1]), math.cos(a[0]) + math.cos(a[1]))
+
+    def _goal_posts(self):
+        f = self._goal_frame(self.play.goal_map)
+        g, lat = f[2], f[4]
+        return [g + s * NP_POST_Y * lat for s in (1.0, -1.0)]
+
+    def _stance_for(self, b, kh_goal):
+        kh = wrap_angle(kh_goal + KICK_AIM_OFFSET[self.foot])
+        c, s = math.cos(kh), math.sin(kh)
+        ox, oy = self.aligner.target
+        return np.asarray(b[:2], float) - np.array([c * ox - s * oy, s * ox + c * oy])
+
+    def _post_clear(self, p):
+        """Distance from p to the nearest GOAL post (either goal: the misfires were goal posts)."""
+        posts = [np.array(o[:2]) for o in getattr(self.play, "obstacles", ()) if o[2] < 0.02]
+        return min((float(np.linalg.norm(np.asarray(p) - q)) for q in posts), default=math.inf)
+
+    def _near_post_gate(self, b, kh_shot):
+        """NP2/NP3: why this ball gets a setup tap instead of a shot, or None (shoot)."""
+        f = self._goal_frame(b)
+        if f is None:
+            return None
+        along, lat, _, _, _ = f
+        near = min(float(np.linalg.norm(np.asarray(b[:2]) - p)) for p in self._goal_posts()) < NP_ZONE_M
+        if getattr(self.play, "np_line", False) and along > -NP_BALL_R and abs(lat) < NP_POST_Y + NP_ZONE_M:
+            return "line"
+        if not getattr(self.play, "np_setup", False):
+            return None
+        if near and math.atan2(abs(lat), -along) > self.play.np_oblique:
+            return "oblique"
+        if self._post_clear(self._stance_for(b, kh_shot)) < NP_STANCE_CLEAR_M:
+            return "stance"
+        return None
+
+    def _setup_spot(self, b):
+        """The tap's target: a shooting spot NP_SPOT_M out from the goal centre, on the axis or up to 45 deg
+        toward the ball's side. Kept only if the ball's line to it clears every post; best = the stance most
+        clear of the goal posts (>= NP_STANCE_CLEAR_M preferred), then the smallest angle off the axis."""
+        _, lat, g, u, latv = self._goal_frame(b)
+        side = 1.0 if lat >= 0 else -1.0
+        bb = np.asarray(b[:2], float)
+        fx0, fx1, fy0, fy1 = getattr(self.sim, "field", (-math.inf, math.inf, -math.inf, math.inf))
+        best = None
+        for deg in (0, 15, 30, 45):
+            th = math.radians(deg) * side
+            out = -u * math.cos(th) + latv * math.sin(th)          # from the goal centre, out into the field
+            spot = g + NP_SPOT_M * out
+            if not (fx0 + 0.2 < spot[0] < fx1 - 0.2 and fy0 + 0.2 < spot[1] < fy1 - 0.2):
+                continue
+            if any(self._seg_dist(bb, spot, np.array(o[:2])) < NP_BALL_R + o[2] + 0.02
+                   for o in getattr(self.play, "obstacles", ())):
+                continue
+            kh = math.atan2(spot[1] - bb[1], spot[0] - bb[0])
+            clear = min(self._post_clear(self._stance_for(bb, kh)), NP_STANCE_CLEAR_M)
+            key = (clear, -deg)
+            if best is None or key > best[0]:
+                best = (key, spot, deg)
+        return None if best is None else (best[1], best[2])
 
     def _goal_far(self, b):
         """Play: aim at the goal's field-map spot (no camera goal needed): the goal is beyond the camera's
@@ -386,7 +483,24 @@ class Mission:
                     d = math.hypot(self.play.goal_map[0] - b[0], self.play.goal_map[1] - b[1])
                     self.result["aim_why"] = ("tap_in" if d < self.play.tap_in_m else
                                               "far" if d > self.play.goal_cam_range else "oblique")
-            self._set_heading(self._heading_from_goal(b))
+            self.setup = None
+            kh_shot = self._heading_from_goal(b)
+            why = self._near_post_gate(b, kh_shot) if self.play is not None else None
+            if why is not None:
+                pick = self._setup_spot(b)
+                if pick is not None:
+                    self.setup = {"spot": pick[0], "why": why}
+                    self.aim_mode = "map"
+                    self.result.update(aim_mode="map", aim_why=f"setup_{why}")
+                    self.log.event({"t": round(t, 3), "event": "NEAR_POST_SETUP", "why": why,
+                                    "ball": [round(float(v), 3) for v in b[:2]],
+                                    "spot": [round(float(v), 3) for v in pick[0]], "spot_deg": pick[1]})
+                else:
+                    self.log.event({"t": round(t, 3), "event": "NEAR_POST_NO_SPOT", "why": why,
+                                    "ball": [round(float(v), 3) for v in b[:2]]})
+            if self.play is not None:
+                self.result["kick_kind"] = "setup" if self.setup is not None else "shot"
+            self._set_heading(self._heading_from_goal(b) if self.setup is not None else kh_shot)
         sim, log, goal, foot, kick_heading = self.sim, self.log, self.goal, self.foot, self.kh_goal
         self.ball0 = b.copy()
         self.plan_ball = b.copy()

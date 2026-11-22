@@ -30,7 +30,7 @@ from collections import defaultdict
 
 import numpy as np
 
-ROOT = os.path.expanduser("~/microduck_rl/logs/evals/play/field4_2026-11-18/final/logs")
+ROOT = os.path.expanduser(os.environ.get("SPLIT_ROOT", "~/microduck_rl/logs/evals/play/field4_2026-11-18/final/logs"))
 ROWS = ["B_right_odom", "B_left_odom", "B_right_mapd", "B_left_mapd"]       # the shipping configuration
 CONTRAST = ["A_right_odom_no_timer_prekick", "A_right_odom_no_corners"]   # labelled contrast only
 POSTS = [(gx, sy * 0.115) for gx in (2.0, -2.0) for sy in (1, -1)]
@@ -63,7 +63,7 @@ def kicks_of(row):
         evs = [json.loads(l) for l in open(ev_p)]
         foot = next((e["foot"] for e in evs if e["event"] == "MISSION_START"), None)
         last_fix, last_yawfix, goal, kh, ball_out, map_mode, aim_md = None, None, None, None, False, False, None
-        pending = None
+        pending, np_pending, np_cur = None, None, None
         for e in evs:
             k, t = e["event"], e["t"]
             if k == "ROUTINE_FIX":
@@ -72,8 +72,11 @@ def kicks_of(row):
                     last_yawfix = t
             elif k == "GOAL_PLACED":
                 goal = e["centre"]
+            elif k == "NEAR_POST_SETUP":
+                np_pending = e["why"]          # logged in _plan just before its MISSION_START
             elif k == "MISSION_START":
                 kh, map_mode = e["kick_heading_deg"], False
+                np_cur, np_pending = np_pending, None
             elif k == "PRE_KICK_LOOK_START":
                 map_mode = True            # the pre-kick look runs only before map-aimed kicks (and is ON here)
             elif k == "HEADING_FROM_GOAL":
@@ -95,7 +98,7 @@ def kicks_of(row):
                 pending = {"row": row, "run": run, "foot": foot, "t": t, "goal": goal, "kh": math.radians(kh),
                            "map": map_mode, "t_fix": None if last_fix is None else t - last_fix,
                            "t_yawfix": None if last_yawfix is None else t - last_yawfix,
-                           "rows": (rows, ts), "md": None}
+                           "rows": (rows, ts), "md": None, "setup": np_cur}
                 out.append(pending)
     return out
 

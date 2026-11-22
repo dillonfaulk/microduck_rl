@@ -331,3 +331,83 @@ def test_play_routes_detour_around_map_posts():
         for o in m.play.obstacles:
             assert km.Mission._seg_dist(np.array(a), np.array(b), np.array(o[:2])) >= 0.2 + o[2] - 1e-9
     assert m._clear_posts(np.array([0.0, 0.0]), [(1.0, 0.5)]) == [(1.0, 0.5)]   # clear legs untouched
+
+
+# --- near-post aim (NP1-NP3, 2026-11-22) ------------------------------------------------------------------
+
+def _np_mission(foot="right", **np):
+    import kick_mission as km
+    m = km.Mission.__new__(km.Mission)
+    posts = ((2.0, 0.115, 0.01), (2.0, -0.115, 0.01), (-2.0, 0.115, 0.01), (-2.0, -0.115, 0.01),
+             (2.0, 2.0, 0.0375), (2.0, -2.0, 0.0375), (-2.0, 2.0, 0.0375), (-2.0, -2.0, 0.0375))
+    m.play = pl.PlayConfig(goal_map=(2.0, 0.0), goal_into=0.0, goal_aim=(2.3, 0.0), obstacles=posts, **np)
+    m.aim_mode, m.sim, m.foot, m.setup = "map", SimpleNamespace(t=0.0, field=(-2.0, 2.0, -2.0, 2.0)), foot, None
+    m.aligner = km.Aligner(foot)
+    return m
+
+
+def _cross_y(b, h, gx=2.0):
+    return b[1] + math.tan(h) * (gx - b[0])
+
+
+def test_np1_aims_through_the_clean_window_where_the_deep_aim_hits_the_post():
+    b = np.array([1.75, 0.30])                                         # ~50 deg off axis, 0.33 m from the post
+    old = _np_mission()._heading_from_goal(b)
+    assert abs(_cross_y(b, old)) > 0.10                                # the 0.3 m-deep aim: at the post
+    new = _np_mission(np_aim=True)._heading_from_goal(b)
+    assert abs(_cross_y(b, new)) < 0.02                                # the window's middle (angle bisector)
+    for bb in ([1.0, 0.0], [1.6, -0.5], [0.5, 1.0]):                   # every line from in front: inside +-70 mm
+        assert abs(_cross_y(np.array(bb), _np_mission(np_aim=True)._heading_from_goal(np.array(bb)))) < 0.07
+    on_line = np.array([1.99, 0.0])                                    # on the line: no bisector, the old aim stands
+    assert _np_mission(np_aim=True)._heading_from_goal(on_line) == pytest.approx(_np_mission()._heading_from_goal(on_line))
+
+
+def test_np2_np3_gates_and_the_tap_spot_clears_the_posts():
+    m = _np_mission(np_aim=True, np_setup=True, np_line=True)
+    shot = lambda b: m._heading_from_goal(np.array(b))
+    assert m._near_post_gate(np.array([1.5, 0.05]), shot([1.5, 0.05])) is None          # head-on, 0.5 m: shoot
+    assert m._near_post_gate(np.array([1.80, 0.40]), shot([1.80, 0.40])) == "oblique"   # 60 deg off, near
+    assert m._near_post_gate(np.array([1.0, 1.5]), shot([1.0, 1.5])) is None            # oblique but far: shoot
+    assert m._near_post_gate(np.array([1.98, 0.25]), shot([1.98, 0.25])) == "line"      # on the line, beside
+    assert _np_mission(np_setup=True)._near_post_gate(np.array([1.98, 0.25]), 0.0) != "line"   # NP3 off
+    assert _np_mission()._near_post_gate(np.array([1.80, 0.40]), 0.0) is None           # all off: unchanged
+    for b in ([1.80, 0.40], [1.98, 0.25], [1.98, -0.30], [1.7, -0.45]):
+        spot, deg = m._setup_spot(np.array(b))
+        assert abs(np.linalg.norm(spot - np.array([2.0, 0.0])) - 0.5) < 1e-9 and deg in (0, 15, 30, 45)
+        assert np.sign(spot[1]) in (0.0, np.sign(b[1])) or deg == 0                     # toward the ball's side
+        for o in m.play.obstacles:                                     # the tap's line clears every post
+            assert m._seg_dist(np.array(b), spot, np.array(o[:2])) >= 0.035 + o[2] + 0.02 - 1e-9
+        m.setup = {"spot": spot, "why": "x"}
+        h = m._heading_from_goal(np.array(b))                         # the mission then heads for the spot
+        assert abs(pl.wrap_angle(h - math.atan2(spot[1] - b[1], spot[0] - b[0]))) < 1e-9
+        m.setup = None
+
+
+def test_np2_stance_clearance_catches_a_stance_beside_a_post():
+    m = _np_mission(np_setup=True)
+    b = np.array([1.93, 0.20])                                         # head-on-ish line but the duck stands at the post
+    gate = m._near_post_gate(b, m._heading_from_goal(b))
+    assert gate in ("oblique", "stance")
+    st = m._stance_for(b, math.atan2(-b[1], 2.3 - b[0]))
+    assert m._post_clear(st) < 0.25 or gate == "oblique"
+
+
+def test_setup_taps_have_their_own_cap():
+    assert pl.SETUP_KICK_CAP == 6 and pl.BALL_KICK_CAP == 6
+    sup = pl.PlaySupervisor.__new__(pl.PlaySupervisor)
+    sup.ball_kicks, sup.setup_kicks = 3, 0
+    sup.retrieving, sup._pending_whistle, sup.state = False, None, "IDLE"
+    sup.log = SimpleNamespace(event=lambda e: None)
+    sup.sim = SimpleNamespace(t=0.0)
+    sup.whistle({"why": "goal", "end": "+x"})
+    assert sup.ball_kicks == 0 and sup.setup_kicks == 0                # a new ball resets both caps
+
+
+def test_spawn_near_post_lands_in_the_zone(field4):
+    sim, _, lm = field4
+    rng = np.random.default_rng(3)
+    g = np.array(lm["+x"][:2])
+    for _ in range(40):
+        b = np.array(pl.spawn_near_post(sim, rng, lm["+x"], sim.field))
+        d = min(np.linalg.norm(b - (g + np.array([0, s_ * 0.115]))) for s_ in (1, -1))
+        assert 0.07 <= d <= 0.5 and b[0] <= 2.0 - 0.02 + 1e-9 and abs(b[1]) < 2.0

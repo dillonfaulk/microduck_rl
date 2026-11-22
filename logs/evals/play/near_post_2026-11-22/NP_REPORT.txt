@@ -1,0 +1,27 @@
+== targeted near-post batteries (30 x 240 s, every ball spawned near the attacked goal's posts) ==
+row             goals   runs  own  taps  cap | shots near near on% misfire% post% open on% tap ok% | near on% by off-axis 0-30 / 30-50 / 50-70 / 70+
+T_right_off        51  28/30    0     0    0 |   172  139     25.2     12.2    38     62.1     nan |  82% (n34) /  26% (n23) /   3% (n35) /   0% (n35)   (near-post spawn, right, NP OFF)
+T_right_np1        89  29/30    0     0    0 |   216  201     49.3     11.4    48     33.3     nan |  89% (n36) /  73% (n30) /  55% (n58) /  21% (n56)   (near-post spawn, right, NP1 only)
+T_right_np12       60  25/30    0    51    0 |   128   55     74.5      7.3    47     66.2      90 |  85% (n27) /  75% (n16) /  67% (n9) / nan% (n0)   (near-post spawn, right, NP1+NP2)
+T_right_on         57  25/30    0    52    0 |   123   53     73.6      7.5    47     66.7      91 |  88% (n25) /  71% (n17) /  62% (n8) / nan% (n0)   (near-post spawn, right, NP1-3 ON)
+T_right_on70       61  26/30    0    32    0 |   126   85     68.2      7.1    46     60.0      84 |  89% (n27) /  88% (n16) /  56% (n34) /  25% (n4)   (right, NP1-3, NP2 at 70 deg)
+T_right_stance     66  26/30    0    21    0 |   168  129     55.0      6.2    47     52.8      82 | 100% (n26) /  86% (n21) /  59% (n39) /  11% (n35)   (right, NP1-3, NP2 stance gate only)
+T_left_off         73  29/30    0     0    0 |   196  161     29.2     13.0    25     91.4     nan |  90% (n42) /  25% (n20) /  11% (n36) /   0% (n57)   (near-post spawn, left, NP OFF)
+T_left_np1        135  30/30    0     0    0 |   266  250     63.2     16.4    46     46.7     nan |  93% (n28) /  95% (n44) /  67% (n91) /  43% (n68)   (left, NP1 only)
+T_left_on          67  27/30    0    57    0 |   129   51     86.3      7.8    22     80.3      95 |  96% (n26) /  93% (n14) /  80% (n5) /  50% (n4)   (near-post spawn, left, NP1-3 ON)
+T_left_on70        79  28/30    0    37    0 |   135   93     86.0      2.2    37     85.0      95 | 100% (n22) /  93% (n15) /  90% (n42) /  50% (n12)   (left, NP1-3, NP2 at 70 deg)
+T_left_stance      81  29/30    0    20    0 |   165  127     73.2      4.7    51     81.6      81 |  91% (n22) / 100% (n22) /  85% (n40) /  42% (n40)   (left, NP1-3, NP2 stance gate only)
+
+== shipping rows (30 x 240 s, normal spawns): NP ON vs the closing-work FINAL (NP did not exist = OFF) ==
+  B_right_odom  FINAL (off)  goals  56  runs 26/30  own 0  taps   0  near shots  70 on  48.6%  misfire 22.9%  open on  36.9%  tap->shootable  nan%
+  B_right_odom  NP1-3 @50    goals  51  runs 27/30  own 0  taps  18  near shots  31 on  83.9%  misfire 12.9%  open on  44.0%  tap->shootable   83%
+  B_right_odom  NP1 only     goals  78  runs 30/30  own 0  taps   0  near shots  68 on  58.8%  misfire 27.9%  open on  42.1%
+  B_left_odom   FINAL (off)  goals  59  runs 26/30  own 0  taps   0  near shots  60 on  35.0%  misfire 30.0%  open on  67.1%  tap->shootable  nan%
+  B_left_odom   NP1-3 @50    goals  60  runs 24/30  own 0  taps   6  near shots  39 on  92.3%  misfire  2.6%  open on  72.1%  tap->shootable   67%
+  B_left_odom   NP1 only     goals  89  runs 30/30  own 0  taps   0  near shots  68 on  82.4%  misfire 16.2%  open on  70.0%
+  B_right_mapd  FINAL (off)  goals  48  runs 27/30  own 0  taps   0  near shots  65 on  30.8%  misfire 40.0%  open on  37.4%  tap->shootable  nan%
+  B_right_mapd  NP1-3 @50    goals  61  runs 25/30  own 0  taps   9  near shots  35 on  68.6%  misfire 22.9%  open on  49.0%  tap->shootable   78%
+  B_right_mapd  NP1 only     goals  77  runs 30/30  own 0  taps   0  near shots  67 on  56.7%  misfire 28.4%  open on  49.4%
+  B_left_mapd   FINAL (off)  goals  61  runs 29/30  own 0  taps   0  near shots  68 on  55.9%  misfire 22.1%  open on  65.9%  tap->shootable  nan%
+  B_left_mapd   NP1-3 @50    goals  60  runs 27/30  own 0  taps   6  near shots  34 on  91.2%  misfire  2.9%  open on  71.4%  tap->shootable  100%
+  B_left_mapd   NP1 only     goals  83  runs 30/30  own 0  taps   0  near shots  63 on  74.6%  misfire 22.2%  open on  70.4%

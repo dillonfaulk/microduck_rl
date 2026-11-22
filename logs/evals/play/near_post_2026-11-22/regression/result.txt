@@ -1,0 +1,3 @@
+right_goal0.8_field_gt.txt: IDENTICAL to final/regression
+right_goal0.8_field_odom_stage2.txt: IDENTICAL to final/regression
+right_goal0.8_full.txt: IDENTICAL to final/regression

@@ -58,7 +58,10 @@ def row_report(name, root):
 def main():
     rows = [("T_right_off", "near-post spawn, right, NP OFF"), ("T_right_np1", "near-post spawn, right, NP1 only"),
             ("T_right_np12", "near-post spawn, right, NP1+NP2"), ("T_right_on", "near-post spawn, right, NP1-3 ON"),
-            ("T_left_off", "near-post spawn, left, NP OFF"), ("T_left_on", "near-post spawn, left, NP1-3 ON")]
+            ("T_right_on70", "right, NP1-3, NP2 at 70 deg"), ("T_right_stance", "right, NP1-3, NP2 stance gate only"),
+            ("T_left_off", "near-post spawn, left, NP OFF"), ("T_left_np1", "left, NP1 only"),
+            ("T_left_on", "near-post spawn, left, NP1-3 ON"), ("T_left_on70", "left, NP1-3, NP2 at 70 deg"),
+            ("T_left_stance", "left, NP1-3, NP2 stance gate only")]
     ship = ["B_right_odom", "B_left_odom", "B_right_mapd", "B_left_mapd"]
     print("== targeted near-post batteries (30 x 240 s, every ball spawned near the attacked goal's posts) ==")
     print(f"{'row':<15}{'goals':>6}{'runs':>7}{'own':>5}{'taps':>6}{'cap':>5} | {'shots':>5}{'near':>5}{'near on%':>9}"
@@ -75,7 +78,17 @@ def main():
     print("\n== shipping rows (30 x 240 s, normal spawns): NP ON vs the closing-work FINAL (NP did not exist = OFF) ==")
     for name in ship:
         for tag, root, txt in (("FINAL (off)", os.path.join(FINAL, "logs"), os.path.join(FINAL, name + ".txt")),
-                               ("NP on", os.path.join(HERE, "logs"), os.path.join(HERE, name + ".txt"))):
+                               ("NP1-3 @50", os.path.join(HERE, "logs"), os.path.join(HERE, name + ".txt")),
+                               ("NP1 only", os.path.join(HERE, "logs"), os.path.join(HERE, name + "_np1.txt"))):
+            if tag == "NP1 only":
+                name_ = name + "_np1"
+                if not os.path.exists(txt):
+                    continue
+                s_, r_ = summary_numbers(txt), row_report(name_, root)
+                print(f"  {name:<13} {tag:<12} goals {s_['goals']:>3}  runs {s_['runs_goal']:>5}  own {s_['own']}  taps {s_['taps']:>3}"
+                      f"  near shots {r_['near_shots']:>3} on {r_['near_on']:5.1f}%  misfire {r_['near_misfire']:4.1f}%"
+                      f"  open on {r_['open_on']:5.1f}%")
+                continue
             if not os.path.exists(txt):
                 continue
             s, r = summary_numbers(txt), row_report(name, root)

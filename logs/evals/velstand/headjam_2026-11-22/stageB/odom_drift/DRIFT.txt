@@ -1,0 +1,19 @@
+== straight
+  round3  h0: 3.39 m along -1.96% (-66 mm) across +1 | v1 4 mm  h120: 3.38 m along -1.87% (-63 mm) across +7 | v1 8 mm  h240: 3.36 m along -1.99% (-67 mm) across +4 | v1 6 mm
+  round3  implied stride scale 1.0194 (stride_v1 = 1.019)
+  hj4250  h0: 3.27 m along -1.70% (-56 mm) across +20 | v1 21 mm  h120: 3.27 m along -1.65% (-54 mm) across +7 | v1 10 mm  h240: 3.26 m along -1.63% (-53 mm) across +9 | v1 12 mm
+  hj4250  implied stride scale 1.0166 (stride_v1 = 1.019)
+== pivot
+  round3  +0.8: 0.02 m raw 4 / v1 5 mm  -0.8: 0.04 m raw 5 / v1 5 mm
+  hj4250  +0.8: 0.03 m raw 9 / v1 10 mm  -0.8: 0.04 m raw 1 / v1 1 mm
+== arc
+  round3  +0.3: 1.43 m raw 25 / v1 10 mm  -0.3: 0.90 m raw 16 / v1 2 mm
+  hj4250  +0.3: 0.85 m raw 19 / v1 12 mm  -0.3: 0.50 m raw 11 / v1 4 mm
+== strafe
+  round3  +0.1: 1.07 m raw 22 / v1 25 mm  -0.1: 0.89 m raw 6 / v1 12 mm
+  hj4250  +0.1: 1.03 m raw 11 / v1 23 mm  -0.1: 0.95 m raw 21 / v1 15 mm
+== mix
+  round3  +0: 3.29 m raw 28 / v1 39 mm  +1: 2.77 m raw 46 / v1 22 mm  +2: 2.92 m raw 31 / v1 24 mm  +3: 3.42 m raw 49 / v1 25 mm  +4: 4.10 m raw 50 / v1 38 mm  +5: 0.79 m raw 28 / v1 27 mm  +6: 0.70 m raw 34 / v1 22 mm  +7: 1.59 m raw 47 / v1 18 mm
+  round3  mix 60 s: v1 error median 24 mm, max 39; raw median 40; distance median 2.85 m
+  hj4250  +0: 2.60 m raw 19 / v1 52 mm  +1: 2.23 m raw 42 / v1 13 mm  +2: 2.65 m raw 37 / v1 13 mm  +3: 3.30 m raw 23 / v1 41 mm  +4: 3.66 m raw 64 / v1 28 mm  +5: 1.30 m raw 55 / v1 65 mm  +6: 0.78 m raw 27 / v1 12 mm  +7: 0.73 m raw 9 / v1 14 mm
+  hj4250  mix 60 s: v1 error median 21 mm, max 65; raw median 32; distance median 2.41 m

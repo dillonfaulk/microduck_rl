@@ -1,0 +1,2 @@
+round3  trunk max excursion med 33 mm (max 33), end drift med 11 mm, foot reach max med 76 mm (max 76), turn rate 0.47 rad/s
+hj4250  trunk max excursion med 47 mm (max 48), end drift med 14 mm, foot reach max med 90 mm (max 91), turn rate 0.48 rad/s

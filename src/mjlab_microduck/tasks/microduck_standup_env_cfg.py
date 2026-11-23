@@ -19,7 +19,16 @@ the ground_state_mix recovery curriculum has finished ramping.
 """
 
 import math
+import os
 from copy import deepcopy
+
+# HeadJamRecover (2026-11-22): neck clip + head-under spawns. Off unless
+# MICRODUCK_HEADJAM=1, so existing runs stay byte-reproducible. See the block
+# before the body-control curricula.
+HEADJAM_ENABLED = os.environ.get("MICRODUCK_HEADJAM", "0") == "1"
+HEADJAM_CLIP_MARGIN = 0.05
+HEADJAM_NECK_CLIP = (-math.pi / 2 + HEADJAM_CLIP_MARGIN, math.radians(60) - HEADJAM_CLIP_MARGIN)
+HEADJAM_SPAWN_PROB = 0.10
 
 # Symmetry
 ENABLE_SYMMETRY = False
@@ -1062,6 +1071,24 @@ def make_microduck_standup_env_cfg(
         cfg.curriculum["spin_cap_weight"] = CurriculumTermCfg(
             func=microduck_mdp.reward_weight,
             params={"reward_name": "spin_cap", "weight_stages": deepcopy(SPIN_CAP_WEIGHT_STAGES)},
+        )
+
+    # ── HeadJamRecover (2026-11-22, MICRODUCK_HEADJAM=1) ─────────────────────
+    # The 42-deg stall: neck folded under, the policy commands the neck far past
+    # its -1.571 limit (-3.35 rad for this expert) and stays stuck. Two pieces,
+    # identical in the StandUp (stage A) and VelStand (stage B) fine-tunes:
+    #   1. neck_pitch position target clipped HEADJAM_CLIP_MARGIN inside the
+    #      joint range (mjlab per-joint clip on the processed action; the obs
+    #      keeps the raw action, so the 61->14 contract is unchanged; every
+    #      runtime must apply the same clip).
+    #   2. a head-under spawn family, its own reset event after set_ground_state
+    #      (the ground_state_mix curriculum never touches it).
+    if HEADJAM_ENABLED:
+        joint_pos_action.clip = {"neck_pitch": HEADJAM_NECK_CLIP}
+        cfg.events["set_head_under_state"] = EventTermCfg(
+            func=microduck_mdp.set_head_under_state,
+            mode="reset",
+            params={"prob": HEADJAM_SPAWN_PROB},
         )
 
     # ── Body-control curricula ────────────────────────────────────────────────

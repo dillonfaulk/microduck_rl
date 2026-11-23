@@ -8159,3 +8159,88 @@ def step_terminal_pose_penalty(
     tight Gaussian above is flat.
     """
     return pose_l1_penalty(env, joint_indices=joint_indices) * _near_target(env, near, command_name)
+
+
+# ── HeadJamRecover (2026-11-22): head-under spawn family ─────────────────────
+# Seeded from the measured 42-deg stall (closing work, 6 m LOOK run 5 at 60 s,
+# logs/evals/velstand/headjam_2026-11-22/stall_state_6m_look_run5_t60.npz):
+# trunk pitched nose-down with the neck folded under against its -1.571 limit,
+# head yawed ~1 rad, legs asymmetric. Both VelStand round 3 and its stand
+# expert stay stuck there. One numpy sampler serves the training reset and the
+# CPU battery, so both draw from the same distribution.
+HEAD_UNDER_STALL_JOINTS = (   # canonical 14-servo order (see symmetry.py)
+    -0.138, 0.274, -0.591, 0.505, 0.693,     # left  hip_yaw, hip_roll, hip_pitch, knee, ankle
+    -1.572, 0.966, -1.034, 0.208,            # neck_pitch, head_pitch, head_yaw, head_roll
+    -0.006, 0.059, 0.979, -0.637, -1.217,    # right hip_yaw, hip_roll, hip_pitch, knee, ankle
+)
+_HU_PERM = (9, 10, 11, 12, 13, 5, 6, 7, 8, 0, 1, 2, 3, 4)      # == symmetry._JOINT_PERM
+_HU_SIGN = (-1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1)
+HEAD_UNDER_DEFAULTS = dict(
+    pitch_deg=(25.0, 60.0),     # nose-down
+    roll_deg=(-20.0, 20.0),
+    neck_pitch=(-1.57, -1.10),  # folded under
+    head_yaw_max=1.1,
+    joint_noise=0.15,           # around the stall pose, every other joint
+    mirror_prob=0.5,            # L-R mirrored stall (no side bias)
+    z=(0.13, 0.14),             # touch-down trunk z is 0.089-0.123 over this family (z_calib.py)
+)
+
+
+def sample_head_under_np(rng: np.random.Generator, n: int, joint_lo, joint_hi, **kw):
+    """n head-under spawns -> (quat_wxyz [n,4], z [n], joints [n,14] in canonical servo order).
+
+    Yaw is uniform. Joints are the stall pose (or its mirror), +-joint_noise, then neck
+    pitch and head yaw are resampled from their own ranges, then clipped to joint ranges."""
+    c = {**HEAD_UNDER_DEFAULTS, **kw}
+    base = np.asarray(HEAD_UNDER_STALL_JOINTS, float)
+    mirr = base[list(_HU_PERM)] * np.asarray(_HU_SIGN, float)
+    is_m = rng.random(n) < c["mirror_prob"]
+    j = np.where(is_m[:, None], mirr[None], base[None]) + rng.uniform(-c["joint_noise"], c["joint_noise"], (n, 14))
+    j[:, 5] = rng.uniform(*c["neck_pitch"], n)
+    j[:, 7] = rng.uniform(-c["head_yaw_max"], c["head_yaw_max"], n)
+    j = np.clip(j, np.asarray(joint_lo, float), np.asarray(joint_hi, float))
+    pitch = np.radians(rng.uniform(*c["pitch_deg"], n))
+    roll = np.radians(rng.uniform(*c["roll_deg"], n))
+    roll = np.where(is_m, -roll, roll)
+    yaw = rng.uniform(-np.pi, np.pi, n)
+    cr, sr = np.cos(roll / 2), np.sin(roll / 2)
+    cp, sp = np.cos(pitch / 2), np.sin(pitch / 2)
+    cy, sy = np.cos(yaw / 2), np.sin(yaw / 2)
+    q = np.stack([cr * cp * cy + sr * sp * sy, sr * cp * cy - cr * sp * sy,
+                  cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy], axis=1)
+    z = rng.uniform(*c["z"], n)
+    return q, z, j
+
+
+def set_head_under_state(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    prob: float = 0.10,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+):
+    """Reset event that runs AFTER set_ground_state and overwrites ~prob of the
+    resetting envs with a head-under spawn (sample_head_under_np). It is its own
+    event, so the ground_state_mix curriculum (which only rewrites
+    set_ground_state's params) never changes its share."""
+    if env_ids is None or len(env_ids) == 0 or prob <= 0.0:
+        return
+    env_ids = env_ids.to(env.device, dtype=torch.long)
+    pick = env_ids[torch.rand(len(env_ids), device=env.device) < prob]
+    n = len(pick)
+    if n == 0:
+        return
+    asset: Entity = env.scene[asset_cfg.name]
+    servo_ids = _servo_joint_ids(env, asset)
+    lims = asset.data.joint_pos_limits[0, servo_ids].cpu().numpy()
+    rng = np.random.default_rng(int(torch.randint(0, 2**31 - 1, (1,)).item()))
+    q, z, j = sample_head_under_np(rng, n, lims[:, 0], lims[:, 1])
+    dev = env.device
+    env.sim.data.qpos[pick, 2] = torch.as_tensor(z, dtype=torch.float32, device=dev) + _env_origin_z(env, pick)
+    env.sim.data.qpos[pick, 3:7] = torch.as_tensor(q, dtype=torch.float32, device=dev)
+    env.sim.data.qvel[pick, :6] = 0.0
+    vcols = torch.tensor([6 + s for s in servo_ids], device=dev, dtype=torch.long)
+    env.sim.data.qvel[pick.unsqueeze(1), vcols.unsqueeze(0)] = 0.0
+    cols = torch.tensor([7 + s for s in servo_ids], device=dev, dtype=torch.long)
+    env.sim.data.qpos[pick.unsqueeze(1), cols.unsqueeze(0)] = torch.as_tensor(j, dtype=torch.float32, device=dev)
+    hu = env.__dict__.setdefault("_head_under_count", [0])
+    hu[0] += n

@@ -1,0 +1,48 @@
+2026-11-22_18-15-02_headjamA_model_11250.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.2 s  t med 0.24  p90 0.3400000000000001  raw neck min -3.32  clip engaged 1.1% of steps
+   stall neighbourhood: up 50/50  t med 0.17999999999999994  raw neck min -3.02
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_11250.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 149  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   8.3deg  final z med 115.5mm  peak|w| med/p90  2.8/ 4.0 rad/s  non-foot floor contact   0.0%
+sitting         n= 191  recovered(held 1s) 100.0%  t_med=0.18s  final tilt med   8.0deg  final z med 115.9mm  peak|w| med/p90  3.6/ 4.7 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 364  recovered(held 1s) 100.0%  t_med=0.42s  final tilt med   7.5deg  final z med 116.0mm  peak|w| med/p90  9.5/11.1 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 320  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   7.9deg  final z med 115.8mm  peak|w| med/p90  6.3/ 7.6 rad/s  non-foot floor contact   0.0%
+=== done 11250
+2026-11-22_18-15-02_headjamA_model_11500.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.3 s  t med 0.19999999999999996  p90 0.28  raw neck min -2.93  clip engaged 0.9% of steps
+   stall neighbourhood: up 50/50  t med 0.24  raw neck min -2.58
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_11500.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 158  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   7.8deg  final z med 116.1mm  peak|w| med/p90  3.1/ 4.2 rad/s  non-foot floor contact   0.0%
+sitting         n= 203  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   8.6deg  final z med 116.0mm  peak|w| med/p90  3.6/ 5.1 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 345  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   7.6deg  final z med 115.9mm  peak|w| med/p90  9.8/11.4 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 318  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   8.3deg  final z med 115.9mm  peak|w| med/p90  6.3/ 7.4 rad/s  non-foot floor contact   0.0%
+=== done 11500
+2026-11-22_18-15-02_headjamA_model_11750.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.3 s  t med 0.17999999999999994  p90 0.28  raw neck min -2.68  clip engaged 0.8% of steps
+   stall neighbourhood: up 50/50  t med 0.29000000000000004  raw neck min -2.60
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_11750.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 155  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   7.7deg  final z med 115.9mm  peak|w| med/p90  3.1/ 4.3 rad/s  non-foot floor contact   0.0%
+sitting         n= 195  recovered(held 1s) 100.0%  t_med=0.18s  final tilt med   9.2deg  final z med 115.8mm  peak|w| med/p90  3.6/ 4.9 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 358  recovered(held 1s) 100.0%  t_med=0.46s  final tilt med   7.0deg  final z med 115.9mm  peak|w| med/p90  9.7/10.8 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 316  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   8.7deg  final z med 115.8mm  peak|w| med/p90  6.3/ 7.5 rad/s  non-foot floor contact   0.0%
+=== done 11750
+2026-11-22_18-15-02_headjamA_model_12000.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.6 s  t med 0.17999999999999994  p90 0.24  raw neck min -2.74  clip engaged 0.6% of steps
+   stall neighbourhood: up 50/50  t med 0.28  raw neck min -2.15
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_12000.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 162  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   9.4deg  final z med 116.0mm  peak|w| med/p90  3.0/ 4.1 rad/s  non-foot floor contact   0.0%
+sitting         n= 204  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   8.5deg  final z med 115.7mm  peak|w| med/p90  3.7/ 5.0 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 339  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   8.8deg  final z med 115.7mm  peak|w| med/p90  9.9/11.5 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 319  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   8.0deg  final z med 115.8mm  peak|w| med/p90  6.1/ 7.4 rad/s  non-foot floor contact   0.0%
+=== done 12000
+2026-11-22_18-15-02_headjamA_model_12250.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.3 s  t med 0.17999999999999994  p90 0.24199999999999988  raw neck min -2.24  clip engaged 0.3% of steps
+   stall neighbourhood: up 50/50  t med 0.30000000000000004  raw neck min -1.90
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_12250.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 163  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   8.5deg  final z med 116.1mm  peak|w| med/p90  2.9/ 4.1 rad/s  non-foot floor contact   0.0%
+sitting         n= 190  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   8.0deg  final z med 116.1mm  peak|w| med/p90  3.4/ 5.0 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 340  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   8.0deg  final z med 116.2mm  peak|w| med/p90  9.8/11.0 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 331  recovered(held 1s) 100.0%  t_med=0.26s  final tilt med   7.9deg  final z med 116.0mm  peak|w| med/p90  6.1/ 7.3 rad/s  non-foot floor contact   0.0%
+=== done 12250
+2026-11-22_18-15-02_headjamA_model_12499.onnx clamp=True: up 200/200 (100.0%)  exact stall up at 0.3 s  t med 0.17999999999999994  p90 0.22199999999999986  raw neck min -2.15  clip engaged 0.4% of steps
+   stall neighbourhood: up 50/50  t med 0.26  raw neck min -2.13
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_12499.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 152  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   9.3deg  final z med 115.6mm  peak|w| med/p90  2.9/ 4.3 rad/s  non-foot floor contact   0.0%
+sitting         n= 202  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   7.5deg  final z med 115.8mm  peak|w| med/p90  3.4/ 4.5 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 353  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   9.5deg  final z med 115.8mm  peak|w| med/p90  9.6/10.9 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 317  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   8.6deg  final z med 115.8mm  peak|w| med/p90  5.9/ 7.2 rad/s  non-foot floor contact   0.0%
+=== done 12499

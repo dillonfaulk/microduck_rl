@@ -1,0 +1,5 @@
+checkpoint logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_12499.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 152  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   9.3deg  final z med 115.6mm  peak|w| med/p90  2.9/ 4.3 rad/s  non-foot floor contact   0.0%
+sitting         n= 202  recovered(held 1s) 100.0%  t_med=0.20s  final tilt med   7.5deg  final z med 115.8mm  peak|w| med/p90  3.4/ 4.5 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 353  recovered(held 1s) 100.0%  t_med=0.44s  final tilt med   9.5deg  final z med 115.8mm  peak|w| med/p90  9.6/10.9 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 317  recovered(held 1s) 100.0%  t_med=0.28s  final tilt med   8.6deg  final z med 115.8mm  peak|w| med/p90  5.9/ 7.2 rad/s  non-foot floor contact   0.0%

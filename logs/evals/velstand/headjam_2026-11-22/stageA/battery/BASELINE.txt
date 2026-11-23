@@ -1,0 +1,4 @@
+expert11000_noclamp  family 181/200  exact STUCK  nbhd 15/50  raw neck min -3.77
+expert11000_clamp    family 190/200  exact STUCK  nbhd 7/50  raw neck min -3.94
+round3_noclamp       family 174/200  exact STUCK  nbhd 14/50  raw neck min -3.77
+round3_clamp         family 180/200  exact STUCK  nbhd None/None  raw neck min -4.06

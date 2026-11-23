@@ -1,0 +1,5 @@
+checkpoint logs/rsl_rl/microduck_stand/2026-11-01_17-21-18_spincap_chunk2/model_11000.pt  envs=1024  (mid-episode resets: 0, excluded)
+standing        n= 162  recovered(held 1s) 100.0%  t_med=0.00s  final tilt med   7.7deg  final z med 116.0mm  peak|w| med/p90  2.9/ 4.2 rad/s  non-foot floor contact   0.0%
+sitting         n= 207  recovered(held 1s) 100.0%  t_med=0.18s  final tilt med   8.0deg  final z med 116.2mm  peak|w| med/p90  3.5/ 4.7 rad/s  non-foot floor contact   0.0%
+prone g_x<0     n= 341  recovered(held 1s) 100.0%  t_med=0.46s  final tilt med   8.1deg  final z med 116.0mm  peak|w| med/p90  9.8/11.2 rad/s  non-foot floor contact   0.0%
+prone g_x>=0    n= 314  recovered(held 1s) 100.0%  t_med=0.26s  final tilt med   8.8deg  final z med 116.1mm  peak|w| med/p90  6.7/ 7.8 rad/s  non-foot floor contact   0.0%

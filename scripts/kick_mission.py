@@ -50,6 +50,15 @@ from goto_point import CONTROL_DT, RunLog  # noqa: E402
 from goto_supervisor import GotoConfig, GotoSupervisor, wrap_angle  # noqa: E402
 from kick_battery import BALL_OFFSET_ABS_Y, BALL_OFFSET_X, SCENES, KickSim  # noqa: E402
 from soccer_referee import Goal, GoalReferee  # noqa: E402
+
+# Shipped VelStand (2026-11-23): HeadJamRecover 4250. Used when the velstand positional is left out.
+# infer_policy turns the neck clip on for it automatically (file name contains "headjam").
+DEFAULT_VELSTAND = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "logs/rsl_rl/velstand/2026-11-22_19-47-54_headjamB/2026-11-22_19-47-54_headjamB_model_4250.onnx")
+ROUND3_VELSTAND = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx")
 from truth_guard import TruthGuard  # noqa: E402
 from pose_provider import ODOM_CALIBS, STALE_S, GroundTruthBall, GroundTruthProvider, make_provider, pose_error  # noqa: E402
 
@@ -1781,7 +1790,8 @@ def print_goal_summary(rows, goal_dist, foot):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("velstand")
+    ap.add_argument("velstand", nargs="?", default=DEFAULT_VELSTAND,
+                    help="VelStand ONNX (default: shipped HeadJamRecover 4250); give only <kick> to use it")
     ap.add_argument("kick")
     ap.add_argument("--runs", type=int, default=5)
     ap.add_argument("--seed", type=int, default=0)

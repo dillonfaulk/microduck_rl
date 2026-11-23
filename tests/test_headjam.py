@@ -2,6 +2,7 @@
 import importlib
 import importlib.util
 import math
+import os
 from pathlib import Path
 
 import numpy as np
@@ -72,3 +73,34 @@ def test_runtime_clip_matches_training_clip():
     from mjlab_microduck.tasks.microduck_standup_env_cfg import HEADJAM_NECK_CLIP
     assert ip.NECK_CLIP_RANGE == pytest.approx(HEADJAM_NECK_CLIP)
     assert ip.NECK_CLIP_INDEX == 5
+
+
+def _load_ip(monkeypatch, env=None):
+    if env is None:
+        monkeypatch.delenv("MICRODUCK_NECK_CLIP", raising=False)
+    else:
+        monkeypatch.setenv("MICRODUCK_NECK_CLIP", env)
+    spec = importlib.util.spec_from_file_location("infer_policy_t", REPO / "scripts" / "infer_policy.py")
+    ip = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ip)
+    return ip
+
+
+def test_neck_clip_auto_for_headjam_policies(monkeypatch):
+    ip = _load_ip(monkeypatch)
+    assert ip.neck_clip_auto("logs/x/2026-11-22_19-47-54_headjamB_model_4250.onnx")
+    assert ip.neck_clip_auto(None, "microduck/velstand/velstand_headjam_model_4250.onnx")
+    assert not ip.neck_clip_auto("logs/x/velstand_round3_model_3999.onnx", None)
+    assert not ip.neck_clip_auto("logs/headjam_dir/velstand_round3_model_3999.onnx")   # file name only
+    # an explicit MICRODUCK_NECK_CLIP (0 or 1) always wins over the automatic switch
+    assert not _load_ip(monkeypatch, "0").neck_clip_auto("velstand_headjam_model_4250.onnx")
+    ip1 = _load_ip(monkeypatch, "1")
+    assert ip1.NECK_CLIP_ENABLED and not ip1.neck_clip_auto("velstand_round3_model_3999.onnx")
+
+
+def test_soccer_default_velstand_is_shipped_4250():
+    import sys
+    sys.path.insert(0, str(REPO / "scripts"))
+    import kick_mission as km
+    assert km.DEFAULT_VELSTAND.endswith("2026-11-22_19-47-54_headjamB_model_4250.onnx")
+    assert os.path.exists(km.DEFAULT_VELSTAND) and os.path.exists(km.ROUND3_VELSTAND)

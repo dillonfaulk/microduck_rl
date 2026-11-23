@@ -26,6 +26,17 @@ MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene.xml"
 # (standup cfg HEADJAM_NECK_CLIP). MICRODUCK_NECK_CLIP=1 applies the same clip here, only
 # while the walking or standing session drives (kick / PrecisionStep policies unchanged).
 NECK_CLIP_ENABLED = os.environ.get("MICRODUCK_NECK_CLIP", "0") == "1"
+# 2026-11-23: HeadJamRecover 4250 is the shipped VelStand. With MICRODUCK_NECK_CLIP unset, the
+# clip turns itself on when the walking or standing ONNX file name contains "headjam", so the
+# soccer stack can't drive it unclipped by mistake. MICRODUCK_NECK_CLIP=0 forces it off.
+NECK_CLIP_ENV_SET = "MICRODUCK_NECK_CLIP" in os.environ
+
+
+def neck_clip_auto(*onnx_paths):
+    """True when the clip should turn itself on for these policy files (env var unset, a headjam policy)."""
+    return (not NECK_CLIP_ENV_SET) and any(p and "headjam" in os.path.basename(str(p)).lower() for p in onnx_paths)
+
+
 NECK_CLIP_INDEX = 5
 NECK_CLIP_RANGE = (-math.pi / 2 + 0.05, math.radians(60) - 0.05)
 # MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene_ramps.xml"
@@ -259,6 +270,11 @@ class PolicyInference:
                     print(f"Found gait period in ONNX metadata: {self.default_gait_period_from_onnx:.4f}s")
             except Exception as e:
                 print(f"Could not read gait period from ONNX metadata: {e}")
+
+        self.neck_clip_auto = neck_clip_auto(walking_onnx_path, standing_onnx_path)
+        if self.neck_clip_auto:
+            print("Neck clip ON (headjam policy, MICRODUCK_NECK_CLIP unset): neck_pitch target "
+                  f"clipped to [{NECK_CLIP_RANGE[0]:.4f}, {NECK_CLIP_RANGE[1]:.4f}] rad")
 
         # Load standing policy
         self.standing_session = None
@@ -896,7 +912,7 @@ class PolicyInference:
         BAM: the firmware position loop lives in the controller (ctrl is the
         motor TORQUE it writes on update()). Legacy: MuJoCo position actuators.
         """
-        if NECK_CLIP_ENABLED and self.ort_session is not None and self.ort_session in (
+        if (NECK_CLIP_ENABLED or getattr(self, "neck_clip_auto", False)) and self.ort_session is not None and self.ort_session in (
                 getattr(self, "walking_session", None), getattr(self, "standing_session", None)):
             t = target_positions[NECK_CLIP_INDEX]
             if t < NECK_CLIP_RANGE[0] or t > NECK_CLIP_RANGE[1]:

@@ -15,7 +15,9 @@ sys.path.insert(0, os.path.join(REPO, "src"))
 import play as pl  # noqa: E402
 import pose_provider as pp  # noqa: E402
 
-VELSTAND = os.path.join(REPO, "logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/velstand_round3_model_3999.onnx")
+# shipped VelStand (HeadJamRecover 4250, 2026-11-23); the neck clip turns on automatically for it
+VELSTAND = os.path.join(REPO, "logs/rsl_rl/velstand/2026-11-22_19-47-54_headjamB/"
+                              "2026-11-22_19-47-54_headjamB_model_4250.onnx")
 KICK_R = os.path.join(REPO, "logs/rsl_rl/ball_kick_v2_right/2026-11-13_18-51-32_v2_right_chunk1/"
                             "2026-11-13_18-51-32_v2_right_chunk1_model_1250.onnx")
 PRECISION = os.path.join(REPO, "logs/rsl_rl/precision_step_v2/2026-11-13_16-23-21_v2_chunk1/"

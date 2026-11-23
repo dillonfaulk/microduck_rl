@@ -1,6 +1,6 @@
 """Continuous play on the field (brief microduck-continuous-play-brief.md, Workstreams A-C). Frozen policies.
 
-  uv run python scripts/play.py <velstand.onnx> <kick.onnx> --foot right --calib v2 --precision <step.onnx> \
+  uv run python scripts/play.py [velstand.onnx] <kick.onnx> --foot right --calib v2 --precision <step.onnx> \
       --pose odom --odom-calib stride_v1 --estimated-only [--runs 30 --time-cap 240] [--viewer]
 
 A. FIXED GOALS. scene_field.xml: boards at +-3 m, goal_a locked in the +x mouth, goal_b in the -x mouth,
@@ -1389,7 +1389,8 @@ def summarize(rows, args):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("velstand")
+    ap.add_argument("velstand", nargs="?", default=km.DEFAULT_VELSTAND,
+                    help="VelStand ONNX (default: shipped HeadJamRecover 4250); give only <kick> to use it")
     ap.add_argument("kick")
     ap.add_argument("--foot", choices=("right", "left"), default="right")
     ap.add_argument("--calib", choices=tuple(km.CALIBRATIONS), default="v2")

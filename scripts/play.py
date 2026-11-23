@@ -153,6 +153,7 @@ class PlayConfig:
     np_setup: bool = False               # NP2: near-post ball > np_oblique off axis, or stance < 0.25 m from a post: tap
     np_line: bool = False                # NP3: ball on/over the goal line: tap it back out in front
     np_oblique: float = math.radians(50)
+    scan_clear: bool = False             # SCAN: back off a map post (obstacles) before pivoting (km._scan_clearance)
 
     @classmethod
     def retrieval(cls, field):
@@ -374,7 +375,7 @@ class PlaySupervisor:
     def __init__(self, sim, kick, precision, foot, pose_src, ball_src, goal_src, attack_goal, attack_key,
                  landmarks, log, estimated_only=True, hide_goal=None, routine_fix=True, single=False, target=None,
                  mission_play=True, corner_look=None, corners=(), timer_fix=False, pre_kick_fix=False,
-                 near_post=None):
+                 near_post=None, scan_clear=False):
         """single (Stage 4 replay, kick_mission.py --reloc): one ball, one kick, then OVER; the missions are
         Stage 4 missions (mission_play=False) aimed at `target` (the placed goal's assignment)."""
         self.sim, self.kick, self.precision, self.foot = sim, kick, precision, foot
@@ -384,6 +385,7 @@ class PlaySupervisor:
                               (attack_goal.cx, attack_goal.cy))   # single (replay): the placed goal
         self.obstacles = tuple(field_obstacles(sim))
         self.cfg.obstacles = self.obstacles
+        self.cfg.scan_clear = bool(scan_clear) and bool(self.obstacles)
         if attack_key in landmarks:
             L = landmarks[attack_key]
             self.cfg.goal_aim = (L[0] + 0.3 * math.cos(L[2]), L[1] + 0.3 * math.sin(L[2]))
@@ -439,6 +441,7 @@ class PlaySupervisor:
             self.sim.arena = (fx0 - m_, fx1 + m_, fy0 - m_, fy1 + m_)
             cfg, goal = PlayConfig.retrieval(self.sim.field), None
             cfg.obstacles = self.obstacles
+            cfg.scan_clear = self.cfg.scan_clear
         elif self.play_arena is not None:
             self.sim.arena = self.play_arena
         self.mission = km.Mission(self.sim, self.kick, None, self.log, foot=self.foot, precision_session=self.precision,
@@ -1174,7 +1177,8 @@ def run_one(args, k, sim, goals, lm, kick, precision, pose_src, ball_cam, goal_c
                          pre_kick_fix=new and not getattr(args, "no_pre_kick_fix", False),
                          near_post={"aim": not getattr(args, "no_np_aim", False), "setup": getattr(args, "np_setup", False),
                                     "line": getattr(args, "np_line", False),
-                                    "oblique_deg": getattr(args, "np_oblique_deg", 50.0)} if new else None)
+                                    "oblique_deg": getattr(args, "np_oblique_deg", 50.0)} if new else None,
+                         scan_clear=new and not getattr(args, "no_scan_clear", False))
     ref = PlayReferee(sim, goals, retrieval=fc["retrieval"])
     if viewer is not None:
         sup.end_on_getup_failure = False      # the viewer waits for a human pick-up (R); batteries end the run
@@ -1421,6 +1425,8 @@ def main():
     ap.add_argument("--np-line", action="store_true", help="4 m field: NP3 ON (setup tap for a ball on/over the goal line; default off)")
     ap.add_argument("--np-oblique-deg", type=float, default=50.0, help="NP2: off-axis angle above which a near-post ball is tapped")
     ap.add_argument("--no-near-post", action="store_true", help="NP1-NP3 all off (the closing-work behaviour)")
+    ap.add_argument("--no-scan-clear", action="store_true",
+                    help="4 m field: SCAN pivots in place even next to a post (before 2026-11-22)")
     ap.add_argument("--spawn-near-post", action="store_true",
                     help="battery: every ball spawns in the attacked goal's near-post zone (0-90 deg off axis, some on the line)")
     ap.add_argument("--dropout", default=None, help='"T0,DUR": pose link down from T0 s into each run for DUR s')

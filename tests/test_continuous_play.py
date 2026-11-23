@@ -411,3 +411,58 @@ def test_spawn_near_post_lands_in_the_zone(field4):
         b = np.array(pl.spawn_near_post(sim, rng, lm["+x"], sim.field))
         d = min(np.linalg.norm(b - (g + np.array([0, s_ * 0.115]))) for s_ in (1, -1))
         assert 0.07 <= d <= 0.5 and b[0] <= 2.0 - 0.02 + 1e-9 and abs(b[1]) < 2.0
+
+
+# --- SCAN clearance (2026-11-22): back off a map post before pivoting ---------------------------------------------
+
+class _Pose:
+    name = "odom"
+
+    def __init__(self, x, y, yaw):
+        self.p = (x, y, yaw)
+
+    def get(self, t):
+        return SimpleNamespace(pose=self.p)
+
+
+def _scan_mission(x, y, yaw, scan_clear=True):
+    import kick_mission as km
+    m = _np_mission()
+    m.play.scan_clear = scan_clear
+    m.scan_clear = scan_clear
+    m._sc_entry, m._sc_count, m._sc_since = None, 0, None
+    m.pose_src, m.t_state, m.result = _Pose(x, y, yaw), 0.0, {}
+    m.log = SimpleNamespace(event=lambda e: None)
+    return m, km
+
+
+def test_scan_clear_backs_away_from_a_near_post_in_the_body_frame():
+    m, km = _scan_mission(1.90, 0.115, 0.0)          # 0.09 m in front of the +x goal's left post (post at +x)
+    tw = m._scan_clearance(1.0)
+    assert tw is not None and tw[0] < 0 and abs(tw[1]) < 1e-6 and tw[2] == 0.0   # walk backward, straight away
+    m, _ = _scan_mission(1.90, 0.115, math.pi / 2)  # facing +y: the post is on the right -> strafe left (+vy)
+    tw = m._scan_clearance(1.0)
+    assert tw[1] > 0 and abs(tw[0]) < 1e-6
+    assert m.result["scan_clear"] == 1
+
+
+def test_scan_clear_does_nothing_when_clear_or_off():
+    m, km = _scan_mission(1.0, 0.0, 0.0)
+    assert m._scan_clearance(1.0) is None
+    m, km = _scan_mission(1.90, 0.115, 0.0, scan_clear=False)
+    m.play = None
+    assert m._scan_clearance(1.0) is None
+
+
+def test_scan_clear_ends_returns_scan_time_and_caps():
+    m, km = _scan_mission(1.90, 0.115, 0.0)
+    assert m._scan_clearance(1.0) is not None
+    m.pose_src = _Pose(1.80, 0.115, 0.0)            # 0.19 m: still inside the exit band
+    assert m._scan_clearance(1.5) is not None
+    m.pose_src = _Pose(1.75, 0.115, 0.0)            # 0.24 m: clear
+    assert m._scan_clearance(2.0) is None
+    assert m.t_state == pytest.approx(1.0)           # the 1 s back-off does not count against SCAN_MAX_S
+    m.pose_src = _Pose(1.90, 0.115, 0.0)            # drifted back in: second back-off allowed, then the cap
+    assert m._scan_clearance(3.0) is not None
+    assert m._scan_clearance(3.0 + km.SCAN_CLEAR_MAX_S + 0.1) is None     # timeout
+    assert m._scan_clearance(9.0) is None            # SCAN_CLEAR_MAX = 2 per entry reached: pivot anyway

@@ -123,6 +123,10 @@ LOOK_RESTORE_S = 0.6                  # head back to neutral before the step pol
 RESCAN_HEAD_YAWS = (0.0, 0.5, -0.5)   # re-scan: look again, then left, then right
 RESCAN_MAX = 3
 SCAN_WZ, SCAN_MAX_S = 0.6, 15.0       # no ball at start: turn in place looking for it
+# SCAN clearance (play, 4 m field, 2026-11-22; see Mission._scan_clearance): back off a map post before pivoting
+SCAN_CLEAR_M, SCAN_CLEAR_EXIT_M = 0.18, 0.22   # estimated trunk to post surface; contacts all started < 0.115 m
+SCAN_CLEAR_SPEED, SCAN_CLEAR_VY = 0.15, 0.10   # body-frame back-off twist (m/s)
+SCAN_CLEAR_MAX_S, SCAN_CLEAR_MAX = 4.0, 2      # per back-off; per SCAN entry
 # --pose mapd: a mission opens with autod's survey ("stand still and sweep the head side to side: a
 # wide look at this place, for the map"), so mapd's first keyframe is a wide view the later stops can
 # be matched against. mapd needs settle_s = 0.4 s of stillness to open a keyframe.
@@ -316,6 +320,8 @@ class Mission:
         self.settle_left = 0
         self.pulse_twist = (0.0, 0.0, 0.0)
         self.result = {"approach_mode": "precision" if precision_session is not None else "pulse"}
+        self.scan_clear = bool(getattr(play, "scan_clear", False))    # SCAN clearance (play, 4 m field)
+        self._sc_entry, self._sc_count, self._sc_since = None, 0, None
         self.camera = hasattr(self.ball_src, "look")   # camera ball: scan, 5 Hz looks, re-observe
         self.nav = None
         self.goal_attempt = 0
@@ -630,7 +636,48 @@ class Mission:
             self.log.event({"t": round(t, 3), "event": why.upper(), "phase": "SCAN"})
             self._goto("DONE")
             return (0.0, 0.0, 0.0)
+        if self.scan_clear:
+            tw = self._scan_clearance(t)
+            if tw is not None:
+                return tw
         return (0.0, 0.0, SCAN_WZ)
+
+    def _scan_clearance(self, t):
+        """Play, 4 m field (2026-11-22): don't pivot next to a post. Measured on the regression soccer rows: every
+        SCAN post contact started < 0.115 m from a post's surface (true), and a bump moves the trunk where the leg
+        odometry can't see it. If the ESTIMATED trunk is within SCAN_CLEAR_M of a map post, walk straight away
+        from it (body-frame twist) until SCAN_CLEAR_EXIT_M, at most SCAN_CLEAR_MAX_S per back-off and
+        SCAN_CLEAR_MAX per SCAN entry; then pivot as before. Returns the twist, or None to pivot."""
+        obstacles = getattr(self.play, "obstacles", ()) if self.play is not None else ()
+        if not obstacles:
+            return None
+        est = self.pose_src.get(t)
+        if est.pose is None:
+            return None
+        p = np.array(est.pose[:2]); yaw = est.pose[2]
+        o = min(obstacles, key=lambda q: np.linalg.norm(p - np.array(q[:2])) - q[2])
+        dist = float(np.linalg.norm(p - np.array(o[:2])) - o[2])
+        if self._sc_entry != self.t_state:                  # a new SCAN entry
+            self._sc_entry, self._sc_count, self._sc_since = self.t_state, 0, None
+        if self._sc_since is None:
+            if dist >= SCAN_CLEAR_M or self._sc_count >= SCAN_CLEAR_MAX:
+                return None
+            self._sc_since, self._sc_count = t, self._sc_count + 1
+            self.result["scan_clear"] = self.result.get("scan_clear", 0) + 1
+            self.log.event({"t": round(t, 3), "event": "SCAN_CLEAR_START", "post": [round(o[0], 3), round(o[1], 3)],
+                            "dist_m": round(dist, 3)})
+        if dist >= SCAN_CLEAR_EXIT_M or t - self._sc_since > SCAN_CLEAR_MAX_S:
+            self.log.event({"t": round(t, 3), "event": "SCAN_CLEAR_DONE", "dist_m": round(dist, 3),
+                            "took_s": round(t - self._sc_since, 2), "timeout": dist < SCAN_CLEAR_EXIT_M})
+            self.t_state += t - self._sc_since               # the back-off does not eat the scan's time budget
+            self._sc_entry = self.t_state
+            self._sc_since = None
+            return None
+        away = (p - np.array(o[:2])) / max(np.linalg.norm(p - np.array(o[:2])), 1e-9)
+        c, s = math.cos(yaw), math.sin(yaw)
+        bx, by = c * away[0] + s * away[1], -s * away[0] + c * away[1]     # world -> body
+        return (float(np.clip(SCAN_CLEAR_SPEED * bx, -SCAN_CLEAR_SPEED, SCAN_CLEAR_SPEED)),
+                float(np.clip(SCAN_CLEAR_SPEED * by, -SCAN_CLEAR_VY, SCAN_CLEAR_VY)), 0.0)
 
     def _start_look(self, t):
         if self.goal_src is not None and not getattr(self, "goal_fresh", False) and self.aim_mode != "map":

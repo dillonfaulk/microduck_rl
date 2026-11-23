@@ -42,6 +42,7 @@ n = len(cells) * reps
 env_cfg = load_env_cfg(TASK, play=True)
 env_cfg.scene.num_envs = n
 env_cfg.events["random_prone_init"].params.update(prone_prob=0.0, crouch_prob=0.0, sit_prob=0.0)  # upright HOME spawns
+env_cfg.events.pop("set_head_under_state", None)  # HeadJamRecover: upright spawns only (neck clip kept)
 for name in [k for k, e in env_cfg.events.items() if e.mode == "interval"]:
     env_cfg.events.pop(name)  # no pushes / interval disturbances
 agent_cfg = load_rl_cfg(TASK)

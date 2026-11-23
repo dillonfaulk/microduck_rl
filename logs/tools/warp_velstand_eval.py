@@ -26,6 +26,9 @@ UP_TILT_DEG, UP_Z, FALL_TILT_DEG = 25.0, 0.09, 60.0
 
 env_cfg = load_env_cfg(TASK, play=False)
 env_cfg.scene.num_envs = n
+# HeadJamRecover: score the normal start mix only (the neck clip, if MICRODUCK_HEADJAM=1, stays on)
+if env_cfg.events.pop("set_head_under_state", None) is not None:
+    print("head-under spawns removed for this eval (neck clip kept)")
 agent_cfg = load_rl_cfg(TASK)
 env = ManagerBasedRlEnv(cfg=env_cfg, device="cuda:0")
 env.common_step_counter = 4000 * 24  # curricula at their final stage

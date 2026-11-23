@@ -1,0 +1,4 @@
+checkpoint logs/rsl_rl/velstand/2026-11-22_19-47-54_headjamB/model_5498.pt  envs=1024  episode 20s, training command mix
+standing (control)  n= 206  got up (held 1s) 100.0%  t_med=0.00s  recycled before up   0.0%  peak|w| med 13.9 rad/s  | fell later  98.1%, of those back up  97.0%
+prone g_x<0         n= 408  got up (held 1s)  99.0%  t_med=0.86s  recycled before up   1.0%  peak|w| med 13.8 rad/s
+prone g_x>=0        n= 410  got up (held 1s) 100.0%  t_med=0.34s  recycled before up   0.0%  peak|w| med 13.7 rad/s

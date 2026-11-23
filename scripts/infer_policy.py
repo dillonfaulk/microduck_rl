@@ -20,6 +20,14 @@ import mujoco.viewer
 import onnxruntime as ort
 
 MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene.xml"
+
+# HeadJamRecover (2026-11-22): VelStand / StandUp policies trained with MICRODUCK_HEADJAM=1
+# had their neck_pitch position target clipped 0.05 rad inside the joint range
+# (standup cfg HEADJAM_NECK_CLIP). MICRODUCK_NECK_CLIP=1 applies the same clip here, only
+# while the walking or standing session drives (kick / PrecisionStep policies unchanged).
+NECK_CLIP_ENABLED = os.environ.get("MICRODUCK_NECK_CLIP", "0") == "1"
+NECK_CLIP_INDEX = 5
+NECK_CLIP_RANGE = (-math.pi / 2 + 0.05, math.radians(60) - 0.05)
 # MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene_ramps.xml"
 # MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene_floor_objects.xml"
 # MICRODUCK_XML = "src/mjlab_microduck/robot/microduck/scene_robot_walk.xml"
@@ -888,6 +896,13 @@ class PolicyInference:
         BAM: the firmware position loop lives in the controller (ctrl is the
         motor TORQUE it writes on update()). Legacy: MuJoCo position actuators.
         """
+        if NECK_CLIP_ENABLED and self.ort_session is not None and self.ort_session in (
+                getattr(self, "walking_session", None), getattr(self, "standing_session", None)):
+            t = target_positions[NECK_CLIP_INDEX]
+            if t < NECK_CLIP_RANGE[0] or t > NECK_CLIP_RANGE[1]:
+                target_positions = np.array(target_positions, dtype=float, copy=True)
+                target_positions[NECK_CLIP_INDEX] = min(max(t, NECK_CLIP_RANGE[0]), NECK_CLIP_RANGE[1])
+                self.neck_clip_count = getattr(self, "neck_clip_count", 0) + 1
         if self.bam_ctrl is not None:
             self.bam_ctrl.q_target[:] = target_positions
         else:

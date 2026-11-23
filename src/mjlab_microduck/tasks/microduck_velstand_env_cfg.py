@@ -217,6 +217,10 @@ Phases (as before, but with a recovery backstop):
 
 import math
 
+from mjlab_microduck.tasks.microduck_standup_env_cfg import (  # HeadJamRecover: one definition
+    HEADJAM_ENABLED, HEADJAM_NECK_CLIP, HEADJAM_SPAWN_PROB,
+)
+
 from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.managers import (
     CurriculumTermCfg,
@@ -307,6 +311,10 @@ ENABLE_EXPERT_BC = True
 # supportgate/model_3500 and velocity/2026-10-26_16-43-15_velocity/model_4750.
 LOCAL_STAND_EXPERT_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/microduck_stand/2026-11-01_17-21-18_spincap_chunk2/model_11000.pt"
 LOCAL_WALK_ANCHOR_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/velocity/2026-11-01_17-21-17_walkv2_chunk2/model_7998.pt"
+# HeadJamRecover stage B (2026-11-22): BC from the stage-A expert (StandUp fine-tune
+# with the neck clip + head-under spawns; frees the 42-deg stall, normal get-ups held).
+if HEADJAM_ENABLED:
+    LOCAL_STAND_EXPERT_CKPT = "/home/n3z/microduck_rl/logs/rsl_rl/microduck_stand/2026-11-22_18-15-02_headjamA/model_12499.pt"
 EXPERT_BC_COEF = 1.0
 EXPERT_BC_GATE_TILT_DEG = 35.0
 
@@ -1016,6 +1024,18 @@ def make_microduck_velstand_env_cfg(play: bool = False, rough: bool = False) -> 
             ],
         },
     )
+
+    # HeadJamRecover stage B (MICRODUCK_HEADJAM=1): the same neck clip and head-under
+    # spawns as the stage-A StandUp fine-tune (microduck_standup_env_cfg), and BC from
+    # that stage-A expert (LOCAL_STAND_EXPERT_CKPT above). The spawn is its own reset
+    # event after random_prone_init, so prone_init_prob never changes its share.
+    if HEADJAM_ENABLED:
+        cfg.actions["joint_pos"].clip = {"neck_pitch": HEADJAM_NECK_CLIP}
+        cfg.events["set_head_under_state"] = EventTermCfg(
+            func=microduck_mdp.set_head_under_state,
+            mode="reset",
+            params={"prob": HEADJAM_SPAWN_PROB},
+        )
 
     return cfg
 

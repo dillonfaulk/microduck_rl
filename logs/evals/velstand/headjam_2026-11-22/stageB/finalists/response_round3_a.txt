@@ -1,0 +1,1937 @@
+/home/n3z/microduck_rl/.venv/lib/python3.12/site-packages/mjlab/entity/entity.py:149: UserWarning: Actuator config matched 14 joint(s) but the same expressions also match 7 site(s): imu, left_foot, head_camera, tof, head_imu, mouth_tip, right_foot. Add a separate config with transmission_type=TransmissionType.SITE if those should be actuated too.
+  self._add_actuators()
+[mdp] Patches 1-2 active: NaN-safe reward/advantage
+[mdp] Patch 4 active: ONNX export filters passive_* joints
+[mdp] Patch 5 active: MICRODUCK_WARM_START=1 restarts curricula after checkpoint load
+Warp 1.12.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5060 Ti" (15 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/n3z/.cache/warp/1.12.0
+Warp DeprecationWarning: The symbol `warp.context.runtime` will soon be removed from the public API. It can still be accessed from `warp._src.context.runtime` but might be changed or removed without notice.
+Module mujoco_warp._src.smooth 95a0b8b load on device 'cuda:0' took 907.17 ms  (cached)
+Module mujoco_warp._src.collision_driver 88f7770 load on device 'cuda:0' took 19.72 ms  (cached)
+Module _nxn_broadphase__locals__kernel_e73b1315 e73b131 load on device 'cuda:0' took 19.61 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_079dfa94 079dfa9 load on device 'cuda:0' took 1205.19 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_b282a07a b282a07 load on device 'cuda:0' took 107.15 ms  (cached)
+Module mujoco_warp._src.constraint 27c5750 load on device 'cuda:0' took 465.83 ms  (cached)
+Module _efc_contact_init__locals__kernel_fda71e14 fda71e1 load on device 'cuda:0' took 36.24 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_7974b597 cc0fc30 load on device 'cuda:0' took 25.17 ms  (cached)
+Module _efc_contact_update__locals__kernel_90315d53 90315d5 load on device 'cuda:0' took 39.05 ms  (cached)
+Module mujoco_warp._src.sensor 7fc0378 load on device 'cuda:0' took 606.30 ms  (cached)
+Module mujoco_warp._src.forward f60f76d load on device 'cuda:0' took 383.29 ms  (cached)
+Module mujoco_warp._src.passive 1a5e55c load on device 'cuda:0' took 184.80 ms  (cached)
+Module mujoco_warp._src.forward 8ebfcb1 load on device 'cuda:0' took 381.52 ms  (cached)
+Module mujoco_warp._src.support dd3f924 load on device 'cuda:0' took 34.82 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_b16bf393 b7e5d5f load on device 'cuda:0' took 312.04 ms  (cached)
+Module mujoco_warp._src.solver b116efb load on device 'cuda:0' took 443.66 ms  (cached)
+Module solve_init_jaref__locals__kernel_5208712d 5208712 load on device 'cuda:0' took 25.04 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_b66df345 b66df34 load on device 'cuda:0' took 24.04 ms  (cached)
+Module update_constraint_efc__locals__kernel_32935e9d 32935e9 load on device 'cuda:0' took 27.94 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_baf8e129 baf8e12 load on device 'cuda:0' took 52.50 ms  (cached)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_9404d42c b63011f load on device 'cuda:0' took 32.04 ms  (cached)
+Module update_gradient_cholesky__locals__kernel_5ee47d83 324a2ff load on device 'cuda:0' took 285.46 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_7bf09094 7bf0909 load on device 'cuda:0' took 24.64 ms  (cached)
+Module linesearch_prepare_gauss__locals__kernel_97347d38 97347d3 load on device 'cuda:0' took 55.95 ms  (cached)
+Module update_constraint_efc__locals__kernel_3c1a9816 3c1a981 load on device 'cuda:0' took 28.49 ms  (cached)
+Module _contact_sort__locals__contact_sort_304c86df 6c97b35 load on device 'cuda:0' took 16.87 ms  (cached)
+Module mujoco_warp._src.derivative d0e2fd7 load on device 'cuda:0' took 162.73 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_e7898c5c e7898c5 load on device 'cuda:0' took 15.71 ms  (cached)
+Module reset_data__locals__reset_qM_10d3c793 10d3c79 load on device 'cuda:0' took 15.38 ms  (cached)
+Module reset_data__locals__reset_mocap_ff71f630 ff71f63 load on device 'cuda:0' took 23.68 ms  (cached)
+Module reset_data__locals__reset_contact_df686d47 df686d4 load on device 'cuda:0' took 15.28 ms  (cached)
+Module reset_data__locals__reset_nworld_6e0d904e 6e0d904 load on device 'cuda:0' took 74.81 ms  (cached)
+[BamActuator] model='m6' joints=14 kt=0.3660 R=2.8114 vin=range=(6.5, 8.2) drop_gain_range=(0.0, 0.2) force_limit=±1.07Nm friction_base=0.0048 friction_viscous=0.0054 envs=2180 device=cuda:0
+Module mujoco_warp._src.render_util 94fd13e load on device 'cuda:0' took 81.41 ms  (cached)
+Module mujoco_warp._src.bvh 08f985a load on device 'cuda:0' took 174.29 ms  (cached)
+Module mujoco_warp._src.ray c8f2bb3 load on device 'cuda:0' took 246.79 ms  (cached)
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 2180   |
+| Environment device     | cuda:0 |
+| Environment seed       | None   |
+| Physics step-size      | 0.005  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 2 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | reset_base                  |
+|   1   | reset_robot_joints          |
+|   2   | reset_action_history        |
+|   3   | randomize_com               |
+|   4   | randomize_head_com          |
+|   5   | randomize_joint_friction    |
+|   6   | randomize_armature          |
+|   7   | random_prone_init           |
++-------+-----------------------------+
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++-------+-------------------------------+
+| Index | Name                          |
++-------+-------------------------------+
+|   0   | foot_friction                 |
+|   1   | encoder_bias                  |
+|   2   | base_com                      |
+|   3   | expand_bam_friction_fields    |
+|   4   | randomize_mass_inertia        |
++-------+-------------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | geom_friction       |
+|   1   | body_ipos           |
+|   2   | body_subtreemass    |
+|   3   | dof_invweight0      |
+|   4   | body_invweight0     |
+|   5   | tendon_length0      |
+|   6   | tendon_invweight0   |
+|   7   | dof_frictionloss    |
+|   8   | dof_damping         |
+|   9   | body_mass           |
+|   10  | body_inertia        |
+|   11  | body_iquat          |
+|   12  | dof_armature        |
++-------+---------------------+
+
+Module repeat_array_kernel_39317a34 b712927 load on device 'cuda:0' took 16.61 ms  (cached)
+Module repeat_array_kernel_39317a34 18fcc7e load on device 'cuda:0' took 28.71 ms  (cached)
+Module repeat_array_kernel_39317a34 5cde7e8 load on device 'cuda:0' took 40.26 ms  (cached)
+Module repeat_array_kernel_39317a34 0fe3117 load on device 'cuda:0' took 52.27 ms  (cached)
+[INFO] <CommandManager> contains 3 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+-----------+----------------------------+
+| Index | Name      |            Type            |
++-------+-----------+----------------------------+
+|   0   | twist     | VelocityCommandCommandOnly |
+|   1   | head_pose |     UniformPoseCommand     |
+|   2   | body_pose |  StandingGatedPoseCommand  |
++-------+-----------+----------------------------+
+
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 14) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          14 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 2 groups.
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'actor' (shape: (61,)) |
++-----------+----------------------------------+------------+
+|   Index   | Name                             |   Shape    |
++-----------+----------------------------------+------------+
+|     0     | base_ang_vel                     |    (3,)    |
+|     1     | projected_gravity                |    (3,)    |
+|     2     | joint_pos                        |   (14,)    |
+|     3     | joint_vel                        |   (14,)    |
+|     4     | actions                          |   (14,)    |
+|     5     | command                          |    (3,)    |
+|     6     | head_command                     |    (4,)    |
+|     7     | body_command                     |    (6,)    |
++-----------+----------------------------------+------------+
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (76,)) |
++----------+------------------------------------+------------+
+|  Index   | Name                               |   Shape    |
++----------+------------------------------------+------------+
+|    0     | base_lin_vel                       |    (3,)    |
+|    1     | base_ang_vel                       |    (3,)    |
+|    2     | projected_gravity                  |    (3,)    |
+|    3     | joint_pos                          |   (14,)    |
+|    4     | joint_vel                          |   (14,)    |
+|    5     | actions                            |   (14,)    |
+|    6     | command                            |    (3,)    |
+|    7     | foot_height                        |    (2,)    |
+|    8     | foot_air_time                      |    (2,)    |
+|    9     | foot_contact                       |    (2,)    |
+|    10    | foot_contact_forces                |    (6,)    |
+|    11    | head_command                       |    (4,)    |
+|    12    | body_command                       |    (6,)    |
++----------+------------------------------------+------------+
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 143
+contact match overflow: please increase Option.contact_sensor_maxmatch to 144
+contact match overflow: please increase Option.contact_sensor_maxmatch to 145
+contact match overflow: please increase Option.contact_sensor_maxmatch to 146
+contact match overflow: please increase Option.contact_sensor_maxmatch to 147
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 118
+contact match overflow: please increase Option.contact_sensor_maxmatch to 119
+contact match overflow: please increase Option.contact_sensor_maxmatch to 121
+contact match overflow: please increase Option.contact_sensor_maxmatch to 122
+contact match overflow: please increase Option.contact_sensor_maxmatch to 124
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 120
+contact match overflow: please increase Option.contact_sensor_maxmatch to 123
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 125
+contact match overflow: please increase Option.contact_sensor_maxmatch to 126
+contact match overflow: please increase Option.contact_sensor_maxmatch to 127
+contact match overflow: please increase Option.contact_sensor_maxmatch to 128
+contact match overflow: please increase Option.contact_sensor_maxmatch to 129
+contact match overflow: please increase Option.contact_sensor_maxmatch to 130
+contact match overflow: please increase Option.contact_sensor_maxmatch to 131
+contact match overflow: please increase Option.contact_sensor_maxmatch to 132
+contact match overflow: please increase Option.contact_sensor_maxmatch to 133
+contact match overflow: please increase Option.contact_sensor_maxmatch to 134
+contact match overflow: please increase Option.contact_sensor_maxmatch to 135
+contact match overflow: please increase Option.contact_sensor_maxmatch to 136
+contact match overflow: please increase Option.contact_sensor_maxmatch to 137
+contact match overflow: please increase Option.contact_sensor_maxmatch to 138
+contact match overflow: please increase Option.contact_sensor_maxmatch to 139
+contact match overflow: please increase Option.contact_sensor_maxmatch to 140
+contact match overflow: please increase Option.contact_sensor_maxmatch to 141
+contact match overflow: please increase Option.contact_sensor_maxmatch to 142
+contact match overflow: please increase Option.contact_sensor_maxmatch to 143
+contact match overflow: please increase Option.contact_sensor_maxmatch to 146
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 119
+contact match overflow: please increase Option.contact_sensor_maxmatch to 122
+contact match overflow: please increase Option.contact_sensor_maxmatch to 124
+contact match overflow: please increase Option.contact_sensor_maxmatch to 127
+contact match overflow: please increase Option.contact_sensor_maxmatch to 129
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 134
+contact match overflow: please increase Option.contact_sensor_maxmatch to 135
+contact match overflow: please increase Option.contact_sensor_maxmatch to 136
+contact match overflow: please increase Option.contact_sensor_maxmatch to 137
+contact match overflow: please increase Option.contact_sensor_maxmatch to 138
+contact match overflow: please increase Option.contact_sensor_maxmatch to 139
+contact match overflow: please increase Option.contact_sensor_maxmatch to 140
+contact match overflow: please increase Option.contact_sensor_maxmatch to 141
+contact match overflow: please increase Option.contact_sensor_maxmatch to 142
+contact match overflow: please increase Option.contact_sensor_maxmatch to 144
+contact match overflow: please increase Option.contact_sensor_maxmatch to 145
+contact match overflow: please increase Option.contact_sensor_maxmatch to 147
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 120
+contact match overflow: please increase Option.contact_sensor_maxmatch to 123
+contact match overflow: please increase Option.contact_sensor_maxmatch to 125
+contact match overflow: please increase Option.contact_sensor_maxmatch to 128
+contact match overflow: please increase Option.contact_sensor_maxmatch to 130
+contact match overflow: please increase Option.contact_sensor_maxmatch to 132
+contact match overflow: please increase Option.contact_sensor_maxmatch to 133
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 118
+contact match overflow: please increase Option.contact_sensor_maxmatch to 121
+contact match overflow: please increase Option.contact_sensor_maxmatch to 126
+contact match overflow: please increase Option.contact_sensor_maxmatch to 131
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 118
+contact match overflow: please increase Option.contact_sensor_maxmatch to 119
+contact match overflow: please increase Option.contact_sensor_maxmatch to 120
+contact match overflow: please increase Option.contact_sensor_maxmatch to 121
+contact match overflow: please increase Option.contact_sensor_maxmatch to 122
+contact match overflow: please increase Option.contact_sensor_maxmatch to 123
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 124
+contact match overflow: please increase Option.contact_sensor_maxmatch to 125
+contact match overflow: please increase Option.contact_sensor_maxmatch to 126
+contact match overflow: please increase Option.contact_sensor_maxmatch to 127
+contact match overflow: please increase Option.contact_sensor_maxmatch to 128
+contact match overflow: please increase Option.contact_sensor_maxmatch to 129
+contact match overflow: please increase Option.contact_sensor_maxmatch to 130
+contact match overflow: please increase Option.contact_sensor_maxmatch to 131
+contact match overflow: please increase Option.contact_sensor_maxmatch to 132
+contact match overflow: please increase Option.contact_sensor_maxmatch to 133
+contact match overflow: please increase Option.contact_sensor_maxmatch to 134
+contact match overflow: please increase Option.contact_sensor_maxmatch to 135
+contact match overflow: please increase Option.contact_sensor_maxmatch to 136
+contact match overflow: please increase Option.contact_sensor_maxmatch to 137
+contact match overflow: please increase Option.contact_sensor_maxmatch to 138
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 126
+contact match overflow: please increase Option.contact_sensor_maxmatch to 127
+contact match overflow: please increase Option.contact_sensor_maxmatch to 128
+contact match overflow: please increase Option.contact_sensor_maxmatch to 129
+contact match overflow: please increase Option.contact_sensor_maxmatch to 130
+contact match overflow: please increase Option.contact_sensor_maxmatch to 131
+contact match overflow: please increase Option.contact_sensor_maxmatch to 132
+contact match overflow: please increase Option.contact_sensor_maxmatch to 133
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 118
+contact match overflow: please increase Option.contact_sensor_maxmatch to 119
+contact match overflow: please increase Option.contact_sensor_maxmatch to 120
+contact match overflow: please increase Option.contact_sensor_maxmatch to 121
+contact match overflow: please increase Option.contact_sensor_maxmatch to 122
+contact match overflow: please increase Option.contact_sensor_maxmatch to 123
+contact match overflow: please increase Option.contact_sensor_maxmatch to 124
+contact match overflow: please increase Option.contact_sensor_maxmatch to 125
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 118
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 106
+contact match overflow: please increase Option.contact_sensor_maxmatch to 109
+contact match overflow: please increase Option.contact_sensor_maxmatch to 111
+contact match overflow: please increase Option.contact_sensor_maxmatch to 114
+contact match overflow: please increase Option.contact_sensor_maxmatch to 115
+contact match overflow: please increase Option.contact_sensor_maxmatch to 116
+contact match overflow: please increase Option.contact_sensor_maxmatch to 117
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 103
+contact match overflow: please increase Option.contact_sensor_maxmatch to 104
+contact match overflow: please increase Option.contact_sensor_maxmatch to 105
+contact match overflow: please increase Option.contact_sensor_maxmatch to 107
+contact match overflow: please increase Option.contact_sensor_maxmatch to 108
+contact match overflow: please increase Option.contact_sensor_maxmatch to 110
+contact match overflow: please increase Option.contact_sensor_maxmatch to 112
+contact match overflow: please increase Option.contact_sensor_maxmatch to 113
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 101
+contact match overflow: please increase Option.contact_sensor_maxmatch to 102
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 100
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 99
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 91
+contact match overflow: please increase Option.contact_sensor_maxmatch to 92
+contact match overflow: please increase Option.contact_sensor_maxmatch to 93
+contact match overflow: please increase Option.contact_sensor_maxmatch to 94
+contact match overflow: please increase Option.contact_sensor_maxmatch to 95
+contact match overflow: please increase Option.contact_sensor_maxmatch to 96
+contact match overflow: please increase Option.contact_sensor_maxmatch to 97
+contact match overflow: please increase Option.contact_sensor_maxmatch to 98
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 88
+contact match overflow: please increase Option.contact_sensor_maxmatch to 89
+contact match overflow: please increase Option.contact_sensor_maxmatch to 90
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 87
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 86
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 77
+contact match overflow: please increase Option.contact_sensor_maxmatch to 78
+contact match overflow: please increase Option.contact_sensor_maxmatch to 79
+contact match overflow: please increase Option.contact_sensor_maxmatch to 80
+contact match overflow: please increase Option.contact_sensor_maxmatch to 81
+contact match overflow: please increase Option.contact_sensor_maxmatch to 82
+contact match overflow: please increase Option.contact_sensor_maxmatch to 83
+contact match overflow: please increase Option.contact_sensor_maxmatch to 84
+contact match overflow: please increase Option.contact_sensor_maxmatch to 85
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 73
+contact match overflow: please increase Option.contact_sensor_maxmatch to 74
+contact match overflow: please increase Option.contact_sensor_maxmatch to 75
+contact match overflow: please increase Option.contact_sensor_maxmatch to 76
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 72
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 71
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 70
+contact match overflow: please increase Option.contact_sensor_maxmatch to 64
+contact match overflow: please increase Option.contact_sensor_maxmatch to 65
+contact match overflow: please increase Option.contact_sensor_maxmatch to 66
+contact match overflow: please increase Option.contact_sensor_maxmatch to 67
+contact match overflow: please increase Option.contact_sensor_maxmatch to 68
+contact match overflow: please increase Option.contact_sensor_maxmatch to 69
+
+[INFO] <TerminationManager> contains 4 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | out_of_terrain_bounds |   True   |
+|   2   | nan_state             |  False   |
+|   3   | fallen_too_long       |  False   |
++-------+-----------------------+----------+
+
+[INFO] <RewardManager> contains 30 active terms.
++-------------------------------------------+
+|            Active Reward Terms            |
++-------+------------------------+----------+
+| Index | Name                   |   Weight |
++-------+------------------------+----------+
+|   0   | track_linear_velocity  |      2.0 |
+|   1   | track_angular_velocity |      2.0 |
+|   2   | upright                |      2.0 |
+|   3   | pose                   |      1.0 |
+|   4   | body_ang_vel           |    -0.05 |
+|   5   | angular_momentum       |    -0.02 |
+|   6   | dof_pos_limits         |     -1.0 |
+|   7   | action_rate_l2         |     -0.1 |
+|   8   | air_time               |      3.0 |
+|   9   | foot_clearance         |     -2.0 |
+|   10  | foot_swing_height      |    -0.25 |
+|   11  | foot_slip              |     -0.1 |
+|   12  | self_collisions        |     -1.0 |
+|   13  | head_pose_tracking     |      2.0 |
+|   14  | body_pose_tracking     |      2.0 |
+|   15  | head_pose_bias         |      0.0 |
+|   16  | track_lin_vel_fine     |      0.0 |
+|   17  | track_yaw_fine         |      2.0 |
+|   18  | upright_progress       |      5.0 |
+|   19  | height_progress        |     30.0 |
+|   20  | com_upward_velocity    |      0.0 |
+|   21  | joint_torque_rate_l2   |   -0.002 |
+|   22  | servo_impact           |   -0.005 |
+|   23  | head_impact            |  -0.0025 |
+|   24  | trunk_impact           |  -0.0025 |
+|   25  | servo_acc_spike        | -0.00025 |
+|   26  | servo_stall            |  -0.0125 |
+|   27  | gentle_rise            |  0.00125 |
+|   28  | fallen_tax             |      0.0 |
+|   29  | recovery_success       |      0.0 |
++-------+------------------------+----------+
+
+[INFO] <CurriculumManager> contains 18 active terms.
++-----------------------------------+
+|      Active Curriculum Terms      |
++-------+---------------------------+
+| Index | Name                      |
++-------+---------------------------+
+|   0   | action_rate_weight        |
+|   1   | track_lin_vel_fine_weight |
+|   2   | track_yaw_fine_weight     |
+|   3   | standing_envs             |
+|   4   | head_pose_range           |
+|   5   | com_range                 |
+|   6   | head_com_range            |
+|   7   | head_pose_bias_weight     |
+|   8   | prone_init_prob           |
+|   9   | fallen_tax_weight         |
+|   10  | recovery_success_weight   |
+|   11  | servo_impact_weight       |
+|   12  | head_impact_weight        |
+|   13  | trunk_impact_weight       |
+|   14  | servo_acc_spike_weight    |
+|   15  | servo_stall_weight        |
+|   16  | gentle_rise_weight        |
+|   17  | com_upward_weight         |
++-------+---------------------------+
+
+[INFO] <MetricsManager> contains 1 active terms.
++-------------------------+
+|   Active Metrics Terms  |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | mean_action_acc |
++-------+-----------------+
+
+[INFO] <NullRecorderManager> (inactive)
+Module mujoco_warp._src.io 4b387a0 load on device 'cuda:0' took 489.94 ms  (cached)
+Module _tile_cholesky_factorize__locals__cholesky_factorize_a02b7349 3d3b894 load on device 'cuda:0' took 199.26 ms  (cached)
+Module _tile_cholesky_solve__locals__cholesky_solve_8c82e9f1 95f6085 load on device 'cuda:0' took 169.17 ms  (cached)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ('actor',)
+	 critic :  ('critic',)
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=61, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=14, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): EmpiricalNormalization()
+  (mlp): MLP(
+    (0): Linear(in_features=76, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+[distill] expert BC ON: stand expert (iter 11000) on tilt>35.0° coef=1.0; walk anchor ON on tilt<25.0° coef=1.0; lr=0.0003 epochs=5 mini_batches=4 min_mb=512
+started upright 844/2180
+started upright but fell/reset: 2 total
+checkpoint logs/rsl_rl/velstand/2026-11-03_10-56-19_round3/model_3999.pt  reps=20  8 s fixed command, achieved = mean over 3-8 s of upright envs
+        fed (vx, vy, wz)      achieved (vx, vy, wz)  upright  fell
+(-0.60, +0.00, +0.00)      (-0.386, -0.010, -0.021)   5/20  1
+(-0.55, +0.00, +0.00)      (-0.392, -0.025, -0.042)   6/20  0
+(-0.50, +0.00, +0.00)      (-0.374, -0.026, -0.058)   6/20  0
+(-0.45, +0.00, +0.00)      (-0.373, -0.023, -0.105)   5/20  0
+(-0.40, +0.00, +0.00)      (-0.318, -0.028, -0.068)   6/20  0
+(-0.35, +0.00, +0.00)      (-0.327, -0.015, -0.016)   8/20  0
+(-0.30, +0.00, +0.00)      (-0.277, -0.019, -0.011)   6/20  0
+(-0.25, +0.00, +0.00)      (-0.254, -0.015, -0.011)   5/20  0
+(-0.20, +0.00, +0.00)      (-0.191, -0.016, -0.031)   5/20  0
+(-0.15, +0.00, +0.00)      (-0.131, -0.014, -0.017)   12/20  0
+(-0.10, +0.00, +0.00)      (-0.027, +0.000, -0.001)   9/20  0
+(-0.05, +0.00, +0.00)      (-0.000, -0.000, -0.003)   7/20  0
+(+0.05, +0.00, +0.00)      (+0.000, +0.000, +0.002)   11/20  0
+(+0.10, +0.00, +0.00)      (+0.035, +0.003, -0.002)   7/20  0
+(+0.15, +0.00, +0.00)      (+0.158, +0.004, +0.001)   10/20  0
+(+0.20, +0.00, +0.00)      (+0.210, +0.001, +0.019)   11/20  0
+(+0.25, +0.00, +0.00)      (+0.273, -0.009, +0.033)   4/20  0
+(+0.30, +0.00, +0.00)      (+0.307, -0.006, -0.031)   9/20  0
+(+0.35, +0.00, +0.00)      (+0.334, -0.007, -0.031)   7/20  0
+(+0.40, +0.00, +0.00)      (+0.372, -0.003, -0.049)   8/20  0
+(+0.45, +0.00, +0.00)      (+0.402, -0.009, -0.061)   7/20  0
+(+0.50, +0.00, +0.00)      (+0.430, -0.016, -0.059)   10/20  0
+(+0.55, +0.00, +0.00)      (+0.456, -0.019, -0.035)   6/20  0
+(+0.60, +0.00, +0.00)      (+0.466, -0.016, -0.012)   12/20  0
+(+0.00, -0.45, +0.00)      (+0.039, -0.127, -0.109)   8/20  0
+(+0.00, -0.40, +0.00)      (+0.032, -0.127, -0.115)   8/20  0
+(+0.00, -0.35, +0.00)      (+0.020, -0.123, -0.089)   9/20  0
+(+0.00, -0.30, +0.00)      (+0.006, -0.118, -0.033)   7/20  0
+(+0.00, -0.25, +0.00)      (+0.019, -0.121, -0.055)   8/20  0
+(+0.00, -0.20, +0.00)      (+0.011, -0.114, -0.027)   6/20  0
+(+0.00, -0.15, +0.00)      (-0.001, -0.110, -0.044)   5/20  0
+(+0.00, -0.10, +0.00)      (+0.000, -0.099, -0.033)   7/20  0
+(+0.00, +0.10, +0.00)      (-0.004, +0.113, -0.001)   11/20  0
+(+0.00, +0.15, +0.00)      (-0.011, +0.126, -0.021)   7/20  0
+(+0.00, +0.20, +0.00)      (-0.019, +0.128, +0.008)   7/20  0
+(+0.00, +0.25, +0.00)      (-0.016, +0.127, +0.030)   7/20  0
+(+0.00, +0.30, +0.00)      (-0.022, +0.138, +0.017)   9/20  0
+(+0.00, +0.35, +0.00)      (-0.018, +0.134, +0.045)   5/20  0
+(+0.00, +0.40, +0.00)      (-0.022, +0.141, +0.027)   12/20  0
+(+0.00, +0.45, +0.00)      (-0.034, +0.142, +0.107)   6/20  0
+(+0.00, +0.00, -1.60)      (-0.001, +0.021, -1.630)   5/20  0
+(+0.00, +0.00, -1.50)      (-0.003, +0.021, -1.523)   6/20  0
+(+0.00, +0.00, -1.40)      (-0.004, +0.017, -1.421)   7/20  0
+(+0.00, +0.00, -1.30)      (-0.003, +0.021, -1.367)   9/20  0
+(+0.00, +0.00, -1.20)      (-0.010, +0.016, -1.239)   8/20  0
+(+0.00, +0.00, -1.10)      (-0.017, +0.015, -1.146)   6/20  0
+(+0.00, +0.00, -1.00)      (-0.010, +0.013, -1.005)   6/20  0
+(+0.00, +0.00, -0.90)      (-0.013, +0.011, -0.869)   10/20  0
+(+0.00, +0.00, -0.80)      (-0.014, +0.011, -0.852)   6/20  0
+(+0.00, +0.00, -0.70)      (-0.010, +0.009, -0.630)   5/20  0
+(+0.00, +0.00, -0.60)      (-0.009, +0.006, -0.502)   8/20  0
+(+0.00, +0.00, -0.50)      (-0.006, +0.005, -0.376)   10/20  0
+(+0.00, +0.00, -0.40)      (-0.003, +0.004, -0.266)   8/20  0
+(+0.00, +0.00, -0.30)      (-0.003, +0.001, -0.107)   7/20  0
+(+0.00, +0.00, -0.20)      (-0.000, +0.000, -0.015)   8/20  0
+(+0.00, +0.00, -0.10)      (-0.000, +0.000, -0.006)   10/20  0
+(+0.00, +0.00, +0.10)      (-0.000, -0.000, +0.002)   5/20  0
+(+0.00, +0.00, +0.20)      (-0.000, -0.000, +0.005)   8/20  0
+(+0.00, +0.00, +0.30)      (+0.000, -0.000, +0.019)   5/20  1
+(+0.00, +0.00, +0.40)      (+0.002, -0.001, +0.079)   10/20  0
+(+0.00, +0.00, +0.50)      (+0.003, -0.003, +0.272)   9/20  0
+(+0.00, +0.00, +0.60)      (+0.005, -0.007, +0.436)   10/20  0
+(+0.00, +0.00, +0.70)      (+0.000, -0.005, +0.528)   11/20  0
+(+0.00, +0.00, +0.80)      (+0.003, -0.007, +0.631)   10/20  0
+(+0.00, +0.00, +0.90)      (+0.002, -0.011, +0.763)   10/20  0
+(+0.00, +0.00, +1.00)      (+0.006, -0.009, +0.932)   6/20  0
+(+0.00, +0.00, +1.10)      (+0.007, -0.013, +1.073)   8/20  0
+(+0.00, +0.00, +1.20)      (+0.013, -0.014, +1.154)   6/20  0
+(+0.00, +0.00, +1.30)      (+0.017, -0.017, +1.268)   4/20  0
+(+0.00, +0.00, +1.40)      (+0.012, -0.015, +1.415)   6/20  0
+(+0.00, +0.00, +1.50)      (+0.012, -0.016, +1.559)   7/20  0
+(+0.00, +0.00, +1.60)      (+0.011, -0.016, +1.598)   8/20  0
+(+0.20, +0.00, -1.30)      (+0.220, -0.005, -1.341)   8/20  0
+(+0.20, +0.00, -1.10)      (+0.220, +0.004, -1.128)   6/20  0
+(+0.20, +0.00, -0.90)      (+0.233, +0.004, -0.954)   7/20  0
+(+0.20, +0.00, -0.70)      (+0.222, -0.002, -0.746)   9/20  0
+(+0.20, +0.00, -0.50)      (+0.221, -0.001, -0.510)   11/20  0
+(+0.20, +0.00, -0.30)      (+0.212, +0.003, -0.262)   5/20  0
+(+0.20, +0.00, +0.30)      (+0.205, +0.003, +0.291)   10/20  0
+(+0.20, +0.00, +0.50)      (+0.217, +0.000, +0.552)   10/20  0
+(+0.20, +0.00, +0.70)      (+0.200, +0.003, +0.780)   8/20  0
+(+0.20, +0.00, +0.90)      (+0.212, -0.009, +0.994)   8/20  0
+(+0.20, +0.00, +1.10)      (+0.210, +0.005, +1.234)   5/20  0
+(+0.20, +0.00, +1.30)      (+0.214, -0.002, +1.400)   13/20  0
+(+0.30, +0.00, -1.30)      (+0.294, +0.008, -1.306)   10/20  0
+(+0.30, +0.00, -1.10)      (+0.316, +0.000, -1.150)   9/20  0
+(+0.30, +0.00, -0.90)      (+0.314, +0.007, -0.933)   3/20  0
+(+0.30, +0.00, -0.70)      (+0.298, +0.009, -0.735)   8/20  0
+(+0.30, +0.00, -0.50)      (+0.294, -0.007, -0.476)   6/20  0
+(+0.30, +0.00, -0.30)      (+0.322, +0.008, -0.306)   6/20  0
+(+0.30, +0.00, +0.30)      (+0.276, +0.001, +0.249)   8/20  0
+(+0.30, +0.00, +0.50)      (+0.297, -0.001, +0.468)   7/20  0
+(+0.30, +0.00, +0.70)      (+0.308, -0.026, +0.701)   2/20  0
+(+0.30, +0.00, +0.90)      (+0.300, -0.011, +0.881)   12/20  0
+(+0.30, +0.00, +1.10)      (+0.297, -0.026, +1.104)   14/20  0
+(+0.30, +0.00, +1.30)      (+0.269, -0.015, +1.305)   8/20  0
+(+0.40, +0.00, -1.30)      (+0.352, +0.019, -1.261)   6/20  0
+(+0.40, +0.00, -1.10)      (+0.364, +0.013, -1.097)   6/20  0
+(+0.40, +0.00, -0.90)      (+0.350, +0.013, -0.899)   8/20  0
+(+0.40, +0.00, -0.70)      (+0.349, +0.012, -0.647)   5/20  0
+(+0.40, +0.00, -0.50)      (+0.373, +0.022, -0.490)   7/20  0
+(+0.40, +0.00, -0.30)      (+0.375, -0.006, -0.312)   10/20  0
+(+0.40, +0.00, +0.30)      (+0.372, -0.017, +0.242)   11/20  0
+(+0.40, +0.00, +0.50)      (+0.403, -0.027, +0.366)   6/20  0
+(+0.40, +0.00, +0.70)      (+0.372, -0.030, +0.571)   8/20  0
+(+0.40, +0.00, +0.90)      (+0.381, -0.031, +0.794)   15/20  0
+(+0.40, +0.00, +1.10)      (+0.343, -0.040, +1.005)   9/20  0
+(+0.40, +0.00, +1.30)      (+0.351, -0.061, +1.077)   4/20  0
+(+0.00, +0.00, +0.00)      (-0.000, +0.000, -0.003)   8/20  0

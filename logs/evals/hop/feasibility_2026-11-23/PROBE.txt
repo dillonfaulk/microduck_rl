@@ -1,0 +1,12 @@
+trials 5500, crouch held 2452, hops (clean lift-off < 30 deg, >= 20 ms off the floor) 1169
+  launched hops (CoM still rising after lift-off by > 2 mm): 3, best CoM rise 3.3 mm
+  peak upward CoM speed while feet push, any trial: 0.48 m/s (ballistic CoM rise at that speed 11.6 mm)
+  CoM vertical speed at lift-off, best-clearance hops: +0.20 +0.12 +0.13 +0.06 +0.08 +0.13 +0.03 +0.14 +0.15 +0.11
+  hops with floor clearance >= 5 mm: 710
+  hops with floor clearance >= 10 mm: 449
+  hops with floor clearance >= 15 mm: 276
+  hops with floor clearance >= 20 mm: 128
+  hops with floor clearance >= 30 mm: 6
+best hop: floor clearance 37.7 mm, flight 150 ms, CoM rise 1.9 mm, lift-off tilt 8 deg; params [0.07, -1.013, -0.216, 0.1, -0.769, -1.017, -1.08, 1.138, -1.104, 0.069, 0.674, -0.557, -1.173, 1.2]
+top-20 hop clearances (mm): 38 35 34 33 31 30 30 29 29 29 29 29 28 28 28 28 28 28 28 27
+top-20 flight (ms):          150 130 115 125 120 115 105 140 140 135 120 125 130 125 125 120 125 135 110 120

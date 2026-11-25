@@ -15,6 +15,9 @@ v2 (2026-11-24): chunk 1a with v1 rewards locked into standing (zero flights by 
 std 0.16). Posture terms now gated like hop_stand, plus a reference prior from the probe's best
 open-loop hop and upward-push shaping, both only inside the request window until the first hop.
 
+v3 (2026-11-24): v2 explored hops but never landed (falls were free once the standing terms
+gated off) -> one-off fall penalty 30 at the fell_over limit + an always-paid upright term 0.5.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -54,6 +57,7 @@ MAX_FWD          = 0.04           # m, forward/back target (final stage)
 MAX_SIDE         = 0.03           # m, left/right target (final stage)
 IN_PLACE_ITERS   = 1000           # in-place only until here (gate), then directions widen
 STAND_Z          = 0.115
+FELL_LIMIT       = math.radians(60.0)   # fell_over termination AND the v3 fall penalty
 NONFOOT_BODIES_PATTERN = r"^(?!ankle_left$|ankle_right$).*$"
 
 # v2 reference prior: the feasibility probe's best open-loop hop (logs/evals/hop/feasibility_2026-11-23/
@@ -161,6 +165,12 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
                 "times": HOP_REF_T, "std": 0.5})
     cfg.rewards["hop_push"] = RewardTermCfg(func=microduck_mdp.hop_push_reward, weight=2.0, params={"vmax": 0.5})
 
+    # ── v3: falling must cost something (v2 iter 250: hops but zero landings, falls free) ──
+    cfg.rewards["upright_alive"] = RewardTermCfg(
+        func=microduck_mdp.hop_upright, weight=0.5, params={"std": math.sqrt(0.05)})
+    cfg.rewards["fell"] = RewardTermCfg(
+        func=microduck_mdp.hop_fell_penalty, weight=30.0, params={"limit_angle": FELL_LIMIT})
+
     # ── Regularisers (action rate capped at -0.4: the hop needs fast actions) ─
     cfg.rewards["action_rate_l2"].weight = -0.1
     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = ("trunk_base",)
@@ -229,7 +239,7 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.terminations["nan_state"] = TerminationTermCfg(func=microduck_mdp.robot_state_is_nan, time_out=False)
     cfg.terminations["nonfoot_contact"] = TerminationTermCfg(
         func=microduck_mdp.hop_nonfoot_termination, time_out=False)
-    cfg.terminations["fell_over"].params["limit_angle"] = math.radians(60.0)
+    cfg.terminations["fell_over"].params["limit_angle"] = FELL_LIMIT
 
     # ── Events ────────────────────────────────────────────────────────────────
     cfg.events["expand_bam_friction_fields"] = EventTermCfg(func=microduck_mdp.expand_bam_friction_fields, mode="startup")

@@ -314,3 +314,17 @@ def test_push_reward_only_in_window_before_hop():
     env, robot = _hop_env()
     robot.data.root_link_lin_vel_w = torch.tensor([[0.0, 0.0, 0.25]])
     assert abs(m.hop_push_reward(env).item() - 0.5) < 1e-6
+
+
+def test_v3_fall_costs_and_alive_upright():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert cfg.rewards["fell"].func is m.hop_fell_penalty and cfg.rewards["fell"].weight == 30.0
+    assert cfg.rewards["fell"].params["limit_angle"] == cfg.terminations["fell_over"].params["limit_angle"]
+    assert cfg.rewards["upright_alive"].weight == 0.5
+    assert cfg.rewards["upright_alive"].weight < cfg.rewards["hop_stand"].weight      # no stand-still trap
+    env, robot = _hop_env()
+    _step(env, robot, True, 0.015, tilt_deg=59)
+    assert m.hop_fell_penalty(env, math.radians(60)).item() == 0.0
+    _step(env, robot, True, 0.015, tilt_deg=61)
+    assert m.hop_fell_penalty(env, math.radians(60)).item() == -1.0
+    assert m.hop_upright(env, math.sqrt(0.05)).item() < 0.01

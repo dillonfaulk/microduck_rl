@@ -8654,3 +8654,23 @@ def hop_push_reward(env: ManagerBasedRlEnv, vmax: float = 0.5) -> torch.Tensor:
     robot: Entity = env.scene["robot"]
     vz = torch.nan_to_num(robot.data.root_link_lin_vel_w[:, 2], nan=0.0)
     return (vz.clamp(0.0, vmax) / vmax) * _hop_prehop_window(env)
+
+
+# ── OmniHop v3 (2026-11-24): falling must cost something ─────────────────────
+# v2 iter 250: hops explored (23 %) but zero landings, most episodes end in a fall at ~0.9 s.
+# After a failed hop the standing terms are gated off, and tilting past fell_over (60 deg) had
+# no penalty -> "launch then fall" scored like "launch then recover". v3: one-off fall penalty
+# (same size as non-foot contact) + a small ALWAYS-paid upright term (0.5/step, well below the
+# ~4.5/step a missing hop forfeits, so v1's stand-still trap does not come back).
+
+def hop_upright(env: ManagerBasedRlEnv, std: float) -> torch.Tensor:
+    """(>= 0) exp(-tilt^2 / std^2), ungated."""
+    robot: Entity = env.scene["robot"]
+    return torch.nan_to_num(torch.exp(-(_tilt(robot) / std) ** 2), nan=0.0)
+
+
+def hop_fell_penalty(env: ManagerBasedRlEnv, limit_angle: float) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): -1 on the step the trunk tilts past the fell_over
+    limit (the episode ends there, so it is paid once)."""
+    robot: Entity = env.scene["robot"]
+    return -(torch.nan_to_num(_tilt(robot), nan=math.pi) > limit_angle).float()

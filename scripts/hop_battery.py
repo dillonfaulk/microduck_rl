@@ -9,7 +9,7 @@ Each episode: standing start at a random heading, VelStand (default: shipped 425
 stand for 1.5 s, then the hop ONNX is swapped in (the runtime contract) and gets
   twist slots = estimated remaining offset to the hop target, trunk yaw frame [dx, dy, 0]
   body slot 0 = hop-request pulse, 1.0 for 0.6 s starting --pulse-delay after the swap
-               (default 0.25 s = the runtime settle; 0 = request immediately at the swap)
+               (default 0 = immediate, the runtime default since 2026-11-25; 0.25 = the settle fallback)
 for 4 s. Drift ON = the training drift model (mdp.py OmniHop section): per-episode odometry
 scale bias N(-1.9 %, 0.6 %), a touchdown jump of the estimate up to 2 cm, a persistent gyro
 bias up to 0.03 rad/s per axis (the IMU tilt offset has no CPU counterpart here: the CPU
@@ -35,8 +35,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_VELSTAND = os.path.join(REPO, "logs/rsl_rl/velstand/2026-11-22_19-47-54_headjamB/2026-11-22_19-47-54_headjamB_model_4250.onnx")
 EPISODE_S, PULSE_S, PRESTAND_S = 4.0, 0.6, 1.5
-SETTLE_S = 0.25   # RUNTIME DEFAULT (Dillon 2026-11-24): the hop policy holds the stand this long after the
-                  # swap before the request pulse. --pulse-delay 0 tests an immediate request.
+RUNTIME_PULSE_DELAY = 0.0   # RUNTIME DEFAULT (Dillon 2026-11-25): request the hop IMMEDIATELY at the swap.
+                            # v5 swap-in training closed the hole the settle worked around (immediate
+                            # 1 mm (v3) -> ~12 mm floor gap, settle ~9 mm).
+SETTLE_S = 0.25             # FALLBACK, known-good (Dillon 2026-11-24): hold the stand this long after the swap
+                            # before the request. Keep it; the gate battery tests both timings.
 MIN_AIR_TICKS, MIN_CLEAR, LAND_TILT, HOLD_S = 3, 0.010, 25.0, 1.0
 SPIN_BAR = 10.7
 LEG_JOINTS = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13]
@@ -274,7 +277,8 @@ if __name__ == "__main__":
     ap.add_argument("--side", type=float, default=0.02)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--out", default=None)
-    ap.add_argument("--pulse-delay", type=float, default=SETTLE_S, help="s after the swap before the request pulse")
+    ap.add_argument("--pulse-delay", type=float, default=RUNTIME_PULSE_DELAY,
+                    help=f"s after the swap before the request pulse (runtime default {RUNTIME_PULSE_DELAY}; settle fallback {SETTLE_S})")
     a = ap.parse_args()
     tgt = {"in_place": (0.0, 0.0), "fwd": (a.fwd, 0.0), "back": (-a.fwd, 0.0), "left": (0.0, a.side), "right": (0.0, -a.side)}
     drifts = {"on": [True], "off": [False], "both": [True, False]}[a.drift]

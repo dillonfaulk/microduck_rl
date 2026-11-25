@@ -358,11 +358,11 @@ def test_swap_action_only_on_the_first_frame():
     assert torch.all(m.hop_last_action(env) == 0.3)
 
 
-def test_battery_default_pulse_delay_is_the_runtime_settle():
+def test_battery_runtime_default_is_immediate_with_settle_fallback():
     import sys
     sys.path.insert(0, "scripts")
     import hop_battery as hb
-    assert hb.SETTLE_S == 0.25
+    assert hb.RUNTIME_PULSE_DELAY == 0.0 and hb.SETTLE_S == 0.25
 
 
 # ── v5 ────────────────────────────────────────────────────────────────────────

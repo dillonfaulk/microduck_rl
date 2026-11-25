@@ -8585,3 +8585,72 @@ def event_param_stages(env: ManagerBasedRlEnv, env_ids, event_name: str, stages:
             cur = s
     cfg.params.update(cur["params"])
     return torch.tensor([float(cur["step"])])
+
+
+# ── OmniHop v2 shaping (2026-11-24, after chunk 1a locked into standing) ──────
+# Chunk 1a (v1 rewards): by iter 250 every episode stood the full 4 s, zero flights, action
+# std 0.16. Cause: posture/upright/height kept paying ~2.5/step after the request, so not
+# hopping only forfeited hop_stand (2/step), and random actions never produced a 60 ms
+# two-foot flight. v2: (1) those standing terms are paid only where standing IS the task
+# (same gate as hop_stand); (2) inside the request window, before the first hop, a reference
+# prior from the feasibility probe's best open-loop hop (crouch 0.3 s -> extend 69 ms ->
+# tuck 0.3 s; 38 mm floor gap, 150 ms flight) on the ACTION (joint targets), plus upward
+# trunk-velocity shaping.
+
+def _hop_standing_gate(env: ManagerBasedRlEnv) -> torch.Tensor:
+    st = _hop_state(env)
+    return ((~st["req"]) | (_hop_t(env) < st["t0"]) | st["landed"]).float()
+
+
+def _hop_prehop_window(env: ManagerBasedRlEnv) -> torch.Tensor:
+    st = hop_update(env)
+    return (_hop_window(env) & (st["hops"] == 0)).float()
+
+
+def hop_gated_pose(env: ManagerBasedRlEnv, std: float, joint_indices: list) -> torch.Tensor:
+    """(>= 0) pose_target_match vs HOME, only where standing is the task."""
+    hop_update(env)
+    return pose_target_match(env, std=std, joint_indices=joint_indices) * _hop_standing_gate(env)
+
+
+def hop_gated_height(env: ManagerBasedRlEnv, target_height: float, std: float) -> torch.Tensor:
+    """(>= 0) trunk-height Gaussian, only where standing is the task."""
+    hop_update(env)
+    return height_target_gaussian(env, target_height=target_height, std=std) * _hop_standing_gate(env)
+
+
+def hop_gated_upright(env: ManagerBasedRlEnv, std: float) -> torch.Tensor:
+    """(>= 0) exp(-tilt^2 / std^2), only where standing is the task."""
+    hop_update(env)
+    robot: Entity = env.scene["robot"]
+    return torch.nan_to_num(torch.exp(-(_tilt(robot) / std) ** 2), nan=0.0) * _hop_standing_gate(env)
+
+
+def hop_reference_targets(env: ManagerBasedRlEnv, crouch, extend, tuck, times) -> tuple[torch.Tensor, torch.Tensor]:
+    """(ref joint targets (n, 14), active mask): the open-loop phase sequence timed from the pulse start."""
+    st = _hop_state(env)
+    tau = _hop_t(env) - st["t0"]
+    t1, t2, t3 = times[0], times[0] + times[1], times[0] + times[1] + times[2]
+    dev = env.device
+    c, e, k = (torch.tensor(p, device=dev, dtype=torch.float) for p in (crouch, extend, tuck))
+    ref = torch.where((tau < t1).unsqueeze(1), c, torch.where((tau < t2).unsqueeze(1), e, k))
+    active = st["req"] & (st["hops"] == 0) & (tau >= 0) & (tau < t3)
+    return ref, active
+
+
+def hop_reference_prior(env: ManagerBasedRlEnv, crouch, extend, tuck, times, std: float = 0.5) -> torch.Tensor:
+    """(>= 0) Gaussian of the policy's joint TARGETS (HOME + action) vs the probe's open-loop
+    hop sequence, inside the request window until the first hop. A prior, not a pin: std 0.5 rad."""
+    hop_update(env)
+    robot: Entity = env.scene["robot"]
+    ref, active = hop_reference_targets(env, crouch, extend, tuck, times)
+    tgt = _servo_default_joint_pos(env, robot) + env.action_manager.action
+    r = torch.exp(-((tgt - ref) ** 2).mean(dim=1) / std ** 2)
+    return torch.nan_to_num(r, nan=0.0) * active.float()
+
+
+def hop_push_reward(env: ManagerBasedRlEnv, vmax: float = 0.5) -> torch.Tensor:
+    """(>= 0) Upward trunk velocity, clamp(vz, 0, vmax) / vmax, inside the request window until the first hop."""
+    robot: Entity = env.scene["robot"]
+    vz = torch.nan_to_num(robot.data.root_link_lin_vel_w[:, 2], nan=0.0)
+    return (vz.clamp(0.0, vmax) / vmax) * _hop_prehop_window(env)

@@ -11,6 +11,10 @@ Feasibility (logs/evals/hop/feasibility_2026-11-23/PROBE.txt, open loop, BAM): a
 launches (peak push speed 0.48 m/s); the head/neck swing is worth 13 -> 38 mm, so the
 policy keeps the head joints.
 
+v2 (2026-11-24): chunk 1a with v1 rewards locked into standing (zero flights by iter 250, action
+std 0.16). Posture terms now gated like hop_stand, plus a reference prior from the probe's best
+open-loop hop and upward-push shaping, both only inside the request window until the first hop.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -51,6 +55,15 @@ MAX_SIDE         = 0.03           # m, left/right target (final stage)
 IN_PLACE_ITERS   = 1000           # in-place only until here (gate), then directions widen
 STAND_Z          = 0.115
 NONFOOT_BODIES_PATTERN = r"^(?!ankle_left$|ankle_right$).*$"
+
+# v2 reference prior: the feasibility probe's best open-loop hop (logs/evals/hop/feasibility_2026-11-23/
+# best.json, 38 mm floor gap / 150 ms flight / 8 deg lift-off), clipped joint TARGETS in the 14-servo
+# order; phases crouch 0.3 s -> extend 69 ms -> tuck 0.3 s from the pulse start.
+HOP_REF_CROUCH = (0.0, -0.0873, -0.3879, -1.0178, 0.2374, 1.0236, -0.2079, 0.0, 0.0, 0.0, 0.0873, 0.3879, 1.0178, -0.2374)
+HOP_REF_EXTEND = (0.0, -0.0873, -0.3584, -0.7737, -0.5642, -0.8243, 1.5491, 0.0, 0.0, 0.0, 0.0873, 0.3584, 0.7737, 0.5642)
+HOP_REF_TUCK   = (0.0, -0.0873, -1.5375, 1.1334, -0.6510, -0.8243, 1.5491, 0.0, 0.0, 0.0, 0.0873, 1.5375, -1.1334, 0.6510)
+HOP_REF_T      = (0.3, 0.069, 0.3)
+HOP_REF_WEIGHT = 2.0
 
 _LEG_JOINTS  = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13]
 _NECK_JOINTS = [5, 6, 7, 8]
@@ -128,20 +141,25 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.rewards["hop_extra"] = RewardTermCfg(func=microduck_mdp.hop_extra_penalty, weight=20.0)
     cfg.rewards["nonfoot_contact"] = RewardTermCfg(func=microduck_mdp.hop_nonfoot_penalty, weight=30.0)
 
-    # ── Posture (loose: the hop crouches and tucks) ───────────────────────────
+    # ── Posture: paid ONLY where standing is the task (v2; v1 paid it always and chunk 1a
+    # locked into standing: zero flights by iter 250, action std 0.16) ───────────────────
+    cfg.rewards.pop("upright", None)
     cfg.rewards["pose_stand_legs"] = RewardTermCfg(
-        func=microduck_mdp.pose_target_match, weight=0.5,
-        params={"std": 0.5, "joint_indices": _LEG_JOINTS, "target_overrides": None})
+        func=microduck_mdp.hop_gated_pose, weight=0.5, params={"std": 0.5, "joint_indices": _LEG_JOINTS})
     cfg.rewards["pose_stand_neck"] = RewardTermCfg(
-        func=microduck_mdp.pose_target_match, weight=0.5,
-        params={"std": 0.5, "joint_indices": _NECK_JOINTS, "target_overrides": None})
-    cfg.rewards["upright"].params["asset_cfg"].body_names = ("trunk_base",)
-    cfg.rewards["upright"].weight = 1.0
-    cfg.rewards["upright"].params["std"] = math.sqrt(0.05)
+        func=microduck_mdp.hop_gated_pose, weight=0.5, params={"std": 0.5, "joint_indices": _NECK_JOINTS})
+    cfg.rewards["upright_stand"] = RewardTermCfg(
+        func=microduck_mdp.hop_gated_upright, weight=1.0, params={"std": math.sqrt(0.05)})
     cfg.rewards["height_stand"] = RewardTermCfg(
-        func=microduck_mdp.height_target_gaussian, weight=0.5,
-        params={"std": 0.04, "target_height": STAND_Z,
-                "asset_cfg": SceneEntityCfg("robot", body_names=("trunk_base",))})
+        func=microduck_mdp.hop_gated_height, weight=0.5, params={"std": 0.04, "target_height": STAND_Z})
+
+    # ── v2 exploration bootstrap, request window until the first hop ──────────
+    # Reference prior = the feasibility probe's best open-loop hop (joint targets).
+    cfg.rewards["hop_reference"] = RewardTermCfg(
+        func=microduck_mdp.hop_reference_prior, weight=HOP_REF_WEIGHT,
+        params={"crouch": HOP_REF_CROUCH, "extend": HOP_REF_EXTEND, "tuck": HOP_REF_TUCK,
+                "times": HOP_REF_T, "std": 0.5})
+    cfg.rewards["hop_push"] = RewardTermCfg(func=microduck_mdp.hop_push_reward, weight=2.0, params={"vmax": 0.5})
 
     # ── Regularisers (action rate capped at -0.4: the hop needs fast actions) ─
     cfg.rewards["action_rate_l2"].weight = -0.1

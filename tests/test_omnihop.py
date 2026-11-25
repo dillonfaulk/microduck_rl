@@ -259,3 +259,58 @@ def test_direction_check_passes_a_policy_that_follows_commands():
     hb, rows = _rows({"in_place": (1, 0), "fwd": (25, 2), "back": (-22, -1), "left": (1, 16), "right": (0, -15)})
     out = "\n".join(hb.direction_check(rows))
     assert "flags: none" in out and "FLAG" not in out
+
+
+# ── v2 shaping (after chunk 1a locked into standing) ──────────────────────────
+
+def test_v2_standing_terms_are_gated_and_shaping_exists():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    r = cfg.rewards
+    assert "upright" not in r
+    assert r["pose_stand_legs"].func is m.hop_gated_pose and r["upright_stand"].func is m.hop_gated_upright
+    assert r["height_stand"].func is m.hop_gated_height
+    assert r["hop_reference"].func is m.hop_reference_prior and r["hop_reference"].weight > 0
+    assert r["hop_push"].weight > 0
+    for p in (oh.HOP_REF_CROUCH, oh.HOP_REF_EXTEND, oh.HOP_REF_TUCK):
+        assert len(p) == 14 and p[9 + 2] == -p[2] and p[9 + 3] == -p[3]      # mirrored legs
+
+
+def test_standing_gate_off_from_pulse_until_landing():
+    env, robot = _hop_env(t0=0.1)
+    assert m._hop_standing_gate(env).item() == 1.0                 # before the pulse
+    for _ in range(4):
+        _step(env, robot, True, 0.015)
+    assert m._hop_standing_gate(env).item() == 0.0                 # requested, not hopped
+    for z in (0.02, 0.025, 0.025, 0.02):
+        _step(env, robot, False, z)
+    _step(env, robot, True, 0.015)
+    assert env._hop["landed"].item() and m._hop_standing_gate(env).item() == 1.0
+
+
+def test_reference_phases_follow_the_pulse_and_stop_after_the_hop():
+    env, robot = _hop_env(t0=0.0)                                   # t = 0.06 s after _hop_env
+    c, e, k, T = oh.HOP_REF_CROUCH, oh.HOP_REF_EXTEND, oh.HOP_REF_TUCK, oh.HOP_REF_T
+    ref, act = m.hop_reference_targets(env, c, e, k, T)
+    assert act.item() and torch.allclose(ref[0], torch.tensor(c))
+    for _ in range(13):                                             # t = 0.32 s: extend
+        _step(env, robot, True, 0.015)
+    ref, act = m.hop_reference_targets(env, c, e, k, T)
+    assert act.item() and torch.allclose(ref[0], torch.tensor(e))
+    for _ in range(4):                                              # t = 0.40 s: tuck
+        _step(env, robot, True, 0.015)
+    ref, _ = m.hop_reference_targets(env, c, e, k, T)
+    assert torch.allclose(ref[0], torch.tensor(k))
+    for z in (0.02, 0.025, 0.025, 0.02):
+        _step(env, robot, False, z)
+    _step(env, robot, True, 0.015)
+    _, act = m.hop_reference_targets(env, c, e, k, T)
+    assert not act.item()                                           # hopped: prior off
+
+
+def test_push_reward_only_in_window_before_hop():
+    env, robot = _hop_env(req=False)
+    robot.data.root_link_lin_vel_w = torch.tensor([[0.0, 0.0, 0.4]])
+    assert m.hop_push_reward(env).item() == 0.0
+    env, robot = _hop_env()
+    robot.data.root_link_lin_vel_w = torch.tensor([[0.0, 0.0, 0.25]])
+    assert abs(m.hop_push_reward(env).item() - 0.5) < 1e-6

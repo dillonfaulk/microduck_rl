@@ -339,7 +339,7 @@ def test_v4_cfg_height_swap_and_schedule():
     assert list(cfg.observations["actor"].terms).index("actions") == 4          # 61-d layout unchanged
     p = cfg.events["reset_hop_target"].params
     assert p["swap_prob"] == 0.5 and p["in_place_prob"] == 1.0
-    assert oh.target_stages()[1]["step"] == 2000 * 24                           # v3 model_999 resume stays in place
+    assert oh.target_stages()[1]["step"] >= 2000 * 24                           # v3 model_999 resume stays in place
 
 
 def test_swap_action_only_on_the_first_frame():
@@ -363,3 +363,26 @@ def test_battery_default_pulse_delay_is_the_runtime_settle():
     sys.path.insert(0, "scripts")
     import hop_battery as hb
     assert hb.SETTLE_S == 0.25
+
+
+# ── v5 ────────────────────────────────────────────────────────────────────────
+
+def test_v5_cfg_home_return_and_stronger_prior():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    r = cfg.rewards
+    assert r["home_pose_match"].func is m.hop_home_pose_match and r["home_pose_match"].params["std"] == 0.1
+    assert r["home_pose_l1"].func is m.hop_home_pose_penalty and r["home_pose_l1"].weight > 0
+    assert r["hop_reference"].weight == 6.0 and r["hop_reference"].params["through_hop"] is True
+    assert r["hop_reference"].params["std"] == 0.35
+    assert oh.target_stages()[1]["step"] == 3000 * 24
+
+
+def test_prior_stays_on_through_the_hop_when_asked():
+    env, robot = _hop_env(t0=0.0)
+    c, e, k, T = oh.HOP_REF_CROUCH, oh.HOP_REF_EXTEND, oh.HOP_REF_TUCK, oh.HOP_REF_T
+    for z in (0.02, 0.025, 0.025, 0.02):
+        _step(env, robot, False, z)
+    _step(env, robot, True, 0.015)
+    assert env._hop["hops"].item() == 1
+    assert not m.hop_reference_targets(env, c, e, k, T)[1].item()
+    assert m.hop_reference_targets(env, c, e, k, T, through_hop=True)[1].item()

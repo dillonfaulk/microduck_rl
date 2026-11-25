@@ -23,6 +23,11 @@ v4 (2026-11-24, fine-tune from v3 model_999): flight reward saturates at 40 mm f
 action on the first frame (v3 barely hopped when requested right after the swap); in-place phase
 extended to iter 2000 so the resume does not widen. Runtime still settles 0.25 s before the request.
 
+v5 (2026-11-25, Dillon; fine-tune from v4 model_1998): return-to-HOME after landing (v4 legs ended
+~45 deg off HOME: the swap-back stance) with PrecisionStep's arrive-pose pair; stronger probe-hop
+imitation (weight 6, std 0.35) kept on through the whole reference timeline (v4's small hop qualified
+before the tuck phase, switching the prior off). In-place phase to iter 3000. Re-gate both, then widen.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -60,7 +65,7 @@ NO_HOP_PROB      = 0.15           # pulse never comes: stand still (a hop there 
 PULSE_DELAY_S    = (0.0, 0.5)
 MAX_FWD          = 0.04           # m, forward/back target (final stage)
 MAX_SIDE         = 0.03           # m, left/right target (final stage)
-IN_PLACE_ITERS   = 2000           # in-place only until here (gate), then directions widen. v4: 1000 -> 2000
+IN_PLACE_ITERS   = 3000           # in-place only until here (gate), then directions widen. v4: 1000 -> 2000, v5: 3000
                                   # (v4 fine-tunes from v3 model_999; must not widen on resume)
 HOP_CLEAR_FULL   = 0.04           # v4: flight reward saturates at 40 mm foot-site rise (v3: 15 mm ~ 7 mm floor gap)
 SWAP_PROB        = 0.5            # v4: share of episodes whose first frame carries a VelStand-like last action
@@ -76,7 +81,8 @@ HOP_REF_CROUCH = (0.0, -0.0873, -0.3879, -1.0178, 0.2374, 1.0236, -0.2079, 0.0, 
 HOP_REF_EXTEND = (0.0, -0.0873, -0.3584, -0.7737, -0.5642, -0.8243, 1.5491, 0.0, 0.0, 0.0, 0.0873, 0.3584, 0.7737, 0.5642)
 HOP_REF_TUCK   = (0.0, -0.0873, -1.5375, 1.1334, -0.6510, -0.8243, 1.5491, 0.0, 0.0, 0.0, 0.0873, 1.5375, -1.1334, 0.6510)
 HOP_REF_T      = (0.3, 0.069, 0.3)
-HOP_REF_WEIGHT = 2.0
+HOP_REF_WEIGHT = 6.0      # v5: 2.0 -> 6.0, std 0.5 -> 0.35, on through the whole timeline (Dillon: imitation first)
+HOP_REF_STD    = 0.35
 
 _LEG_JOINTS  = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13]
 _NECK_JOINTS = [5, 6, 7, 8]
@@ -158,6 +164,11 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     # ── Posture: paid ONLY where standing is the task (v2; v1 paid it always and chunk 1a
     # locked into standing: zero flights by iter 250, action std 0.16) ───────────────────
     cfg.rewards.pop("upright", None)
+    # v5: return to HOME after landing (v4 ended ~45 deg off HOME), PrecisionStep's arrive-pose pair.
+    cfg.rewards["home_pose_match"] = RewardTermCfg(
+        func=microduck_mdp.hop_home_pose_match, weight=2.0, params={"std": 0.1, "joint_indices": _LEG_JOINTS})
+    cfg.rewards["home_pose_l1"] = RewardTermCfg(
+        func=microduck_mdp.hop_home_pose_penalty, weight=5.0, params={"joint_indices": _LEG_JOINTS})
     cfg.rewards["pose_stand_legs"] = RewardTermCfg(
         func=microduck_mdp.hop_gated_pose, weight=0.5, params={"std": 0.5, "joint_indices": _LEG_JOINTS})
     cfg.rewards["pose_stand_neck"] = RewardTermCfg(
@@ -172,7 +183,7 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.rewards["hop_reference"] = RewardTermCfg(
         func=microduck_mdp.hop_reference_prior, weight=HOP_REF_WEIGHT,
         params={"crouch": HOP_REF_CROUCH, "extend": HOP_REF_EXTEND, "tuck": HOP_REF_TUCK,
-                "times": HOP_REF_T, "std": 0.5})
+                "times": HOP_REF_T, "std": HOP_REF_STD, "through_hop": True})
     cfg.rewards["hop_push"] = RewardTermCfg(func=microduck_mdp.hop_push_reward, weight=2.0, params={"vmax": 0.5})
 
     # ── v3: falling must cost something (v2 iter 250: hops but zero landings, falls free) ──

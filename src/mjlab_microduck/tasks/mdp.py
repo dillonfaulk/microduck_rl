@@ -8634,24 +8634,33 @@ def hop_gated_upright(env: ManagerBasedRlEnv, std: float) -> torch.Tensor:
     return torch.nan_to_num(torch.exp(-(_tilt(robot) / std) ** 2), nan=0.0) * _hop_standing_gate(env)
 
 
-def hop_reference_targets(env: ManagerBasedRlEnv, crouch, extend, tuck, times) -> tuple[torch.Tensor, torch.Tensor]:
-    """(ref joint targets (n, 14), active mask): the open-loop phase sequence timed from the pulse start."""
+def hop_reference_targets(
+    env: ManagerBasedRlEnv, crouch, extend, tuck, times, through_hop: bool = False
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """(ref joint targets (n, 14), active mask): the open-loop phase sequence timed from the pulse start.
+    through_hop=False (v2-v4): off at the first qualifying hop. v5: True keeps it on for the whole
+    reference timeline -- v4's small hop qualified before the tuck phase began, so the tuck (the part
+    that gives the probe its 38 mm) was never rewarded."""
     st = _hop_state(env)
     tau = _hop_t(env) - st["t0"]
     t1, t2, t3 = times[0], times[0] + times[1], times[0] + times[1] + times[2]
     dev = env.device
     c, e, k = (torch.tensor(p, device=dev, dtype=torch.float) for p in (crouch, extend, tuck))
     ref = torch.where((tau < t1).unsqueeze(1), c, torch.where((tau < t2).unsqueeze(1), e, k))
-    active = st["req"] & (st["hops"] == 0) & (tau >= 0) & (tau < t3)
+    active = st["req"] & (tau >= 0) & (tau < t3)
+    if not through_hop:
+        active = active & (st["hops"] == 0)
     return ref, active
 
 
-def hop_reference_prior(env: ManagerBasedRlEnv, crouch, extend, tuck, times, std: float = 0.5) -> torch.Tensor:
+def hop_reference_prior(
+    env: ManagerBasedRlEnv, crouch, extend, tuck, times, std: float = 0.5, through_hop: bool = False
+) -> torch.Tensor:
     """(>= 0) Gaussian of the policy's joint TARGETS (HOME + action) vs the probe's open-loop
     hop sequence, inside the request window until the first hop. A prior, not a pin: std 0.5 rad."""
     hop_update(env)
     robot: Entity = env.scene["robot"]
-    ref, active = hop_reference_targets(env, crouch, extend, tuck, times)
+    ref, active = hop_reference_targets(env, crouch, extend, tuck, times, through_hop)
     tgt = _servo_default_joint_pos(env, robot) + env.action_manager.action
     r = torch.exp(-((tgt - ref) ** 2).mean(dim=1) / std ** 2)
     return torch.nan_to_num(r, nan=0.0) * active.float()
@@ -8698,3 +8707,23 @@ def hop_last_action(env: ManagerBasedRlEnv) -> torch.Tensor:
     a = env.action_manager.action
     first = (env.episode_length_buf == 0) & st["swap"]
     return torch.where(first.unsqueeze(1), st["swap_act"], a)
+
+
+
+# ── OmniHop v5 (2026-11-25): return to HOME after landing ─────────────────────
+# v4 landed upright but ended with the legs ~45 deg off HOME (v3: 17 deg): the stance it hands back to
+# VelStand. PrecisionStep lesson (its run 1 parked in a 30-36 deg crouch and the kick never swung): the
+# end stance must BE the next policy's start stance. Same pair PrecisionStep used (arrive_pose_match
+# std 0.1 + arrive_pose_l1), paid where standing is the task (before the request, no-request episodes,
+# and after a successful landing).
+
+def hop_home_pose_match(env: ManagerBasedRlEnv, std: float, joint_indices: list) -> torch.Tensor:
+    """(>= 0) tight Gaussian leg pose vs HOME, where standing is the task."""
+    hop_update(env)
+    return pose_target_match(env, std=std, joint_indices=joint_indices) * _hop_standing_gate(env)
+
+
+def hop_home_pose_penalty(env: ManagerBasedRlEnv, joint_indices: list) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): mean |leg joint - HOME|, where standing is the task."""
+    hop_update(env)
+    return pose_l1_penalty(env, joint_indices=joint_indices) * _hop_standing_gate(env)

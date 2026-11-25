@@ -222,3 +222,40 @@ def test_body_command_carries_the_pulse_in_slot_0_only():
     for _ in range(40):                                      # past 0.6 s
         _step(env, robot, True, 0.015)
     assert m.hop_body_command(env)[0, 0].item() == 0.0
+
+
+# ── conditioning guard (IsaacLab PR #9173) ────────────────────────────────────
+
+def test_direction_command_is_in_every_actor_frame_no_goal_encoder():
+    """The hop target rides in the twist slots of the flat 61-d actor obs each step, into a
+    plain MLP: no separate goal/latent encoder that could saturate to one value for all commands."""
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    actor = cfg.observations["actor"]
+    assert actor.terms["command"].params["command_name"] == "twist"
+    assert getattr(actor, "history_length", 0) in (0, 1, None)
+    rl = oh.MicroduckOmniHopRlCfg
+    assert rl.actor.hidden_dims == (512, 256, 128)
+    assert not any("encoder" in k.lower() for k in vars(rl.actor))
+    assert set(rl.obs_groups["actor"]) == {"actor"}
+
+
+def _rows(disp_by_dir, n=5):
+    import sys
+    sys.path.insert(0, "scripts")
+    import hop_battery as hb
+    tg = {"in_place": (0, 0), "fwd": (30, 0), "back": (-30, 0), "left": (0, 20), "right": (0, -20)}
+    rows = [{"drift": True, "dir": d, "target_mm": list(tg[d]), "first": {"disp_mm": list(disp_by_dir[d])}}
+            for d in tg for _ in range(n)]
+    return hb, rows
+
+
+def test_direction_check_flags_one_hop_for_every_command():
+    hb, rows = _rows({d: (2.0, 1.0) for d in ("in_place", "fwd", "back", "left", "right")})
+    out = "\n".join(hb.direction_check(rows))
+    assert "SAME HOP REGARDLESS OF DIRECTION" in out and "DIRECTION NOT FOLLOWED: fwd/back" in out
+
+
+def test_direction_check_passes_a_policy_that_follows_commands():
+    hb, rows = _rows({"in_place": (1, 0), "fwd": (25, 2), "back": (-22, -1), "left": (1, 16), "right": (0, -15)})
+    out = "\n".join(hb.direction_check(rows))
+    assert "flags: none" in out and "FLAG" not in out

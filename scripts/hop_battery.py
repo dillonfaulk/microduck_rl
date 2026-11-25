@@ -206,7 +206,55 @@ def summarize(rows):
                 f"{sum(r['fell_t'] is not None for r in rs):>5d} {sum(r['nonfoot_t'] is not None for r in rs):>7d} "
                 f"{np.median([r['spin_peak'] for r in rs]):>7.1f} {sum(r['spin_peak'] > SPIN_BAR for r in rs):>5d} "
                 f"{np.median([r['leg_dev_deg_end'] for r in rs]):>7.1f}")
-    return lines
+    return lines + direction_check(rows)
+
+
+SAME_HOP_MM = 5.0        # every direction's median landing within this of each other = one hop for all
+PAIR_SEP_MIN = 0.5       # opposite directions must separate by >= half the commanded span
+
+
+def direction_check(rows):
+    """Conditioning guard (IsaacLab PR #9173: a collapsed goal latent gave one fixed motion for
+    every command). Per direction: median achieved landing displacement (start yaw frame, first
+    qualifying hop) vs commanded, gain along the commanded axis, cross-axis drift. Flags (warnings,
+    not pass floors): SAME HOP REGARDLESS OF DIRECTION when every direction's median landing sits
+    within SAME_HOP_MM of every other; DIRECTION NOT FOLLOWED when an opposite pair (fwd/back,
+    left/right) separates by < PAIR_SEP_MIN x the commanded span."""
+    out = []
+    for drift in sorted({r["drift"] for r in rows}, reverse=True):
+        med = {}
+        out.append(f"== direction check, drift {'ON' if drift else 'OFF'}")
+        out.append(f"  {'dir':9s} {'cmd mm':>12s} {'achieved mm':>14s} {'n':>3s} {'gain':>6s} {'cross mm':>8s}")
+        for d in DIRS_ORDER:
+            rs = [r for r in rows if r["drift"] == drift and r["dir"] == d]
+            ds = [r["first"]["disp_mm"] for r in rs if r["first"]]
+            if not rs:
+                continue
+            t = np.array(rs[0]["target_mm"], float)
+            if not ds:
+                out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {'no hops':>14s} {0:>3d}")
+                continue
+            a = np.median(np.array(ds, float), axis=0)
+            med[d] = (t, a)
+            n = np.linalg.norm(t)
+            gain = f"{a @ t / n ** 2:6.2f}" if n > 0 else "     -"
+            cross = abs(a[0] * t[1] - a[1] * t[0]) / n if n > 0 else np.linalg.norm(a)
+            out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {str([round(v, 1) for v in a]):>14s} {len(ds):>3d} {gain} {cross:>8.1f}")
+        flags = []
+        if len(med) >= 3:
+            pts = [a for _, a in med.values()]
+            spread = max(np.linalg.norm(p - q) for p in pts for q in pts)
+            if spread < SAME_HOP_MM:
+                flags.append(f"SAME HOP REGARDLESS OF DIRECTION (median landings within {spread:.1f} mm)")
+        for p, q, ax in (("fwd", "back", 0), ("left", "right", 1)):
+            if p in med and q in med:
+                span = abs(med[p][0][ax] - med[q][0][ax])
+                sep = (med[p][1][ax] - med[q][1][ax]) / span if span > 0 else 0.0
+                out.append(f"  {p}/{q} separation: {sep:.2f} of the commanded span")
+                if sep < PAIR_SEP_MIN:
+                    flags.append(f"DIRECTION NOT FOLLOWED: {p}/{q} separation {sep:.2f} < {PAIR_SEP_MIN}")
+        out += [f"  FLAG: {f}" for f in flags] or ["  flags: none"]
+    return out
 
 
 DIRS_ORDER = ("in_place", "fwd", "back", "left", "right")

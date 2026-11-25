@@ -4768,8 +4768,35 @@ class VelocityCommandCommandOnly(UniformVelocityCommand):
         # spinning on the spot was effectively untrained → slow/unstable real-robot
         # turning. Mirrors the base rel_forward_envs mechanism.
         p = getattr(self.cfg, "rel_turn_in_place_envs", 0.0)
-        if p <= 0.0:
+        if p > 0.0:
+            self._resample_turn_in_place(env_ids, p)
+        pf = getattr(self.cfg, "rel_fine_envs", 0.0)
+        if pf > 0.0:
+            self._resample_fine(env_ids, pf)
+
+    def _resample_fine(self, env_ids: torch.Tensor, p: float) -> None:
+        """FineTurn (2026-11-24): low-end pure-channel commands. A fraction p of envs gets
+        ONE non-zero channel (in-place wz, pure vx or pure vy; equal odds, both signs) with
+        |value| uniform in the cfg's fine range, the other channels exactly 0. Uniform
+        independent sampling almost never gives a slow PURE command (~0.8 % of envs)."""
+        r = torch.empty(len(env_ids), device=self.device)
+        ids = env_ids[r.uniform_(0.0, 1.0) < p]
+        if len(ids) == 0:
             return
+        n = len(ids)
+        ch = torch.randint(0, 3, (n,), device=self.device)
+        lo = torch.tensor([self.cfg.fine_wz_range[0], self.cfg.fine_vx_range[0], self.cfg.fine_vy_range[0]], device=self.device)[ch]
+        hi = torch.tensor([self.cfg.fine_wz_range[1], self.cfg.fine_vx_range[1], self.cfg.fine_vy_range[1]], device=self.device)[ch]
+        mag = lo + (hi - lo) * torch.rand(n, device=self.device)
+        sign = torch.where(torch.rand(n, device=self.device) < 0.5, -1.0, 1.0)
+        cmd = torch.zeros(n, 3, device=self.device)
+        col = torch.tensor([2, 0, 1], device=self.device)[ch]          # wz, vx, vy → command columns
+        cmd[torch.arange(n, device=self.device), col] = sign * mag
+        self.vel_command_b[ids] = cmd
+        self.is_standing_env[ids] = False
+        self.vel_command_w[ids] = self.vel_command_b[ids]
+
+    def _resample_turn_in_place(self, env_ids: torch.Tensor, p: float) -> None:
         r = torch.empty(len(env_ids), device=self.device)
         turn_ids = env_ids[r.uniform_(0.0, 1.0) < p]
         if len(turn_ids) == 0:
@@ -4828,6 +4855,12 @@ class VelocityCommandCommandOnlyCfg(UniformVelocityCommandCfg):
     # 0.4 (historical) means in-place yaw below 0.4 rad/s is never trained (standing
     # envs zero the whole command; uniform sampling never gives lin == 0).
     turn_in_place_min_frac: float = 0.4
+    # FineTurn: fraction of envs given a slow PURE-channel command (see _resample_fine).
+    # 0 = disabled. Applied after turn-in-place, so it can overwrite those envs.
+    rel_fine_envs: float = 0.0
+    fine_wz_range: tuple[float, float] = (0.05, 0.4)
+    fine_vx_range: tuple[float, float] = (0.03, 0.2)
+    fine_vy_range: tuple[float, float] = (0.03, 0.12)
 
     def build(self, env: ManagerBasedRlEnv) -> "VelocityCommandCommandOnly":
         return VelocityCommandCommandOnly(self, env)

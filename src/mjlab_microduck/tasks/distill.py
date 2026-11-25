@@ -94,6 +94,10 @@ def default_bc_cfg() -> dict:
         # being trained out), and coef-1.0 BC pinned every earlier yaw fix. Separable:
         # the command is in the obs.
         "unanchor_turn_in_place": False,
+        # FineTurn (2026-11-24): {"vx"|"vy"|"wz": (neg, pos)} -- pure-channel command frames
+        # inside a band where the anchor itself is measured dead are taken off the anchor
+        # (see anchor_dead_band_mask). None = off.
+        "anchor_dead_bands": None,
         # Teacher-side yaw remap (2026-10-12, branch improve_standup_velstand). The walk
         # anchor has a yaw dead zone (in place: fed 0.6 → 0.0 rad/s, 1.0 → ~0.25; walking
         # ≈ 0.6 × the command) and coef-1.0 BC copies it into every student. Unanchoring
@@ -141,6 +145,26 @@ def turn_in_place_mask(obs: torch.Tensor, twist_slice: tuple[int, int], eps: flo
     """Linear command exactly 0 and a non-zero yaw command (command obs carry no noise)."""
     tw = obs[:, twist_slice[0]:twist_slice[1]]
     return (tw[:, :2].abs().amax(dim=1) <= eps) & (tw[:, 2].abs() > eps)
+
+
+def anchor_dead_band_mask(obs: torch.Tensor, twist_slice: tuple[int, int], bands: dict, eps: float = 1e-6) -> torch.Tensor:
+    """FineTurn (2026-11-24): pure-channel commands (the other two channels exactly 0; command
+    obs carry no noise) whose value lies strictly inside a band where the walk anchor's own
+    response is measured DEAD (logs/evals/velstand/fineturn_2026-11-23/sweep.json, anchor fed
+    the remapped command). bands = {"wz": (neg, pos), "vx": (neg, pos), "vy": (neg, pos)}:
+    a channel value c with neg < c < pos, c != 0, is masked. Those frames are left to PPO."""
+    tw = obs[:, twist_slice[0]:twist_slice[1]]
+    nz = tw.abs() > eps
+    out = torch.zeros(tw.shape[0], dtype=torch.bool, device=obs.device)
+    for col, key in ((0, "vx"), (1, "vy"), (2, "wz")):
+        if key not in bands:
+            continue
+        neg, pos = bands[key]
+        c = tw[:, col]
+        others = [k for k in range(3) if k != col]
+        pure = nz[:, col] & ~nz[:, others].any(dim=1)
+        out |= pure & (c > neg) & (c < pos)
+    return out
 
 
 def body_frame_masks(
@@ -305,7 +329,11 @@ class PpoWithExpertBc(PPO):
         if cfg.get("unanchor_turn_in_place"):
             turn_free = turn_in_place_mask(flat, tuple(cfg["twist_slice"]))
             upright = upright & ~turn_free
-        stats = {"expert_bc_fallen_frac": fallen.float().mean().item(), "expert_bc_anchor_frac": upright.float().mean().item(),
+        fine_free = torch.zeros_like(fallen)
+        if cfg.get("anchor_dead_bands"):
+            fine_free = anchor_dead_band_mask(flat, tuple(cfg["twist_slice"]), cfg["anchor_dead_bands"])
+            upright = upright & ~fine_free
+        stats = {"expert_bc_fine_free_frac": fine_free.float().mean().item(),"expert_bc_fallen_frac": fallen.float().mean().item(), "expert_bc_anchor_frac": upright.float().mean().item(),
                  "expert_bc_body_teach_frac": body_teach.float().mean().item(),
                  "expert_bc_turn_free_frac": turn_free.float().mean().item()}
         tilted = fallen_mask_from_obs(flat, gsl, cfg.get("expert_mask_tilt_deg", 75.0)) & fallen  # expert_mask_cols rows

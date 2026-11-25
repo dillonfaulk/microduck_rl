@@ -216,6 +216,7 @@ Phases (as before, but with a recovery backstop):
 """
 
 import math
+import os
 
 from mjlab_microduck.tasks.microduck_standup_env_cfg import (  # HeadJamRecover: one definition
     HEADJAM_ENABLED, HEADJAM_NECK_CLIP, HEADJAM_SPAWN_PROB,
@@ -462,6 +463,21 @@ ANCHOR_YAW_REMAP = WALKV2_ANCHOR_TWIST_REMAP  # round 2: LOCAL_ANCHOR_TWIST_REMA
 YAW_REMAP_TURN_IN_PLACE_FRACTION = 0.2   # velocity recipe: 0.15
 YAW_REMAP_TURN_IN_PLACE_MIN_FRAC = 0.2   # velocity recipe: 0.4 (in-place |wz| < 0.4 never trained)
 
+# FineTurn (2026-11-24, MICRODUCK_FINETURN=1; Dillon approved A+B). Step-0 sweep
+# (logs/evals/velstand/fineturn_2026-11-23/SWEEP.txt): 4250 is dead from still on in-place
+# left yaw to 0.4 rad/s, right to 0.2, forward to 0.15 m/s. Distribution: in-place |wz| < 0.2
+# never sampled, slow PURE linear commands ~0.8 % of envs.
+#   A: 15 % of envs get a slow pure-channel command (VelocityCommandCommandOnly._resample_fine),
+#      in-place minimum 0.2 → 0.05 rad/s.
+#   B: the walk anchor is masked ONLY where its own (remapped) response is measured dead from
+#      still -- pure in-place |wz| < 0.12, pure vx in (-0.13, 0.145), pure |vy| < 0.06. The
+#      anchor turns ~1:1 from 0.15 rad/s, so yaw frames above that STAY anchored: unanchoring
+#      all turn-in-place frames (ENABLE_YAW_FIX, runs sape62zb/brkpcnn8) lost turning twice.
+FINETURN_ENABLED = os.environ.get("MICRODUCK_FINETURN", "0") == "1"
+FINETURN_FRACTION = 0.15
+FINETURN_TURN_IN_PLACE_MIN_FRAC = 0.05
+FINETURN_ANCHOR_DEAD_BANDS = {"wz": (-0.12, 0.12), "vx": (-0.13, 0.145), "vy": (-0.06, 0.06)}
+
 # Stand-up coverage (2026-10-07, branch improve_standup_velstand). Robot: get-ups
 # sometimes fail, and the robot sometimes stays stuck without trying again.
 # Measured on v7 (j4i6yoq2@1250, claude_experiments/velstand_rise_battery.py,
@@ -699,6 +715,10 @@ def make_microduck_velstand_env_cfg(play: bool = False, rough: bool = False) -> 
             weight=TRACK_YAW_FINE_WEIGHT,
             params={"std": TRACK_YAW_FINE_STD, "command_name": cfg.rewards["track_angular_velocity"].params["command_name"]},
         )
+    if FINETURN_ENABLED:
+        tw = cfg.commands["twist"]
+        tw.rel_fine_envs = FINETURN_FRACTION
+        tw.turn_in_place_min_frac = FINETURN_TURN_IN_PLACE_MIN_FRAC
 
     # True full-collision model: the robot can lie on / push off any part, and
     # the servo housings are named so the impact sensor below can single them
@@ -1078,6 +1098,7 @@ MicroduckVelStandRlCfg = RslRlOnPolicyRunnerCfg(
             **({"body_slice": (55, 61)} if ENABLE_BODY_CONTROL else {}),
             **({"unanchor_turn_in_place": True} if ENABLE_YAW_FIX else {}),
             **({"anchor_yaw_remap": ANCHOR_YAW_REMAP} if ENABLE_ANCHOR_YAW_REMAP else {}),
+            **({"anchor_dead_bands": FINETURN_ANCHOR_DEAD_BANDS} if FINETURN_ENABLED else {}),
             **({"expert_mask_cols": TEACHER_MASK_COLS, "expert_mask_tilt_deg": TEACHER_MASK_TILT_DEG} if ENABLE_JOINT_MASKED_TEACHER else {}),
         } if ENABLE_EXPERT_BC else None,
     ),

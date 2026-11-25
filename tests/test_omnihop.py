@@ -328,3 +328,38 @@ def test_v3_fall_costs_and_alive_upright():
     _step(env, robot, True, 0.015, tilt_deg=61)
     assert m.hop_fell_penalty(env, math.radians(60)).item() == -1.0
     assert m.hop_upright(env, math.sqrt(0.05)).item() < 0.01
+
+
+# ── v4 ────────────────────────────────────────────────────────────────────────
+
+def test_v4_cfg_height_swap_and_schedule():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert cfg.rewards["hop_flight"].params["clear_full"] == 0.04
+    assert cfg.observations["actor"].terms["actions"].func is m.hop_last_action
+    assert list(cfg.observations["actor"].terms).index("actions") == 4          # 61-d layout unchanged
+    p = cfg.events["reset_hop_target"].params
+    assert p["swap_prob"] == 0.5 and p["in_place_prob"] == 1.0
+    assert oh.target_stages()[1]["step"] == 2000 * 24                           # v3 model_999 resume stays in place
+
+
+def test_swap_action_only_on_the_first_frame():
+    from types import SimpleNamespace as NS2
+    env, robot = _stub_env(2000)
+    torch.manual_seed(3)
+    m.reset_hop_target(env, torch.arange(2000), swap_prob=0.5, swap_noise=0.15)
+    st = env._hop
+    env.action_manager = NS2(action=torch.full((2000, 14), 0.3))
+    env.episode_length_buf[:] = 0
+    a0 = m.hop_last_action(env)
+    assert 0.45 < st["swap"].float().mean().item() < 0.55
+    assert torch.equal(a0[st["swap"]], st["swap_act"][st["swap"]]) and a0[st["swap"]].abs().max() <= 0.15
+    assert torch.all(a0[~st["swap"]] == 0.3)
+    env.episode_length_buf[:] = 1
+    assert torch.all(m.hop_last_action(env) == 0.3)
+
+
+def test_battery_default_pulse_delay_is_the_runtime_settle():
+    import sys
+    sys.path.insert(0, "scripts")
+    import hop_battery as hb
+    assert hb.SETTLE_S == 0.25

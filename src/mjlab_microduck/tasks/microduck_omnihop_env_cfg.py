@@ -18,6 +18,11 @@ open-loop hop and upward-push shaping, both only inside the request window until
 v3 (2026-11-24): v2 explored hops but never landed (falls were free once the standing terms
 gated off) -> one-off fall penalty 30 at the fell_over limit + an always-paid upright term 0.5.
 
+v4 (2026-11-24, fine-tune from v3 model_999): flight reward saturates at 40 mm foot rise (v3's
+15 mm ~ 7 mm true gap: hops only just qualified); half the episodes start with a VelStand-like last
+action on the first frame (v3 barely hopped when requested right after the swap); in-place phase
+extended to iter 2000 so the resume does not widen. Runtime still settles 0.25 s before the request.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -55,7 +60,11 @@ NO_HOP_PROB      = 0.15           # pulse never comes: stand still (a hop there 
 PULSE_DELAY_S    = (0.0, 0.5)
 MAX_FWD          = 0.04           # m, forward/back target (final stage)
 MAX_SIDE         = 0.03           # m, left/right target (final stage)
-IN_PLACE_ITERS   = 1000           # in-place only until here (gate), then directions widen
+IN_PLACE_ITERS   = 2000           # in-place only until here (gate), then directions widen. v4: 1000 -> 2000
+                                  # (v4 fine-tunes from v3 model_999; must not widen on resume)
+HOP_CLEAR_FULL   = 0.04           # v4: flight reward saturates at 40 mm foot-site rise (v3: 15 mm ~ 7 mm floor gap)
+SWAP_PROB        = 0.5            # v4: share of episodes whose first frame carries a VelStand-like last action
+SWAP_NOISE       = 0.15
 STAND_Z          = 0.115
 FELL_LIMIT       = math.radians(60.0)   # fell_over termination AND the v3 fall penalty
 NONFOOT_BODIES_PATTERN = r"^(?!ankle_left$|ankle_right$).*$"
@@ -139,7 +148,8 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     # landing upright in the window, half for hitting the target). Standing: ~2/step,
     # forfeited from the pulse until a successful landing -> not hopping costs ~5 per
     # remaining second.
-    cfg.rewards["hop_flight"] = RewardTermCfg(func=microduck_mdp.hop_flight_reward, weight=5.0)
+    cfg.rewards["hop_flight"] = RewardTermCfg(
+        func=microduck_mdp.hop_flight_reward, weight=5.0, params={"clear_full": HOP_CLEAR_FULL})
     cfg.rewards["hop_landing"] = RewardTermCfg(func=microduck_mdp.hop_landing_reward, weight=30.0)
     cfg.rewards["hop_stand"] = RewardTermCfg(func=microduck_mdp.hop_stand_reward, weight=2.0)
     cfg.rewards["hop_extra"] = RewardTermCfg(func=microduck_mdp.hop_extra_penalty, weight=20.0)
@@ -227,6 +237,7 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         cfg.events.pop("encoder_bias", None)
 
     for group in ("actor", "critic"):
+        cfg.observations[group].terms["actions"] = ObservationTermCfg(func=microduck_mdp.hop_last_action)
         cfg.observations[group].terms["head_command"] = ObservationTermCfg(
             func=microduck_mdp.zero_command_padding, params={"dim": 4})
         cfg.observations[group].terms["body_command"] = ObservationTermCfg(func=microduck_mdp.hop_body_command)
@@ -256,6 +267,7 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.events["reset_hop_target"] = EventTermCfg(
         func=microduck_mdp.reset_hop_target, mode="reset",
         params={"no_hop_prob": NO_HOP_PROB, "pulse_delay": PULSE_DELAY_S, "drift": DRIFT_ENABLED,
+                "swap_prob": SWAP_PROB, "swap_noise": SWAP_NOISE,
                 **(stages[-1]["params"] if play else stages[0]["params"])})
 
     if ENABLE_VELOCITY_PUSHES:

@@ -8,7 +8,8 @@ Run from the microduck_rl repo root:
 Each episode: standing start at a random heading, VelStand (default: shipped 4250) holds the
 stand for 1.5 s, then the hop ONNX is swapped in (the runtime contract) and gets
   twist slots = estimated remaining offset to the hop target, trunk yaw frame [dx, dy, 0]
-  body slot 0 = hop-request pulse, 1.0 for the first 0.6 s after the swap
+  body slot 0 = hop-request pulse, 1.0 for 0.6 s starting --pulse-delay after the swap
+               (default 0.25 s = the runtime settle; 0 = request immediately at the swap)
 for 4 s. Drift ON = the training drift model (mdp.py OmniHop section): per-episode odometry
 scale bias N(-1.9 %, 0.6 %), a touchdown jump of the estimate up to 2 cm, a persistent gyro
 bias up to 0.03 rad/s per axis (the IMU tilt offset has no CPU counterpart here: the CPU
@@ -34,6 +35,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_VELSTAND = os.path.join(REPO, "logs/rsl_rl/velstand/2026-11-22_19-47-54_headjamB/2026-11-22_19-47-54_headjamB_model_4250.onnx")
 EPISODE_S, PULSE_S, PRESTAND_S = 4.0, 0.6, 1.5
+SETTLE_S = 0.25   # RUNTIME DEFAULT (Dillon 2026-11-24): the hop policy holds the stand this long after the
+                  # swap before the request pulse. --pulse-delay 0 tests an immediate request.
 MIN_AIR_TICKS, MIN_CLEAR, LAND_TILT, HOLD_S = 3, 0.010, 25.0, 1.0
 SPIN_BAR = 10.7
 LEG_JOINTS = [0, 1, 2, 3, 4, 9, 10, 11, 12, 13]
@@ -103,7 +106,7 @@ class HopSim:
 
 
 def run_episode(job):
-    onnx, velstand, direction, target, drift, seed = job
+    onnx, velstand, direction, target, drift, seed, delay = job
     global _HS
     if "_HS" not in globals() or _HS is None or _HS[0] != (onnx, velstand):
         _HS = ((onnx, velstand), HopSim(onnx, velstand))
@@ -139,7 +142,7 @@ def run_episode(job):
     hops, landed, first = 0, False, None
     fell_t, bad_t, spin_peak = None, None, 0.0
     while sim.t < EPISODE_S - 1e-9:
-        hs.set_cmd(est_offset(landed), sim.t < PULSE_S)
+        hs.set_cmd(est_offset(landed), delay <= sim.t < delay + PULSE_S)
         sim.step()
         ld, rd, bad = hs.contacts()
         fz = np.array([sim.data.site_xpos[i][2] for i in hs.sites])
@@ -271,14 +274,15 @@ if __name__ == "__main__":
     ap.add_argument("--side", type=float, default=0.02)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--pulse-delay", type=float, default=SETTLE_S, help="s after the swap before the request pulse")
     a = ap.parse_args()
     tgt = {"in_place": (0.0, 0.0), "fwd": (a.fwd, 0.0), "back": (-a.fwd, 0.0), "left": (0.0, a.side), "right": (0.0, -a.side)}
     drifts = {"on": [True], "off": [False], "both": [True, False]}[a.drift]
-    jobs = [(os.path.abspath(a.onnx), os.path.abspath(a.prestand), d, tgt[d], dr, 1000 * i + j)
+    jobs = [(os.path.abspath(a.onnx), os.path.abspath(a.prestand), d, tgt[d], dr, 1000 * i + j, a.pulse_delay)
             for dr in drifts for j, d in enumerate(a.dirs.split(",")) for i in range(a.episodes)]
     with Pool(a.workers) as pool:
         rows = pool.map(run_episode, jobs, chunksize=1)
-    lines = [f"OmniHop battery: {a.onnx}", f"  {a.episodes} episodes per row; VelStand prestand {PRESTAND_S}s -> swap-in; "
+    lines = [f"OmniHop battery: {a.onnx}", f"  {a.episodes} episodes per row; VelStand prestand {PRESTAND_S}s -> swap-in; request pulse {a.pulse_delay:.2f}s after the swap; "
              f"hop = >= {MIN_AIR_TICKS * 20} ms off, >= {MIN_CLEAR * 1000:.0f} mm clearance, feet-only touchdown "
              f"< {LAND_TILT:.0f} deg, still up {HOLD_S:.0f} s later", ""] + summarize(rows)
     print("\n".join(lines))

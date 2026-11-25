@@ -8311,6 +8311,7 @@ def _hop_state(env: ManagerBasedRlEnv) -> dict:
             "hops": z(dtype=torch.long), "landed": z(dtype=torch.bool),
             "ev_land": z(), "ev_extra": z(), "ev_unreq": z(), "land_err": z(),
             "flight_steps": z(), "best_clear": z(),
+            "swap_act": z(14), "swap": z(dtype=torch.bool),     # v4: VelStand-like last action at swap-in
             "step": -1,
         }
     return env._hop
@@ -8423,6 +8424,8 @@ def reset_hop_target(
     scale_bias: tuple = (-0.019, 0.006),
     jump_max: float = 0.02,
     gyro_bias_max: float = 0.03,
+    swap_prob: float = 0.0,
+    swap_noise: float = 0.15,
 ):
     """Sample the episode's hop request + target and the drift draws. Must run AFTER
     set_ground_state (reads the final robot pose from qpos). Directions: in place, or
@@ -8455,6 +8458,11 @@ def reset_hop_target(
         st["scale"][env_ids] = 0.0
         st["jump"][env_ids] = 0.0
         st["gyro_bias"][env_ids] = 0.0
+    # v4 swap-in: with swap_prob, the FIRST actor frame's last-action slot carries a VelStand-like
+    # action (uniform +-swap_noise per joint; VelStand's last action at a measured swap: |a| <= 0.14),
+    # as at runtime, where only the first frame after the ONNX swap holds the previous policy's action.
+    st["swap"][env_ids] = torch.rand(n, device=dev) < swap_prob
+    st["swap_act"][env_ids] = (2 * torch.rand(n, 14, device=dev) - 1) * swap_noise
     for k in ("air", "hops"):
         st[k][env_ids] = 0
     for k in ("clear", "lift_tilt", "land_err", "flight_steps", "best_clear"):
@@ -8674,3 +8682,19 @@ def hop_fell_penalty(env: ManagerBasedRlEnv, limit_angle: float) -> torch.Tensor
     limit (the episode ends there, so it is paid once)."""
     robot: Entity = env.scene["robot"]
     return -(torch.nan_to_num(_tilt(robot), nan=math.pi) > limit_angle).float()
+
+
+
+# ── OmniHop v4 (2026-11-24): swap-in robustness ───────────────────────────────
+# v3 gate: from HOME (training start) 80 ms / 7-10 mm floor gap, but requested right after the
+# VelStand -> hop ONNX swap only 40 ms / 1-2 mm; a 0.25 s settle restored 60-80 ms / 6-7 mm. The
+# stance is within 5 deg of HOME; the difference is the carried-over last action (training always
+# started with zero history). Action-manager reset runs after the reset events, so the history is
+# seeded where the policy sees it: the first actor frame's last-action term.
+
+def hop_last_action(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """last_action, except on the first frame of a swap-seeded episode (VelStand-like action)."""
+    st = _hop_state(env)
+    a = env.action_manager.action
+    first = (env.episode_length_buf == 0) & st["swap"]
+    return torch.where(first.unsqueeze(1), st["swap_act"], a)

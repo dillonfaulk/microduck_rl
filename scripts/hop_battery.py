@@ -239,7 +239,7 @@ def direction_check(rows):
             n = np.linalg.norm(t)
             gain = f"{a @ t / n ** 2:6.2f}" if n > 0 else "     -"
             cross = abs(a[0] * t[1] - a[1] * t[0]) / n if n > 0 else np.linalg.norm(a)
-            out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {str([round(v, 1) for v in a]):>14s} {len(ds):>3d} {gain} {cross:>8.1f}")
+            out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {str([round(float(v), 1) for v in a]):>14s} {len(ds):>3d} {gain} {cross:>8.1f}")
         flags = []
         if len(med) >= 3:
             pts = [a for _, a in med.values()]

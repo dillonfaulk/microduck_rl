@@ -1,0 +1,224 @@
+"""OmniHop (2026-11-24): cfg contract, target sampler, drift algebra, hop state machine (stub env)."""
+import importlib
+import math
+from types import SimpleNamespace as NS
+
+import torch
+
+from mjlab_microduck.tasks import mdp as m
+from mjlab_microduck.tasks import microduck_omnihop_env_cfg as oh
+
+
+# ── cfg contract ──────────────────────────────────────────────────────────────
+
+def test_actor_is_the_61d_layout_with_pulse_in_body_slot():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    actor = cfg.observations["actor"].terms
+    assert list(actor) == ["base_ang_vel", "projected_gravity", "joint_pos", "joint_vel", "actions",
+                           "command", "head_command", "body_command"]
+    assert actor["body_command"].func is m.hop_body_command
+    assert actor["head_command"].params == {"dim": 4}
+    assert isinstance(cfg.commands["twist"], m.HopTargetCommandCfg)
+    assert actor["base_ang_vel"].func is m.base_ang_vel_imu_biased
+
+
+def test_robot_sensors_terminations_and_event_order():
+    from mjlab_microduck.robot.microduck_constants import MICRODUCK_ALLCOLLISIONS_ROBOT_CFG
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert cfg.scene.entities == {"robot": MICRODUCK_ALLCOLLISIONS_ROBOT_CFG}
+    assert {s.name for s in cfg.scene.sensors} >= {"feet_ground_contact", "nonfoot_ground_contact"}
+    assert "nonfoot_contact" in cfg.terminations
+    ev = list(cfg.events)
+    assert ev.index("reset_hop_target") > ev.index("set_ground_state")
+    assert cfg.events["reset_hop_target"].params["in_place_prob"] == 1.0      # in place first
+    assert oh.make_microduck_omnihop_env_cfg(play=True).events["reset_hop_target"].params["in_place_prob"] == 0.25
+
+
+def test_nonfoot_pattern_excludes_only_the_ankles():
+    import re
+    p = re.compile(oh.NONFOOT_BODIES_PATTERN)
+    assert not p.match("ankle_left") and not p.match("ankle_right")
+    assert all(p.match(b) for b in ("trunk_base", "leg", "leg_2", "jaw_soft", "neck_pitch", "upper_leg_left"))
+
+
+def test_self_negating_terms_have_positive_weights_and_symmetry_on():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    for name in ("hop_extra", "nonfoot_contact"):
+        assert cfg.rewards[name].weight > 0
+    assert oh.MicroduckOmniHopRlCfg.algorithm.symmetry_cfg is not None
+    assert oh.MicroduckOmniHopRlCfg.experiment_name == "omnihop"
+
+
+def test_drift_switch(monkeypatch):
+    monkeypatch.setenv("MICRODUCK_HOP_DRIFT", "0")
+    try:
+        mod = importlib.reload(oh)
+        assert mod.make_microduck_omnihop_env_cfg().events["reset_hop_target"].params["drift"] is False
+    finally:
+        monkeypatch.delenv("MICRODUCK_HOP_DRIFT")
+        importlib.reload(oh)
+    assert oh.make_microduck_omnihop_env_cfg().events["reset_hop_target"].params["drift"] is True
+
+
+# ── stub env ──────────────────────────────────────────────────────────────────
+
+class _Sensors(dict):
+    pass
+
+
+def _stub_env(n, yaw0=0.0):
+    qpos = torch.zeros(n, 7)
+    qpos[:, 2] = 0.115
+    qpos[:, 3] = math.cos(yaw0 / 2)
+    qpos[:, 6] = math.sin(yaw0 / 2)
+    data = NS(root_link_pos_w=qpos[:, 0:3].clone(), root_link_quat_w=qpos[:, 3:7].clone(),
+              projected_gravity_b=torch.tensor([[0.0, 0.0, -1.0]]).repeat(n, 1),
+              root_link_lin_vel_b=torch.zeros(n, 3), root_link_ang_vel_b=torch.zeros(n, 3),
+              site_pos_w=torch.zeros(n, 2, 3))
+    robot = NS(indexing=NS(free_joint_q_adr=torch.arange(7)), data=data,
+               find_sites=lambda names, preserve_order=False: ([0, 1], list(names)))
+    sensors = {"feet_ground_contact": NS(data=NS(found=torch.ones(n, 2))),
+               "nonfoot_ground_contact": NS(data=NS(found=torch.zeros(n, 5, 1)))}
+    env = NS(device="cpu", num_envs=n, sim=NS(data=NS(qpos=qpos)), step_dt=0.02,
+             common_step_counter=0, episode_length_buf=torch.zeros(n, dtype=torch.long))
+    env.scene = type("S", (), {"__getitem__": lambda self, k: {"robot": robot}[k], "sensors": sensors})()
+    return env, robot
+
+
+def _step(env, robot, feet_down: bool, foot_z: float, tilt_deg: float = 0.0):
+    env.common_step_counter += 1
+    env.episode_length_buf += 1
+    env.scene.sensors["feet_ground_contact"].data.found[:] = 1.0 if feet_down else 0.0
+    robot.data.site_pos_w[:, :, 2] = foot_z
+    t = math.radians(tilt_deg)
+    robot.data.projected_gravity_b[:] = torch.tensor([math.sin(t), 0.0, -math.cos(t)])
+    return m.hop_update(env)
+
+
+# ── sampler ───────────────────────────────────────────────────────────────────
+
+def test_in_place_stage_targets_are_zero_and_no_hop_bucket():
+    torch.manual_seed(0)
+    env, _ = _stub_env(5000)
+    m.reset_hop_target(env, torch.arange(5000), no_hop_prob=0.15, in_place_prob=1.0)
+    st = env._hop
+    assert torch.all(st["target_b"] == 0)
+    assert 0.13 < (~st["req"]).float().mean().item() < 0.17
+    assert ((st["t0"] >= 0.0) & (st["t0"] <= 0.5)).all()
+
+
+def test_widened_targets_are_single_axis_and_in_range():
+    torch.manual_seed(1)
+    env, _ = _stub_env(8000)
+    m.reset_hop_target(env, torch.arange(8000), no_hop_prob=0.0, in_place_prob=0.25, max_fwd=0.04, max_side=0.03)
+    tb = env._hop["target_b"]
+    moving = tb.abs().sum(dim=1) > 0
+    assert 0.72 < moving.float().mean().item() < 0.78
+    assert ((tb[moving] != 0).sum(dim=1) == 1).all()
+    x, y = tb[:, 0], tb[:, 1]
+    assert x.abs().max() <= 0.04 + 1e-6 and y.abs().max() <= 0.03 + 1e-6
+    assert (x[x != 0].abs() >= 0.01 - 1e-6).all() and (y[y != 0].abs() >= 0.0075 - 1e-6).all()
+    for v in (x > 0, x < 0, y > 0, y < 0):
+        assert v.sum() > 1000
+
+
+def test_drift_draws_and_off_switch():
+    torch.manual_seed(2)
+    env, _ = _stub_env(4000)
+    m.reset_hop_target(env, torch.arange(4000), drift=True)
+    st = env._hop
+    assert abs(st["scale"].mean().item() + 0.019) < 0.002
+    assert st["jump"].norm(dim=1).max() <= 0.02 + 1e-6 and st["gyro_bias"].abs().max() <= 0.03
+    m.reset_hop_target(env, torch.arange(4000), drift=False)
+    assert torch.all(st["scale"] == 0) and torch.all(st["jump"] == 0) and torch.all(st["gyro_bias"] == 0)
+
+
+# ── drift algebra ─────────────────────────────────────────────────────────────
+
+def test_offset_is_target_at_start_and_zero_on_arrival_any_heading():
+    env, robot = _stub_env(1, yaw0=0.7)
+    m.reset_hop_target(env, torch.arange(1), no_hop_prob=0.0, in_place_prob=0.0, drift=False)
+    st = env._hop
+    st["target_b"][:] = torch.tensor([[0.04, 0.0]])
+    assert torch.allclose(m.hop_est_offset(env), torch.tensor([[0.04, 0.0]]), atol=1e-6)
+    gx, gy = m._yaw_frame_to_world(torch.tensor([0.04]), torch.tensor([0.0]), torch.tensor([0.7]))
+    robot.data.root_link_pos_w[:, 0] += gx
+    robot.data.root_link_pos_w[:, 1] += gy
+    assert torch.allclose(m.hop_est_offset(env), torch.zeros(1, 2), atol=1e-6)
+    st["scale"][:] = -0.02            # odometry under-reads: 2 % of the hop still "remains"
+    assert torch.allclose(m.hop_est_offset(env), torch.tensor([[0.0008, 0.0]]), atol=1e-6)
+
+
+# ── state machine ─────────────────────────────────────────────────────────────
+
+def _hop_env(req=True, t0=0.0):
+    env, robot = _stub_env(1)
+    m.reset_hop_target(env, torch.arange(1), no_hop_prob=0.0 if req else 1.0, pulse_delay=(t0, t0), drift=False)
+    for _ in range(3):
+        _step(env, robot, True, 0.015)
+    return env, robot
+
+
+def test_clean_hop_counts_once_and_lands():
+    env, robot = _hop_env()
+    assert m.hop_pulse(env).item()
+    for z in (0.020, 0.025, 0.027, 0.025, 0.020):
+        st = _step(env, robot, False, z)
+        assert m.hop_flight_reward(env).item() > 0.2
+    st = _step(env, robot, True, 0.015)
+    assert st["hops"].item() == 1 and st["landed"].item() and st["ev_land"].item() == 1.0
+    assert abs(st["best_clear"].item() - 0.012) < 1e-4 and st["flight_steps"].item() == 5
+    assert m.hop_landing_reward(env).item() > 0.99          # in place, landed on target
+    assert m.hop_extra_penalty(env).item() == 0.0
+    st = _step(env, robot, True, 0.015)
+    assert st["ev_land"].item() == 0.0 and m.hop_stand_reward(env).item() > 0.9
+
+
+def test_second_hop_is_penalised_and_short_flights_do_not_count():
+    env, robot = _hop_env()
+    _step(env, robot, False, 0.03)
+    _step(env, robot, False, 0.03)                           # 2 steps: too short
+    st = _step(env, robot, True, 0.015)
+    assert st["hops"].item() == 0
+    for _ in range(4):
+        _step(env, robot, False, 0.03)
+    _step(env, robot, True, 0.015)
+    for _ in range(4):
+        _step(env, robot, False, 0.03)
+    st = _step(env, robot, True, 0.015)
+    assert st["hops"].item() == 2 and m.hop_extra_penalty(env).item() == -1.0
+
+
+def test_unrequested_hop_is_penalised_and_stand_reward_kept_when_no_request():
+    env, robot = _hop_env(req=False)
+    assert not m.hop_pulse(env).item() and m.hop_stand_reward(env).item() > 0.9
+    for _ in range(4):
+        _step(env, robot, False, 0.03)
+    st = _step(env, robot, True, 0.015)
+    assert st["ev_unreq"].item() == 1.0 and not st["landed"].item()
+    assert m.hop_extra_penalty(env).item() == -1.0
+
+
+def test_requested_but_no_hop_forfeits_standing_after_the_pulse():
+    env, robot = _hop_env(t0=0.1)
+    for _ in range(4):
+        _step(env, robot, True, 0.015)                       # t = 0.14 s: pulse on
+    assert m.hop_pulse(env).item() and m.hop_stand_reward(env).item() == 0.0
+
+
+def test_tilted_liftoff_is_not_a_hop():
+    env, robot = _hop_env()
+    for _ in range(5):
+        _step(env, robot, False, 0.03, tilt_deg=40)
+        assert m.hop_flight_reward(env).item() == 0.0
+    st = _step(env, robot, True, 0.015, tilt_deg=40)
+    assert st["hops"].item() == 0
+
+
+def test_body_command_carries_the_pulse_in_slot_0_only():
+    env, robot = _hop_env()
+    b = m.hop_body_command(env)
+    assert b.shape == (1, 6) and b[0, 0].item() == 1.0 and torch.all(b[0, 1:] == 0)
+    for _ in range(40):                                      # past 0.6 s
+        _step(env, robot, True, 0.015)
+    assert m.hop_body_command(env)[0, 0].item() == 0.0

@@ -8277,3 +8277,311 @@ def set_head_under_state(
     env.sim.data.qpos[pick.unsqueeze(1), cols.unsqueeze(0)] = torch.as_tensor(j, dtype=torch.float32, device=dev)
     hu = env.__dict__.setdefault("_head_under_count", [0])
     hu[0] += n
+
+
+# =============================================================================
+# OmniHop (2026-11-24): one two-foot hop on request, then land and stand
+# =============================================================================
+# Command contract (61-d unchanged): twist slots = ESTIMATED remaining offset to the
+# hop target in the trunk yaw frame [dx, dy, 0]; body-command slot 0 (body x, mirror-
+# invariant) = hop-request pulse (1.0 for PULSE_S after a per-episode delay, else 0);
+# every other head/body slot 0. One state machine (hop_update) advances once per env
+# step and feeds the terminations, rewards, command and obs.
+#
+# Estimator drift (brief 2026-11-19): the supervisor's pose estimate drives the target.
+# In a body-frame remaining-offset command a constant heading bias cancels exactly
+# (R(-(yaw+b)) R(yaw0+b) = R(yaw0-yaw)), so only (1) a per-episode odometry SCALE bias
+# on the displacement and (2) a touchdown JUMP of the estimate reach the policy; plus
+# (3) a per-episode gyro bias on the IMU obs (gravity tilt offset = the existing
+# per-env IMU misalignment). Rewards judge the command the policy is given.
+
+HOP_PULSE_S = 0.6
+
+
+def _hop_state(env: ManagerBasedRlEnv) -> dict:
+    if not hasattr(env, "_hop"):
+        n, d = env.num_envs, env.device
+        z = lambda *s, **k: torch.zeros(n, *s, device=d, **k)
+        env._hop = {
+            "start": z(2), "yaw0": z(), "target_b": z(2),       # target in the START yaw frame
+            "req": z(dtype=torch.bool), "t0": z(),               # hop requested, pulse start (s)
+            "scale": z(), "jump": z(2), "gyro_bias": z(3),       # drift model
+            "air": z(dtype=torch.long), "clear": z(), "lift_tilt": z(),
+            "base": z(2), "base_ok": z(2, dtype=torch.bool),     # per-foot site z when grounded
+            "hops": z(dtype=torch.long), "landed": z(dtype=torch.bool),
+            "ev_land": z(), "ev_extra": z(), "ev_unreq": z(), "land_err": z(),
+            "flight_steps": z(), "best_clear": z(),
+            "step": -1,
+        }
+    return env._hop
+
+
+def _hop_t(env: ManagerBasedRlEnv) -> torch.Tensor:
+    return env.episode_length_buf.float() * env.step_dt
+
+
+def hop_pulse(env: ManagerBasedRlEnv) -> torch.Tensor:
+    st = _hop_state(env)
+    t = _hop_t(env)
+    return st["req"] & (t >= st["t0"]) & (t < st["t0"] + HOP_PULSE_S)
+
+
+def _hop_window(env: ManagerBasedRlEnv, grace: float = 0.3) -> torch.Tensor:
+    st = _hop_state(env)
+    t = _hop_t(env)
+    return st["req"] & (t >= st["t0"]) & (t < st["t0"] + HOP_PULSE_S + grace)
+
+
+def _tilt(robot: Entity) -> torch.Tensor:
+    g = robot.data.projected_gravity_b
+    return torch.acos((-g[:, 2]).clamp(-1.0, 1.0))
+
+
+def hop_est_offset(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """Estimated remaining offset (trunk yaw frame): R(yaw0-yaw) target - (1+k) R(-yaw) disp - jump."""
+    st = _hop_state(env)
+    robot: Entity = env.scene["robot"]
+    pos = robot.data.root_link_pos_w[:, :2]
+    yaw = _yaw_from_quat_wxyz(robot.data.root_link_quat_w)
+    tx, ty = world_to_yaw_frame(*_yaw_frame_to_world(st["target_b"][:, 0], st["target_b"][:, 1], st["yaw0"]), yaw)
+    d = pos - st["start"]
+    ddx, ddy = world_to_yaw_frame(d[:, 0], d[:, 1], yaw)
+    k = 1.0 + st["scale"]
+    j = st["jump"] * st["landed"].float().unsqueeze(1)
+    out = torch.stack([tx - k * ddx - j[:, 0], ty - k * ddy - j[:, 1]], dim=1)
+    return torch.nan_to_num(out, nan=0.0)
+
+
+def _yaw_frame_to_world(bx, by, yaw):
+    c, s = torch.cos(yaw), torch.sin(yaw)
+    return c * bx - s * by, s * bx + c * by
+
+
+def hop_update(
+    env: ManagerBasedRlEnv,
+    feet_sensor: str = "feet_ground_contact",
+    min_air_steps: int = 3,
+    min_clear: float = 0.005,
+    lift_tilt_max: float = math.radians(30),
+    land_tilt_max: float = math.radians(25),
+) -> dict:
+    """Advance the hop state machine once per env step (idempotent within a step).
+
+    A flight = both foot geoms off the floor. On touchdown it QUALIFIES as a hop if it
+    lasted >= min_air_steps, the lowest foot cleared >= min_clear, and lift-off tilt was
+    < lift_tilt_max. Events (one-step flags): ev_land (first hop, inside the request
+    window, landed upright), ev_extra (any further hop), ev_unreq (a hop with no request
+    or outside the window)."""
+    st = _hop_state(env)
+    if st["step"] == env.common_step_counter:
+        return st
+    st["step"] = env.common_step_counter
+    robot: Entity = env.scene["robot"]
+    for k in ("ev_land", "ev_extra", "ev_unreq"):
+        st[k].zero_()
+    found = env.scene.sensors[feet_sensor].data.found
+    down = (found.reshape(found.shape[0], -1) > 0)[:, :2]
+    if not hasattr(env, "_hop_site_ids"):
+        env._hop_site_ids = robot.find_sites(("left_foot", "right_foot"), preserve_order=True)[0]
+    fz = torch.nan_to_num(robot.data.site_pos_w[:, env._hop_site_ids, 2], nan=0.0)
+    st["base"] = torch.where(down, torch.where(st["base_ok"], 0.9 * st["base"] + 0.1 * fz, fz), st["base"])
+    st["base_ok"] |= down
+    airborne = ~down.any(dim=1)
+    tilt = torch.nan_to_num(_tilt(robot), nan=math.pi)
+    takeoff = airborne & (st["air"] == 0)
+    st["lift_tilt"] = torch.where(takeoff, tilt, st["lift_tilt"])
+    st["clear"] = torch.where(takeoff, torch.zeros_like(st["clear"]), st["clear"])
+    gap = (fz - st["base"]).min(dim=1).values * st["base_ok"].all(dim=1).float()
+    st["clear"] = torch.where(airborne, torch.maximum(st["clear"], gap), st["clear"])
+    touchdown = ~airborne & (st["air"] > 0)
+    qual = touchdown & (st["air"] >= min_air_steps) & (st["clear"] >= min_clear) & (st["lift_tilt"] < lift_tilt_max)
+    in_win = _hop_window(env)
+    first = qual & (st["hops"] == 0)
+    land_ok = first & in_win & (tilt < land_tilt_max)
+    st["ev_unreq"] = (qual & ~in_win & (st["hops"] == 0)).float()
+    st["ev_extra"] = (qual & (st["hops"] > 0)).float()
+    st["ev_land"] = land_ok.float()
+    st["land_err"] = torch.where(land_ok, torch.linalg.norm(hop_est_offset(env), dim=1), st["land_err"])
+    st["flight_steps"] = torch.where(first, st["air"].float(), st["flight_steps"])
+    st["best_clear"] = torch.where(first, st["clear"], st["best_clear"])
+    st["landed"] |= land_ok
+    st["hops"] += qual.long()
+    st["air"] = torch.where(airborne, st["air"] + 1, torch.zeros_like(st["air"]))
+    return st
+
+
+def reset_hop_target(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    no_hop_prob: float = 0.15,
+    in_place_prob: float = 1.0,
+    max_fwd: float = 0.04,
+    max_side: float = 0.03,
+    min_mag_frac: float = 0.25,
+    pulse_delay: tuple = (0.0, 0.5),
+    drift: bool = True,
+    scale_bias: tuple = (-0.019, 0.006),
+    jump_max: float = 0.02,
+    gyro_bias_max: float = 0.03,
+):
+    """Sample the episode's hop request + target and the drift draws. Must run AFTER
+    set_ground_state (reads the final robot pose from qpos). Directions: in place, or
+    one of forward / back / left / right with |d| in [min_mag_frac, 1] x max."""
+    if env_ids is None or len(env_ids) == 0:
+        return
+    env_ids = env_ids.to(env.device)
+    st = _hop_state(env)
+    robot: Entity = env.scene["robot"]
+    n, dev = len(env_ids), env.device
+    root = env.sim.data.qpos[env_ids][:, robot.indexing.free_joint_q_adr]
+    st["start"][env_ids] = root[:, 0:2]
+    st["yaw0"][env_ids] = _yaw_from_quat_wxyz(root[:, 3:7])
+    req = torch.rand(n, device=dev) >= no_hop_prob
+    st["req"][env_ids] = req
+    st["t0"][env_ids] = pulse_delay[0] + (pulse_delay[1] - pulse_delay[0]) * torch.rand(n, device=dev)
+    dirs = torch.tensor([[1.0, 0.0], [-1.0, 0.0], [0.0, 1.0], [0.0, -1.0]], device=dev)
+    pick = dirs[torch.randint(0, 4, (n,), device=dev)]
+    cap = torch.where(pick[:, 0] != 0, torch.full((n,), max_fwd, device=dev), torch.full((n,), max_side, device=dev))
+    mag = cap * (min_mag_frac + (1.0 - min_mag_frac) * torch.rand(n, device=dev))
+    moving = req & (torch.rand(n, device=dev) >= in_place_prob)
+    st["target_b"][env_ids] = pick * (mag * moving.float()).unsqueeze(1)
+    if drift:
+        st["scale"][env_ids] = (scale_bias[0] + scale_bias[1] * torch.randn(n, device=dev)).clamp(-0.05, 0.02)
+        ang = 2 * math.pi * torch.rand(n, device=dev)
+        r = jump_max * torch.rand(n, device=dev)
+        st["jump"][env_ids] = torch.stack([r * torch.cos(ang), r * torch.sin(ang)], dim=1)
+        st["gyro_bias"][env_ids] = (2 * torch.rand(n, 3, device=dev) - 1) * gyro_bias_max
+    else:
+        st["scale"][env_ids] = 0.0
+        st["jump"][env_ids] = 0.0
+        st["gyro_bias"][env_ids] = 0.0
+    for k in ("air", "hops"):
+        st[k][env_ids] = 0
+    for k in ("clear", "lift_tilt", "land_err", "flight_steps", "best_clear"):
+        st[k][env_ids] = 0.0
+    st["landed"][env_ids] = False
+    st["base_ok"][env_ids] = False
+
+
+class HopTargetCommand(CommandTerm):
+    """Estimated remaining offset to the hop target [dx, dy, 0]. Metrics hold the
+    latest per-episode values, so the value logged at reset is the episode's outcome."""
+
+    cfg: "HopTargetCommandCfg"
+
+    def __init__(self, cfg: "HopTargetCommandCfg", env: ManagerBasedRlEnv):
+        super().__init__(cfg, env)
+        self._command = torch.zeros(self.num_envs, 3, device=self.device)
+        for k in ("hop_success", "hops", "flight_ms", "clear_mm", "land_err_mm", "unrequested"):
+            self.metrics[k] = torch.zeros(self.num_envs, device=self.device)
+
+    @property
+    def command(self) -> torch.Tensor:
+        return self._command
+
+    def _update_metrics(self) -> None:
+        st = hop_update(self._env)
+        self.metrics["hop_success"][:] = (st["landed"] & (st["hops"] == 1)).float()
+        self.metrics["hops"][:] = st["hops"].float()
+        self.metrics["flight_ms"][:] = st["flight_steps"] * self._env.step_dt * 1000.0
+        self.metrics["clear_mm"][:] = st["best_clear"] * 1000.0
+        self.metrics["land_err_mm"][:] = st["land_err"] * 1000.0
+        self.metrics["unrequested"][:] = ((~st["req"]) & (st["hops"] > 0)).float()
+
+    def _update_command(self) -> None:
+        self._command[:, :2] = hop_est_offset(self._env)
+        self._command[:, 2] = 0.0
+
+    def _resample_command(self, env_ids: torch.Tensor) -> None:
+        if len(env_ids) == 0:
+            return
+        self._command[env_ids, :2] = hop_est_offset(self._env)[env_ids]
+        self._command[env_ids, 2] = 0.0
+
+
+@dataclass(kw_only=True)
+class HopTargetCommandCfg(CommandTermCfg):
+    def build(self, env: ManagerBasedRlEnv) -> "HopTargetCommand":
+        return HopTargetCommand(self, env)
+
+
+def hop_body_command(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """Body-command block (6): slot 0 = hop-request pulse, rest 0."""
+    out = torch.zeros(env.num_envs, 6, device=env.device)
+    out[:, 0] = hop_pulse(env).float()
+    return out
+
+
+def base_ang_vel_imu_biased(env: ManagerBasedRlEnv, max_angle_deg: float = 6.0) -> torch.Tensor:
+    """IMU-misaligned gyro + the episode's persistent gyro bias (drift model)."""
+    return base_ang_vel_imu_misaligned(env, max_angle_deg=max_angle_deg) + _hop_state(env)["gyro_bias"]
+
+
+def hop_flight_reward(env: ManagerBasedRlEnv, clear_full: float = 0.015) -> torch.Tensor:
+    """(>= 0) Per airborne step of the FIRST flight inside the request window, while
+    lift-off was clean: 0.2 + 0.8 * min(clearance / clear_full, 1)."""
+    st = hop_update(env)
+    ok = (st["air"] > 0) & (st["hops"] == 0) & _hop_window(env) & (st["lift_tilt"] < math.radians(30))
+    return ok.float() * (0.2 + 0.8 * (st["clear"] / clear_full).clamp(0.0, 1.0))
+
+
+def hop_landing_reward(env: ManagerBasedRlEnv, std: float = 0.015) -> torch.Tensor:
+    """(>= 0) One-off on the first qualifying, upright, in-window touchdown: 0.5 for
+    landing + 0.5 x Gaussian of the estimated remaining offset at touchdown."""
+    st = hop_update(env)
+    return st["ev_land"] * (0.5 + 0.5 * torch.exp(-(st["land_err"] / std) ** 2))
+
+
+def hop_stand_reward(
+    env: ManagerBasedRlEnv, feet_sensor: str = "feet_ground_contact", lin_std: float = 0.05, ang_std: float = 0.3
+) -> torch.Tensor:
+    """(>= 0) Stand still on both feet, upright -- paid only where standing IS the task:
+    no request, before the pulse, or after a successful landing. A requested hop that
+    never happens forfeits it for the rest of the episode."""
+    st = hop_update(env)
+    robot: Entity = env.scene["robot"]
+    t = _hop_t(env)
+    gate = (~st["req"]) | (t < st["t0"]) | st["landed"]
+    found = env.scene.sensors[feet_sensor].data.found
+    both = (found.reshape(found.shape[0], -1) > 0)[:, :2].all(dim=1)
+    v = torch.linalg.norm(robot.data.root_link_lin_vel_b[:, :2], dim=1)
+    w = torch.linalg.norm(robot.data.root_link_ang_vel_b, dim=1)
+    up = torch.exp(-(_tilt(robot) / math.radians(10)) ** 2)
+    r = gate.float() * both.float() * up * torch.exp(-(v / lin_std) ** 2 - (w / ang_std) ** 2)
+    return torch.nan_to_num(r, nan=0.0)
+
+
+def hop_extra_penalty(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): -1 per qualifying hop beyond the first,
+    and per hop that was not requested / outside the window."""
+    st = hop_update(env)
+    return -(st["ev_extra"] + st["ev_unreq"])
+
+
+def hop_nonfoot_contact(env: ManagerBasedRlEnv, sensor_name: str = "nonfoot_ground_contact") -> torch.Tensor:
+    """Any non-foot robot body touching the floor (bool)."""
+    hop_update(env)
+    found = env.scene.sensors[sensor_name].data.found
+    return (found.reshape(found.shape[0], -1) > 0).any(dim=1)
+
+
+def hop_nonfoot_penalty(env: ManagerBasedRlEnv, sensor_name: str = "nonfoot_ground_contact") -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): -1 on non-foot floor contact (episode ends)."""
+    return -hop_nonfoot_contact(env, sensor_name).float()
+
+
+def hop_nonfoot_termination(env: ManagerBasedRlEnv, sensor_name: str = "nonfoot_ground_contact") -> torch.Tensor:
+    return hop_nonfoot_contact(env, sensor_name)
+
+
+def event_param_stages(env: ManagerBasedRlEnv, env_ids, event_name: str, stages: list) -> torch.Tensor:
+    """Curriculum: stages = [{"step": env_steps, "params": {...}}]; the latest stage
+    reached overwrites those params on the LIVE event term cfg."""
+    del env_ids
+    cfg = env.event_manager.get_term_cfg(event_name)
+    cur = stages[0]
+    for s in stages:
+        if env.common_step_counter >= s["step"]:
+            cur = s
+    cfg.params.update(cur["params"])
+    return torch.tensor([float(cur["step"])])

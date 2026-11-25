@@ -47,6 +47,10 @@ from .microduck_precision_step_env_cfg import (
     make_microduck_precision_step_env_cfg,
     MicroduckPrecisionStepRlCfg,
 )
+from .microduck_omnihop_env_cfg import (
+    make_microduck_omnihop_env_cfg,
+    MicroduckOmniHopRlCfg,
+)
 from .microduck_sitstand_env_cfg import (
     make_microduck_sitstand_env_cfg,
     MicroduckSitStandRlCfg,
@@ -176,6 +180,16 @@ register_mjlab_task(
     env_cfg=make_microduck_precision_step_env_cfg(),
     play_env_cfg=make_microduck_precision_step_env_cfg(play=True),
     rl_cfg=MicroduckPrecisionStepRlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+# OmniHop (fork-local, 2026-11-24) — one two-foot hop on request (in place / fwd /
+# back / left / right), land, stand. Twist = remaining hop offset, body slot 0 = pulse.
+register_mjlab_task(
+    task_id="Mjlab-OmniHop-Flat-MicroDuck",
+    env_cfg=make_microduck_omnihop_env_cfg(),
+    play_env_cfg=make_microduck_omnihop_env_cfg(play=True),
+    rl_cfg=MicroduckOmniHopRlCfg,
     runner_cls=MicroduckOnPolicyRunner,
 )
 

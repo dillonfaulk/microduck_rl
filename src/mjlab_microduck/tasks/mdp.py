@@ -8312,6 +8312,7 @@ def _hop_state(env: ManagerBasedRlEnv) -> dict:
             "ev_land": z(), "ev_extra": z(), "ev_unreq": z(), "land_err": z(),
             "flight_steps": z(), "best_clear": z(),
             "swap_act": z(14), "swap": z(dtype=torch.bool),     # v4: VelStand-like last action at swap-in
+            "prev_d": z(),                                       # v6: est remaining distance, previous step
             "step": -1,
         }
     return env._hop
@@ -8469,6 +8470,7 @@ def reset_hop_target(
         st[k][env_ids] = 0.0
     st["landed"][env_ids] = False
     st["base_ok"][env_ids] = False
+    st["prev_d"][env_ids] = torch.linalg.norm(st["target_b"][env_ids], dim=1)
 
 
 class HopTargetCommand(CommandTerm):
@@ -8654,13 +8656,16 @@ def hop_reference_targets(
 
 
 def hop_reference_prior(
-    env: ManagerBasedRlEnv, crouch, extend, tuck, times, std: float = 0.5, through_hop: bool = False
+    env: ManagerBasedRlEnv, crouch, extend, tuck, times, std: float = 0.5, through_hop: bool = False,
+    in_place_only: bool = False,
 ) -> torch.Tensor:
     """(>= 0) Gaussian of the policy's joint TARGETS (HOME + action) vs the probe's open-loop
     hop sequence, inside the request window until the first hop. A prior, not a pin: std 0.5 rad."""
     hop_update(env)
     robot: Entity = env.scene["robot"]
     ref, active = hop_reference_targets(env, crouch, extend, tuck, times, through_hop)
+    if in_place_only:   # v6: the reference is an IN-PLACE hop; on directional targets it pulls against the target
+        active = active & (_hop_state(env)["target_b"].abs().sum(dim=1) == 0)
     tgt = _servo_default_joint_pos(env, robot) + env.action_manager.action
     r = torch.exp(-((tgt - ref) ** 2).mean(dim=1) / std ** 2)
     return torch.nan_to_num(r, nan=0.0) * active.float()
@@ -8727,3 +8732,29 @@ def hop_home_pose_penalty(env: ManagerBasedRlEnv, joint_indices: list) -> torch.
     """SELF-NEGATING (<= 0, positive weight): mean |leg joint - HOME|, where standing is the task."""
     hop_update(env)
     return pose_l1_penalty(env, joint_indices=joint_indices) * _hop_standing_gate(env)
+
+
+
+# ── OmniHop v6 (2026-11-25): a direction signal ───────────────────────────────
+# Widening run (3000 -> 4496): every command landed ~+22 mm forward (fwd/back separation 0.08,
+# left/right 0.03); training landing error rose to the mean target size. The only direction reward
+# was half the one-off landing term at a 15 mm scale (~0 for 30-40 mm misses: no gradient), and the
+# in-place imitation prior stayed on in directional episodes. v6: prior in-place only (cfg), a coarse
+# landing term at a 40 mm scale, and dense potential-based progress toward the target in the window.
+
+def hop_landing_coarse(env: ManagerBasedRlEnv, std: float = 0.04) -> torch.Tensor:
+    """(>= 0) One-off on the first qualifying in-window landing: Gaussian of the estimated remaining
+    offset at touchdown at a coarse scale (still pays for a 30-40 mm miss)."""
+    st = hop_update(env)
+    return st["ev_land"] * torch.exp(-(st["land_err"] / std) ** 2)
+
+
+def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5) -> torch.Tensor:
+    """Potential-based progress toward the hop target, (prev - current est distance) / dt, clamped,
+    paid inside the request window only (approach +, retreat -, holding 0: unfarmable). prev is tracked
+    every step so the window opens without a jump. In-place episodes: drifting away is negative."""
+    st = hop_update(env)
+    d = torch.linalg.norm(hop_est_offset(env), dim=1)
+    rate = torch.nan_to_num((st["prev_d"] - d) / env.step_dt, nan=0.0).clamp(-max_speed, max_speed)
+    st["prev_d"] = d
+    return rate * _hop_window(env).float()

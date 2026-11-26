@@ -398,3 +398,58 @@ def test_direction_check_sees_sub_threshold_collapse():
             for d in tg for _ in range(4)]
     out = "\n".join(hb.direction_check(rows))
     assert "SAME HOP REGARDLESS OF DIRECTION" in out and "DIRECTION NOT FOLLOWED" in out
+
+
+# ── v6 ────────────────────────────────────────────────────────────────────────
+
+def test_v6_cfg_direction_signal_and_entropy():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    r = cfg.rewards
+    assert r["hop_reference"].params["in_place_only"] is True
+    assert r["hop_landing_coarse"].func is m.hop_landing_coarse and r["hop_landing_coarse"].params["std"] == 0.04
+    assert r["hop_progress"].func is m.hop_target_progress and r["hop_progress"].weight > 0
+    assert oh.MicroduckOmniHopRlCfg.algorithm.entropy_coef == 0.015
+
+
+def _directional_env(target):
+    env, robot = _stub_env(1)
+    m.reset_hop_target(env, torch.arange(1), no_hop_prob=0.0, pulse_delay=(0.0, 0.0), drift=False)
+    env._hop["target_b"][:] = torch.tensor([target])
+    env._hop["prev_d"][:] = torch.linalg.norm(env._hop["target_b"], dim=1)
+    _step(env, robot, True, 0.015)
+    return env, robot
+
+
+def test_prior_off_for_directional_targets(monkeypatch):
+    from types import SimpleNamespace as NS2
+    for target, on in (((0.0, 0.0), True), ((0.03, 0.0), False)):
+        env, robot = _directional_env(target)
+        env.action_manager = NS2(action=torch.zeros(1, 14))
+        robot.data.default_joint_pos = torch.tensor([list(oh.HOP_REF_CROUCH)])
+        monkeypatch.setattr(m, "_servo_joint_ids", lambda env, asset: list(range(14)))
+        r = m.hop_reference_prior(env, oh.HOP_REF_CROUCH, oh.HOP_REF_EXTEND, oh.HOP_REF_TUCK, oh.HOP_REF_T,
+                                  std=0.35, through_hop=True, in_place_only=True)
+        assert (r.item() > 0.99) is on
+
+
+def test_progress_pays_approach_charges_retreat_only_in_window():
+    env, robot = _directional_env((0.03, 0.0))
+    m.hop_target_progress(env)                                   # sync prev_d
+    robot.data.root_link_pos_w[:, 0] += 0.004                     # 4 mm toward the target in one step
+    env.common_step_counter += 1
+    assert abs(m.hop_target_progress(env, max_speed=0.5).item() - 0.2) < 1e-4
+    robot.data.root_link_pos_w[:, 0] -= 0.004
+    env.common_step_counter += 1
+    assert m.hop_target_progress(env, max_speed=0.5).item() < 0
+    env.episode_length_buf[:] = 100                              # past the window
+    robot.data.root_link_pos_w[:, 0] += 0.004
+    env.common_step_counter += 1
+    assert m.hop_target_progress(env).item() == 0.0
+
+
+def test_coarse_landing_still_pays_a_30mm_miss():
+    env, robot = _directional_env((0.0, 0.0))
+    env._hop["ev_land"][:] = 1.0
+    env._hop["land_err"][:] = 0.03
+    assert m.hop_landing_coarse(env, std=0.04).item() > 0.5
+    assert torch.exp(-(torch.tensor(0.03) / 0.015) ** 2).item() < 0.02      # the old 15 mm scale: ~nothing

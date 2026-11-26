@@ -8758,3 +8758,18 @@ def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5) -> torch
     rate = torch.nan_to_num((st["prev_d"] - d) / env.step_dt, nan=0.0).clamp(-max_speed, max_speed)
     st["prev_d"] = d
     return rate * _hop_window(env).float()
+
+
+# ── OmniHop v7 (2026-11-25): no slide after landing ───────────────────────────
+# v6 chunk 2 model_6000: direction converged (no flags at either request timing), but after landing the
+# trunk still drifts ~10-12 mm forward with both feet down (in place / left / right; ~6 mm on forward)
+# and "back" keeps stepping. Dillon: add the trunk-movement penalty once direction has converged,
+# measured on its own. Penalty on horizontal trunk speed after a successful landing: summed over the
+# episode it is ~weight x distance moved (dt-scaled), so w40 makes a 10 mm slide cost ~0.4 (~ hop_landing).
+
+def hop_post_landing_motion_penalty(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): -|horizontal trunk velocity| (m/s) after a successful landing."""
+    st = hop_update(env)
+    robot: Entity = env.scene["robot"]
+    v = torch.linalg.norm(torch.nan_to_num(robot.data.root_link_lin_vel_w[:, :2], nan=0.0), dim=1)
+    return -v.clamp(max=1.0) * st["landed"].float()

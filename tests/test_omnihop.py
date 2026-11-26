@@ -453,3 +453,19 @@ def test_coarse_landing_still_pays_a_30mm_miss():
     env._hop["land_err"][:] = 0.03
     assert m.hop_landing_coarse(env, std=0.04).item() > 0.5
     assert torch.exp(-(torch.tensor(0.03) / 0.015) ** 2).item() < 0.02      # the old 15 mm scale: ~nothing
+
+
+# ── v7 ────────────────────────────────────────────────────────────────────────
+
+def test_v7_post_landing_motion_penalty_only_after_landing():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert cfg.rewards["post_landing_motion"].func is m.hop_post_landing_motion_penalty
+    assert cfg.rewards["post_landing_motion"].weight > 0
+    env, robot = _hop_env()
+    robot.data.root_link_lin_vel_w = torch.tensor([[0.006, 0.0, 0.0]])
+    assert m.hop_post_landing_motion_penalty(env).item() == 0.0                  # not landed yet
+    for z in (0.02, 0.025, 0.025, 0.02):
+        _step(env, robot, False, z)
+    _step(env, robot, True, 0.015)
+    assert env._hop["landed"].item()
+    assert abs(m.hop_post_landing_motion_penalty(env).item() + 0.006) < 1e-6

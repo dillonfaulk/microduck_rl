@@ -32,6 +32,10 @@ v6 (2026-11-25, Dillon; fine-tune from the widening run's model_4496): direction
 (every command landed ~+22 mm forward). Imitation prior in-place targets only; coarse landing-target
 term (40 mm scale, w15); dense progress toward the target in the request window (w20); entropy 0.015.
 
+v7 (2026-11-25, Dillon's conditional call met: direction converged at v6c2 model_6000 with no flags,
+slide still ~10-12 mm): penalty on horizontal trunk speed after a successful landing (w40). Fine-tune
+from v6c2 model_6000; measured on its own (end - lift-off - flight displacement per direction).
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -74,7 +78,8 @@ IN_PLACE_ITERS   = 3000           # in-place only until here (gate), then direct
 HOP_CLEAR_FULL   = 0.04           # v4: flight reward saturates at 40 mm foot-site rise (v3: 15 mm ~ 7 mm floor gap)
 SWAP_PROB        = 0.5            # v4: share of episodes whose first frame carries a VelStand-like last action
 SWAP_NOISE       = 0.15
-ENTROPY_COEF     = 0.015          # v6: 0.01 -> 0.015 (action std 0.12 after ~3000 in-place iterations)
+ENTROPY_COEF     = 0.015
+POST_LANDING_MOTION_WEIGHT = 40.0  # v7: ~0.4 total for a 10 mm post-landing slide (dt-scaled), ~ hop_landing          # v6: 0.01 -> 0.015 (action std 0.12 after ~3000 in-place iterations)
 STAND_Z          = 0.115
 FELL_LIMIT       = math.radians(60.0)   # fell_over termination AND the v3 fall penalty
 NONFOOT_BODIES_PATTERN = r"^(?!ankle_left$|ankle_right$).*$"
@@ -167,6 +172,9 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     # dense progress toward the target in the request window (~0.6 total for a 30 mm hop, = hop_landing).
     cfg.rewards["hop_landing_coarse"] = RewardTermCfg(
         func=microduck_mdp.hop_landing_coarse, weight=15.0, params={"std": 0.04})
+    # v7: no slide after landing (v6c2 model_6000 drifted ~10-12 mm forward with both feet down)
+    cfg.rewards["post_landing_motion"] = RewardTermCfg(
+        func=microduck_mdp.hop_post_landing_motion_penalty, weight=POST_LANDING_MOTION_WEIGHT)
     cfg.rewards["hop_progress"] = RewardTermCfg(
         func=microduck_mdp.hop_target_progress, weight=20.0, params={"max_speed": 0.5})
     cfg.rewards["hop_extra"] = RewardTermCfg(func=microduck_mdp.hop_extra_penalty, weight=20.0)

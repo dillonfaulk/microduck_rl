@@ -386,3 +386,15 @@ def test_prior_stays_on_through_the_hop_when_asked():
     assert env._hop["hops"].item() == 1
     assert not m.hop_reference_targets(env, c, e, k, T)[1].item()
     assert m.hop_reference_targets(env, c, e, k, T, through_hop=True)[1].item()
+
+
+def test_direction_check_sees_sub_threshold_collapse():
+    """Widening run 2026-11-25: every direction ~ +25 mm forward, all hops under the 10 mm line."""
+    import sys
+    sys.path.insert(0, "scripts")
+    import hop_battery as hb
+    tg = {"in_place": (0, 0), "fwd": (30, 0), "back": (-30, 0), "left": (0, 20), "right": (0, -20)}
+    rows = [{"drift": True, "dir": d, "target_mm": list(tg[d]), "first": None, "end_disp_mm": [24.0, -2.0]}
+            for d in tg for _ in range(4)]
+    out = "\n".join(hb.direction_check(rows))
+    assert "SAME HOP REGARDLESS OF DIRECTION" in out and "DIRECTION NOT FOLLOWED" in out

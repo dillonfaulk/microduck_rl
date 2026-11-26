@@ -182,6 +182,8 @@ def run_episode(job):
             air = 0
         if first is not None and "hold_tilt" not in first and sim.t >= first["t"] + HOLD_S:
             first["hold_tilt"] = round(tilt, 1)
+    (xe, ye, _), _, _ = sim.pose()
+    end_disp = [round(1000 * v, 1) for v in to_frame(xe - x0, ye - y0, yaw0)]
     q = np.array([sim.data.qpos[j] for j in sim.policy.joint_qpos_indices]) - sim.policy.default_pose
     ok = (first is not None and first["land_tilt"] < LAND_TILT and not first["bad_contact"]
           and first.get("hold_tilt", 99) < LAND_TILT and fell_t is None and bad_t is None)
@@ -189,7 +191,7 @@ def run_episode(job):
             "success": bool(ok), "hops": hops, "first": first, "fell_t": fell_t, "nonfoot_t": bad_t,
             "landing_fall": bool(first is not None and fell_t is not None and fell_t >= first["t"] - 0.1),
             "spin_peak": round(spin_peak, 2), "leg_dev_deg_end": round(math.degrees(float(np.abs(q[LEG_JOINTS]).max())), 1),
-            "start_tilt": round(tilt0, 1)}
+            "start_tilt": round(tilt0, 1), "end_disp_mm": end_disp}
 
 
 def summarize(rows):
@@ -222,7 +224,7 @@ PAIR_SEP_MIN = 0.5       # opposite directions must separate by >= half the comm
 def direction_check(rows):
     """Conditioning guard (IsaacLab PR #9173: a collapsed goal latent gave one fixed motion for
     every command). Per direction: median achieved landing displacement (start yaw frame, first
-    qualifying hop) vs commanded, gain along the commanded axis, cross-axis drift. Flags (warnings,
+    qualifying hop, else end-of-episode displacement) vs commanded, gain along the commanded axis, cross-axis drift. Flags (warnings,
     not pass floors): SAME HOP REGARDLESS OF DIRECTION when every direction's median landing sits
     within SAME_HOP_MM of every other; DIRECTION NOT FOLLOWED when an opposite pair (fwd/back,
     left/right) separates by < PAIR_SEP_MIN x the commanded span."""
@@ -233,7 +235,10 @@ def direction_check(rows):
         out.append(f"  {'dir':9s} {'cmd mm':>12s} {'achieved mm':>14s} {'n':>3s} {'gain':>6s} {'cross mm':>8s}")
         for d in DIRS_ORDER:
             rs = [r for r in rows if r["drift"] == drift and r["dir"] == d]
-            ds = [r["first"]["disp_mm"] for r in rs if r["first"]]
+            # first qualifying hop's landing; else (sub-threshold hops, 2026-11-25 widening run) the trunk's
+            # end-of-episode displacement, so a collapse cannot hide below the 10 mm hop line
+            ds = [r["first"]["disp_mm"] if r["first"] else r.get("end_disp_mm") for r in rs]
+            ds = [x for x in ds if x is not None]
             if not rs:
                 continue
             t = np.array(rs[0]["target_mm"], float)

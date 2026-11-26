@@ -36,6 +36,10 @@ v7 (2026-11-25, Dillon's conditional call met: direction converged at v6c2 model
 slide still ~10-12 mm): penalty on horizontal trunk speed after a successful landing (w40). Fine-tune
 from v6c2 model_6000; measured on its own (end - lift-off - flight displacement per direction).
 
+v8 (2026-11-25, Dillon + n3z-jr; fine-tune from v7 model_6500): the hold-still PENALTIES (post-landing
+motion, HOME L1) also apply once the request window has closed, counted hop or not -- v7's low "back"
+hops often missed the training hop line and slid back forward. Positive standing rewards unchanged.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -174,7 +178,8 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         func=microduck_mdp.hop_landing_coarse, weight=15.0, params={"std": 0.04})
     # v7: no slide after landing (v6c2 model_6000 drifted ~10-12 mm forward with both feet down)
     cfg.rewards["post_landing_motion"] = RewardTermCfg(
-        func=microduck_mdp.hop_post_landing_motion_penalty, weight=POST_LANDING_MOTION_WEIGHT)
+        func=microduck_mdp.hop_post_landing_motion_penalty, weight=POST_LANDING_MOTION_WEIGHT,
+        params={"after_window": True})   # v8: after ANY touchdown once the request window closes
     cfg.rewards["hop_progress"] = RewardTermCfg(
         func=microduck_mdp.hop_target_progress, weight=20.0, params={"max_speed": 0.5})
     cfg.rewards["hop_extra"] = RewardTermCfg(func=microduck_mdp.hop_extra_penalty, weight=20.0)
@@ -187,7 +192,7 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.rewards["home_pose_match"] = RewardTermCfg(
         func=microduck_mdp.hop_home_pose_match, weight=2.0, params={"std": 0.1, "joint_indices": _LEG_JOINTS})
     cfg.rewards["home_pose_l1"] = RewardTermCfg(
-        func=microduck_mdp.hop_home_pose_penalty, weight=5.0, params={"joint_indices": _LEG_JOINTS})
+        func=microduck_mdp.hop_home_pose_penalty, weight=5.0, params={"joint_indices": _LEG_JOINTS, "after_window": True})
     cfg.rewards["pose_stand_legs"] = RewardTermCfg(
         func=microduck_mdp.hop_gated_pose, weight=0.5, params={"std": 0.5, "joint_indices": _LEG_JOINTS})
     cfg.rewards["pose_stand_neck"] = RewardTermCfg(

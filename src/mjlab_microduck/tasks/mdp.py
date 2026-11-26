@@ -8728,10 +8728,19 @@ def hop_home_pose_match(env: ManagerBasedRlEnv, std: float, joint_indices: list)
     return pose_target_match(env, std=std, joint_indices=joint_indices) * _hop_standing_gate(env)
 
 
-def hop_home_pose_penalty(env: ManagerBasedRlEnv, joint_indices: list) -> torch.Tensor:
-    """SELF-NEGATING (<= 0, positive weight): mean |leg joint - HOME|, where standing is the task."""
+def _hop_post_window_gate(env: ManagerBasedRlEnv, grace: float = 0.3) -> torch.Tensor:
+    """v8: standing gate OR the request window has closed (after ANY touchdown, counted hop or not)."""
+    st = _hop_state(env)
+    closed = st["req"] & (_hop_t(env) >= st["t0"] + HOP_PULSE_S + grace)
+    return torch.maximum(_hop_standing_gate(env), closed.float())
+
+
+def hop_home_pose_penalty(env: ManagerBasedRlEnv, joint_indices: list, after_window: bool = False) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): mean |leg joint - HOME|, where standing is the task
+    (after_window=True, v8: also once the request window has closed, counted hop or not)."""
     hop_update(env)
-    return pose_l1_penalty(env, joint_indices=joint_indices) * _hop_standing_gate(env)
+    gate = _hop_post_window_gate(env) if after_window else _hop_standing_gate(env)
+    return pose_l1_penalty(env, joint_indices=joint_indices) * gate
 
 
 
@@ -8767,9 +8776,14 @@ def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5) -> torch
 # measured on its own. Penalty on horizontal trunk speed after a successful landing: summed over the
 # episode it is ~weight x distance moved (dt-scaled), so w40 makes a 10 mm slide cost ~0.4 (~ hop_landing).
 
-def hop_post_landing_motion_penalty(env: ManagerBasedRlEnv) -> torch.Tensor:
-    """SELF-NEGATING (<= 0, positive weight): -|horizontal trunk velocity| (m/s) after a successful landing."""
+def hop_post_landing_motion_penalty(env: ManagerBasedRlEnv, after_window: bool = False) -> torch.Tensor:
+    """SELF-NEGATING (<= 0, positive weight): -|horizontal trunk velocity| (m/s) after a successful landing.
+    after_window=True (v8): also wherever standing is the task and once the request window has closed --
+    v7's "back" hops often stayed under the training hop line (60 ms / 5 mm), so nothing held them and they
+    slid +7-8 mm forward again. Only the PENALTY terms widen: the positive standing rewards stay tied to a
+    counted landing, so a skipped hop does not earn them back (v1's stand-still trap stays closed)."""
     st = hop_update(env)
     robot: Entity = env.scene["robot"]
     v = torch.linalg.norm(torch.nan_to_num(robot.data.root_link_lin_vel_w[:, :2], nan=0.0), dim=1)
-    return -v.clamp(max=1.0) * st["landed"].float()
+    gate = _hop_post_window_gate(env) if after_window else st["landed"].float()
+    return -v.clamp(max=1.0) * gate

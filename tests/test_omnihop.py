@@ -469,3 +469,21 @@ def test_v7_post_landing_motion_penalty_only_after_landing():
     _step(env, robot, True, 0.015)
     assert env._hop["landed"].item()
     assert abs(m.hop_post_landing_motion_penalty(env).item() + 0.006) < 1e-6
+
+
+# ── v8 ────────────────────────────────────────────────────────────────────────
+
+def test_v8_hold_still_penalties_cover_uncounted_hops_but_rewards_do_not():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert cfg.rewards["post_landing_motion"].params["after_window"] is True
+    assert cfg.rewards["home_pose_l1"].params["after_window"] is True
+    assert "after_window" not in cfg.rewards["home_pose_match"].params           # positive term: unchanged
+    env, robot = _hop_env(t0=0.0)
+    robot.data.root_link_lin_vel_w = torch.tensor([[0.006, 0.0, 0.0]])
+    assert m.hop_post_landing_motion_penalty(env, after_window=True).item() == 0.0   # in the window
+    for _ in range(50):                                                            # past 0.9 s, never hopped
+        _step(env, robot, True, 0.015)
+    assert not env._hop["landed"].item()
+    assert m.hop_post_landing_motion_penalty(env, after_window=False).item() == 0.0  # v7: hole
+    assert abs(m.hop_post_landing_motion_penalty(env, after_window=True).item() + 0.006) < 1e-6
+    assert m._hop_standing_gate(env).item() == 0.0                                  # rewards still forfeited

@@ -15,6 +15,12 @@ scale bias N(-1.9 %, 0.6 %), a touchdown jump of the estimate up to 2 cm, a pers
 bias up to 0.03 rad/s per axis (the IMU tilt offset has no CPU counterpart here: the CPU
 harness reads the real gravity sensor, as on the robot).
 
+YARDSTICK (Dillon 2026-11-27): the hop target, the command, the landing error and every displacement are
+measured on the STANCE MIDPOINT (mean of the two foot sites), in the start trunk-yaw frame. v7/v8 showed
+the trunk is the wrong ruler: the feet stay within ~1 mm of touchdown while the trunk re-centres over them,
+and the "back hop" was a trunk lean (trunk 9-13 mm back, feet 3-5 mm forward). Trunk displacements are
+kept alongside (trunk_disp_mm, end_trunk_disp_mm) for the feet-vs-trunk breakdown.
+
 What counts as ONE HOP (a measurement definition, not a pass floor): both feet off the
 floor >= 60 ms, floor clearance >= 10 mm (min robot-geom gap, not the foot-site rise), touchdown on the feet only, upright
 (< 25 deg) at touchdown and still standing (< 25 deg, no fall) 1 s later.
@@ -79,6 +85,11 @@ class HopSim:
         raw = p.get_base_ang_vel
         p.get_base_ang_vel = lambda: raw() + self.gyro_bias
 
+    def feet_mid(self):
+        """Stance midpoint (world xy): mean of the two foot sites -- the hop yardstick (2026-11-27)."""
+        d = self.sim.data
+        return tuple(float(v) for v in np.mean([d.site_xpos[i][:2] for i in self.sites], axis=0))
+
     def floor_gap(self):
         """True clearance: min distance floor <-> any robot collision geom (the probe's metric).
         The foot-site rise the training reward uses overstates it during a tuck (probe best hop:
@@ -123,7 +134,8 @@ def run_episode(job):
     sim.set_twist((0.0, 0.0, 0.0))
     while sim.t < PRESTAND_S - 1e-9:
         sim.step()
-    (x0, y0, yaw0), tilt0, _ = sim.pose()
+    (xt0, yt0, yaw0), tilt0, _ = sim.pose()
+    x0, y0 = hs.feet_mid()            # YARDSTICK (Dillon 2026-11-27): the stance midpoint, not the trunk
     k = float(np.clip(rng.normal(-0.019, 0.006), -0.05, 0.02)) if drift else 0.0
     ja, jr = rng.uniform(0, 2 * math.pi), rng.uniform(0, 0.02)
     jump = np.array([jr * math.cos(ja), jr * math.sin(ja)]) if drift else np.zeros(2)
@@ -132,7 +144,8 @@ def run_episode(job):
     goal = (x0 + c * target[0] - s * target[1], y0 + s * target[0] + c * target[1])
 
     def est_offset(landed):
-        (x, y, yaw), _, _ = sim.pose()
+        (_, _, yaw), _, _ = sim.pose()
+        x, y = hs.feet_mid()
         tx, ty = to_frame(goal[0] - x0, goal[1] - y0, yaw)
         ddx, ddy = to_frame(x - x0, y - y0, yaw)
         j = jump if landed else np.zeros(2)
@@ -143,6 +156,7 @@ def run_episode(job):
     base = None
     air, clear, lift_tilt, site_rise = 0, 0.0, 0.0, 0.0
     hops, landed, first = 0, False, None
+    best_air, td_feet, steps_after, td_t = 0, None, 0, None   # longest flight's touchdown (counted or not)
     fell_t, bad_t, spin_peak = None, None, 0.0
     while sim.t < EPISODE_S - 1e-9:
         hs.set_cmd(est_offset(landed), delay <= sim.t < delay + PULSE_S)
@@ -162,6 +176,12 @@ def run_episode(job):
         if fell_t is None and (tilt > 60 or z < 0.06):
             fell_t = sim.t
         airborne = not (ld or rd)
+        if not airborne and air > 0 and air >= best_air:
+            best_air, td_t = air, sim.t
+            fx, fy = hs.feet_mid()
+            td_feet = [round(1000 * v, 1) for v in to_frame(fx - x0, fy - y0, yaw0)]
+        if td_t is not None and sim.t > td_t and ld != rd:
+            steps_after += 1
         if airborne:
             if air == 0:
                 lift_tilt, clear, site_rise = tilt, 0.0, 0.0
@@ -172,18 +192,22 @@ def run_episode(job):
             if air >= MIN_AIR_TICKS and clear >= MIN_CLEAR and lift_tilt < 30:
                 hops += 1
                 if first is None:
-                    (x, y, _), _, _ = sim.pose()
+                    (xt, yt, _), _, _ = sim.pose()
+                    x, y = hs.feet_mid()
                     eo = est_offset(False)
                     first = {"t": round(sim.t, 3), "flight_ms": air * 20, "clear_mm": round(clear * 1000, 1), "site_rise_mm": round(site_rise * 1000, 1),
                              "land_tilt": round(tilt, 1), "true_err_mm": round(1000 * math.hypot(goal[0] - x, goal[1] - y), 1),
                              "est_err_mm": round(1000 * math.hypot(*eo), 1), "bad_contact": bad,
-                             "disp_mm": [round(1000 * v, 1) for v in to_frame(x - x0, y - y0, yaw0)]}
+                             "disp_mm": [round(1000 * v, 1) for v in to_frame(x - x0, y - y0, yaw0)],
+                             "trunk_disp_mm": [round(1000 * v, 1) for v in to_frame(xt - xt0, yt - yt0, yaw0)]}
                     landed = True
             air = 0
         if first is not None and "hold_tilt" not in first and sim.t >= first["t"] + HOLD_S:
             first["hold_tilt"] = round(tilt, 1)
-    (xe, ye, _), _, _ = sim.pose()
+    (xte, yte, _), _, _ = sim.pose()
+    xe, ye = hs.feet_mid()
     end_disp = [round(1000 * v, 1) for v in to_frame(xe - x0, ye - y0, yaw0)]
+    end_trunk = [round(1000 * v, 1) for v in to_frame(xte - xt0, yte - yt0, yaw0)]
     q = np.array([sim.data.qpos[j] for j in sim.policy.joint_qpos_indices]) - sim.policy.default_pose
     ok = (first is not None and first["land_tilt"] < LAND_TILT and not first["bad_contact"]
           and first.get("hold_tilt", 99) < LAND_TILT and fell_t is None and bad_t is None)
@@ -191,7 +215,8 @@ def run_episode(job):
             "success": bool(ok), "hops": hops, "first": first, "fell_t": fell_t, "nonfoot_t": bad_t,
             "landing_fall": bool(first is not None and fell_t is not None and fell_t >= first["t"] - 0.1),
             "spin_peak": round(spin_peak, 2), "leg_dev_deg_end": round(math.degrees(float(np.abs(q[LEG_JOINTS]).max())), 1),
-            "start_tilt": round(tilt0, 1), "end_disp_mm": end_disp}
+            "start_tilt": round(tilt0, 1), "end_disp_mm": end_disp, "end_trunk_disp_mm": end_trunk,
+            "td_feet_mm": td_feet, "steps_after": steps_after}
 
 
 def summarize(rows):
@@ -232,7 +257,7 @@ def direction_check(rows):
     for drift in sorted({r["drift"] for r in rows}, reverse=True):
         med = {}
         out.append(f"== direction check, drift {'ON' if drift else 'OFF'}")
-        out.append(f"  {'dir':9s} {'cmd mm':>12s} {'achieved mm':>14s} {'n':>3s} {'gain':>6s} {'cross mm':>8s}")
+        out.append(f"  {'dir':9s} {'cmd mm':>12s} {'achieved mm':>14s} {'n':>3s} {'gain':>6s} {'cross mm':>8s} {'trunk mm':>14s}   (achieved = FEET midpoint)")
         for d in DIRS_ORDER:
             rs = [r for r in rows if r["drift"] == drift and r["dir"] == d]
             # first qualifying hop's landing; else (sub-threshold hops, 2026-11-25 widening run) the trunk's
@@ -246,11 +271,14 @@ def direction_check(rows):
                 out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {'no hops':>14s} {0:>3d}")
                 continue
             a = np.median(np.array(ds, float), axis=0)
+            tr = [r["first"].get("trunk_disp_mm") if r["first"] else r.get("end_trunk_disp_mm") for r in rs]
+            tr = [x for x in tr if x is not None]
+            tstr = str([round(float(v), 1) for v in np.median(np.array(tr, float), axis=0)]) if tr else "-"
             med[d] = (t, a)
             n = np.linalg.norm(t)
             gain = f"{a @ t / n ** 2:6.2f}" if n > 0 else "     -"
             cross = abs(a[0] * t[1] - a[1] * t[0]) / n if n > 0 else np.linalg.norm(a)
-            out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {str([round(float(v), 1) for v in a]):>14s} {len(ds):>3d} {gain} {cross:>8.1f}")
+            out.append(f"  {d:9s} {str([round(v) for v in t]):>12s} {str([round(float(v), 1) for v in a]):>14s} {len(ds):>3d} {gain} {cross:>8.1f} {tstr:>14s}")
         flags = []
         if len(med) >= 3:
             pts = [a for _, a in med.values()]
@@ -265,6 +293,14 @@ def direction_check(rows):
                 if sep < PAIR_SEP_MIN:
                     flags.append(f"DIRECTION NOT FOLLOWED: {p}/{q} separation {sep:.2f} < {PAIR_SEP_MIN}")
         out += [f"  FLAG: {f}" for f in flags] or ["  flags: none"]
+        out.append(f"  phases (feet midpoint, median): {'dir':9s} {'@touchdown':>16s} {'@end':>16s} {'1-foot ticks after':>18s}")
+        for d in DIRS_ORDER:
+            rs = [r for r in rows if r["drift"] == drift and r["dir"] == d and r.get("td_feet_mm")]
+            if rs:
+                td = np.median(np.array([r["td_feet_mm"] for r in rs], float), axis=0)
+                en = np.median(np.array([r["end_disp_mm"] for r in rs], float), axis=0)
+                out.append(f"  {'':31s} {d:9s} {str([round(float(v), 1) for v in td]):>16s} "
+                           f"{str([round(float(v), 1) for v in en]):>16s} {np.median([r['steps_after'] for r in rs]):>18.0f}")
     return out
 
 

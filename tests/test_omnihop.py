@@ -141,9 +141,12 @@ def test_offset_is_target_at_start_and_zero_on_arrival_any_heading():
     st = env._hop
     st["target_b"][:] = torch.tensor([[0.04, 0.0]])
     assert torch.allclose(m.hop_est_offset(env), torch.tensor([[0.04, 0.0]]), atol=1e-6)
+    m.hop_update(env)                                    # v9: the feet-midpoint start is set on the 1st update
     gx, gy = m._yaw_frame_to_world(torch.tensor([0.04]), torch.tensor([0.0]), torch.tensor([0.7]))
-    robot.data.root_link_pos_w[:, 0] += gx
-    robot.data.root_link_pos_w[:, 1] += gy
+    robot.data.root_link_pos_w[:, 0] += 0.05             # trunk moves alone (a lean): nothing changes
+    assert torch.allclose(m.hop_est_offset(env), torch.tensor([[0.04, 0.0]]), atol=1e-6)
+    robot.data.site_pos_w[:, :, 0] += gx                 # the FEET arrive
+    robot.data.site_pos_w[:, :, 1] += gy
     assert torch.allclose(m.hop_est_offset(env), torch.zeros(1, 2), atol=1e-6)
     st["scale"][:] = -0.02            # odometry under-reads: 2 % of the hop still "remains"
     assert torch.allclose(m.hop_est_offset(env), torch.tensor([[0.0008, 0.0]]), atol=1e-6)
@@ -435,16 +438,36 @@ def test_prior_off_for_directional_targets(monkeypatch):
 def test_progress_pays_approach_charges_retreat_only_in_window():
     env, robot = _directional_env((0.03, 0.0))
     m.hop_target_progress(env)                                   # sync prev_d
-    robot.data.root_link_pos_w[:, 0] += 0.004                     # 4 mm toward the target in one step
+    robot.data.site_pos_w[:, :, 0] += 0.004                      # feet 4 mm toward the target in one step
     env.common_step_counter += 1
     assert abs(m.hop_target_progress(env, max_speed=0.5).item() - 0.2) < 1e-4
-    robot.data.root_link_pos_w[:, 0] -= 0.004
+    robot.data.site_pos_w[:, :, 0] -= 0.004
     env.common_step_counter += 1
     assert m.hop_target_progress(env, max_speed=0.5).item() < 0
     env.episode_length_buf[:] = 100                              # past the window
-    robot.data.root_link_pos_w[:, 0] += 0.004
+    robot.data.site_pos_w[:, :, 0] += 0.004
     env.common_step_counter += 1
     assert m.hop_target_progress(env).item() == 0.0
+
+
+def test_v9_progress_pays_flight_not_steps():
+    env, robot = _directional_env((0.03, 0.0))
+    m.hop_target_progress(env, airborne_only=True)               # sync prev_d (feet down)
+    robot.data.site_pos_w[:, :, 0] += 0.004                      # a STEP: feet move, still on the ground
+    env.common_step_counter += 1
+    assert m.hop_target_progress(env, airborne_only=True).item() == 0.0
+    env.common_step_counter += 1
+    env.episode_length_buf += 1
+    env.scene.sensors["feet_ground_contact"].data.found[:] = 0.0  # airborne
+    m.hop_update(env)
+    robot.data.site_pos_w[:, :, 0] += 0.004
+    assert abs(m.hop_target_progress(env, airborne_only=True).item() - 0.2) < 1e-4
+
+
+def test_v9_cfg_yardstick_drops_trunk_motion_penalty():
+    cfg = oh.make_microduck_omnihop_env_cfg()
+    assert "post_landing_motion" not in cfg.rewards
+    assert cfg.rewards["hop_progress"].params["airborne_only"] is True
 
 
 def test_coarse_landing_still_pays_a_30mm_miss():
@@ -458,9 +481,7 @@ def test_coarse_landing_still_pays_a_30mm_miss():
 # ── v7 ────────────────────────────────────────────────────────────────────────
 
 def test_v7_post_landing_motion_penalty_only_after_landing():
-    cfg = oh.make_microduck_omnihop_env_cfg()
-    assert cfg.rewards["post_landing_motion"].func is m.hop_post_landing_motion_penalty
-    assert cfg.rewards["post_landing_motion"].weight > 0
+    """v7/v8 function (term dropped from the cfg in v9; kept for the v7/v8 checkpoints' provenance)."""
     env, robot = _hop_env()
     robot.data.root_link_lin_vel_w = torch.tensor([[0.006, 0.0, 0.0]])
     assert m.hop_post_landing_motion_penalty(env).item() == 0.0                  # not landed yet
@@ -475,7 +496,6 @@ def test_v7_post_landing_motion_penalty_only_after_landing():
 
 def test_v8_hold_still_penalties_cover_uncounted_hops_but_rewards_do_not():
     cfg = oh.make_microduck_omnihop_env_cfg()
-    assert cfg.rewards["post_landing_motion"].params["after_window"] is True
     assert cfg.rewards["home_pose_l1"].params["after_window"] is True
     assert "after_window" not in cfg.rewards["home_pose_match"].params           # positive term: unchanged
     env, robot = _hop_env(t0=0.0)

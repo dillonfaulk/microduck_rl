@@ -8313,6 +8313,7 @@ def _hop_state(env: ManagerBasedRlEnv) -> dict:
             "flight_steps": z(), "best_clear": z(),
             "swap_act": z(14), "swap": z(dtype=torch.bool),     # v4: VelStand-like last action at swap-in
             "prev_d": z(),                                       # v6: est remaining distance, previous step
+            "start_ok": z(dtype=torch.bool),                     # v9: start = feet midpoint, set on 1st update
             "step": -1,
         }
     return env._hop
@@ -8339,11 +8340,23 @@ def _tilt(robot: Entity) -> torch.Tensor:
     return torch.acos((-g[:, 2]).clamp(-1.0, 1.0))
 
 
+def _hop_feet_mid(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """Stance midpoint (world xy): mean of the two foot sites -- the hop YARDSTICK (Dillon 2026-11-27)."""
+    robot: Entity = env.scene["robot"]
+    if not hasattr(env, "_hop_site_ids"):
+        env._hop_site_ids = robot.find_sites(("left_foot", "right_foot"), preserve_order=True)[0]
+    return torch.nan_to_num(robot.data.site_pos_w[:, env._hop_site_ids, :2].mean(dim=1), nan=0.0)
+
+
 def hop_est_offset(env: ManagerBasedRlEnv) -> torch.Tensor:
-    """Estimated remaining offset (trunk yaw frame): R(yaw0-yaw) target - (1+k) R(-yaw) disp - jump."""
+    """Estimated remaining offset (trunk yaw frame): R(yaw0-yaw) target - (1+k) R(-yaw) disp - jump.
+    v9 YARDSTICK: disp is the STANCE MIDPOINT's displacement (feet), not the trunk's -- v7/v8 showed the
+    feet stay within ~1 mm of touchdown while the trunk re-centres, and the "back hop" was a trunk lean
+    (trunk 9-13 mm back, feet 3-5 mm forward). Heading frame stays the trunk yaw. Until the first update
+    after a reset sets the feet start (start_ok), disp is 0 (the offset is the target itself)."""
     st = _hop_state(env)
     robot: Entity = env.scene["robot"]
-    pos = robot.data.root_link_pos_w[:, :2]
+    pos = torch.where(st["start_ok"].unsqueeze(1), _hop_feet_mid(env), st["start"])
     yaw = _yaw_from_quat_wxyz(robot.data.root_link_quat_w)
     tx, ty = world_to_yaw_frame(*_yaw_frame_to_world(st["target_b"][:, 0], st["target_b"][:, 1], st["yaw0"]), yaw)
     d = pos - st["start"]
@@ -8379,6 +8392,10 @@ def hop_update(
         return st
     st["step"] = env.common_step_counter
     robot: Entity = env.scene["robot"]
+    new = ~st["start_ok"]                                   # v9: feet-midpoint start, first step after reset
+    if new.any():
+        st["start"] = torch.where(new.unsqueeze(1), _hop_feet_mid(env), st["start"])
+        st["start_ok"] |= new
     for k in ("ev_land", "ev_extra", "ev_unreq"):
         st[k].zero_()
     found = env.scene.sensors[feet_sensor].data.found
@@ -8471,6 +8488,7 @@ def reset_hop_target(
     st["landed"][env_ids] = False
     st["base_ok"][env_ids] = False
     st["prev_d"][env_ids] = torch.linalg.norm(st["target_b"][env_ids], dim=1)
+    st["start_ok"][env_ids] = False
 
 
 class HopTargetCommand(CommandTerm):
@@ -8758,7 +8776,7 @@ def hop_landing_coarse(env: ManagerBasedRlEnv, std: float = 0.04) -> torch.Tenso
     return st["ev_land"] * torch.exp(-(st["land_err"] / std) ** 2)
 
 
-def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5) -> torch.Tensor:
+def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5, airborne_only: bool = False) -> torch.Tensor:
     """Potential-based progress toward the hop target, (prev - current est distance) / dt, clamped,
     paid inside the request window only (approach +, retreat -, holding 0: unfarmable). prev is tracked
     every step so the window opens without a jump. In-place episodes: drifting away is negative."""
@@ -8766,7 +8784,10 @@ def hop_target_progress(env: ManagerBasedRlEnv, max_speed: float = 0.5) -> torch
     d = torch.linalg.norm(hop_est_offset(env), dim=1)
     rate = torch.nan_to_num((st["prev_d"] - d) / env.step_dt, nan=0.0).clamp(-max_speed, max_speed)
     st["prev_d"] = d
-    return rate * _hop_window(env).float()
+    gate = _hop_window(env).float()
+    if airborne_only:   # v9: with the feet yardstick, ground frames would pay STEPS; pay the hop's own flight
+        gate = gate * (st["air"] > 0).float()
+    return rate * gate
 
 
 # ── OmniHop v7 (2026-11-25): no slide after landing ───────────────────────────

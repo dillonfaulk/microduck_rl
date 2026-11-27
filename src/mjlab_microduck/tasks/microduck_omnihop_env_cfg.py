@@ -40,6 +40,11 @@ v8 (2026-11-25, Dillon + n3z-jr; fine-tune from v7 model_6500): the hold-still P
 motion, HOME L1) also apply once the request window has closed, counted hop or not -- v7's low "back"
 hops often missed the training hop line and slid back forward. Positive standing rewards unchanged.
 
+v9 (2026-11-27, Dillon: fix the yardstick first): the hop target, the command and the landing are measured
+on the STANCE MIDPOINT (feet), not the trunk; trunk-motion penalty dropped; progress paid on airborne frames
+only (on the ground the feet move only by stepping). Fine-tune from v6c2 model_6000 (last checkpoint
+without the trunk-motion penalty; direction converged). v7 model_6500 @ immediate stays the banked fallback.
+
 Command contract (mdp.py OmniHop section): twist = estimated remaining offset to the hop
 target [dx, dy, 0] (trunk yaw frame), body slot 0 = hop-request pulse (0.6 s), every
 other head/body slot 0. 61-d obs / 14 actions / 50 Hz.
@@ -176,12 +181,10 @@ def make_microduck_omnihop_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     # dense progress toward the target in the request window (~0.6 total for a 30 mm hop, = hop_landing).
     cfg.rewards["hop_landing_coarse"] = RewardTermCfg(
         func=microduck_mdp.hop_landing_coarse, weight=15.0, params={"std": 0.04})
-    # v7: no slide after landing (v6c2 model_6000 drifted ~10-12 mm forward with both feet down)
-    cfg.rewards["post_landing_motion"] = RewardTermCfg(
-        func=microduck_mdp.hop_post_landing_motion_penalty, weight=POST_LANDING_MOTION_WEIGHT,
-        params={"after_window": True})   # v8: after ANY touchdown once the request window closes
+    # v7/v8 post-landing trunk-motion penalty DROPPED in v9 (Dillon 2026-11-27): the "slide" was the trunk
+    # re-centring over feet that stay within ~1 mm of touchdown -- there is no slide to stop.
     cfg.rewards["hop_progress"] = RewardTermCfg(
-        func=microduck_mdp.hop_target_progress, weight=20.0, params={"max_speed": 0.5})
+        func=microduck_mdp.hop_target_progress, weight=20.0, params={"max_speed": 0.5, "airborne_only": True})
     cfg.rewards["hop_extra"] = RewardTermCfg(func=microduck_mdp.hop_extra_penalty, weight=20.0)
     cfg.rewards["nonfoot_contact"] = RewardTermCfg(func=microduck_mdp.hop_nonfoot_penalty, weight=30.0)
 

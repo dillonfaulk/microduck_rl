@@ -1,0 +1,49 @@
+OmniHop battery: logs/rsl_rl/omnihop/2026-11-27_16-38-02_v9c2/2026-11-27_16-38-02_v9c2_model_7998.onnx
+  50 episodes per row; VelStand prestand 1.5s -> swap-in; request pulse 0.00s after the swap; hop = >= 60 ms off, >= 10 mm clearance, feet-only touchdown < 25 deg, still up 1 s later
+
+== drift ON
+  dir          target mm  success  clear mm flight ms true err est err hops/swap land falls falls nonfoot spin pk >10.7 leg dev
+  in_place        [0, 0]   0/50           -         -        -       -      0.00          0     0       0     2.4     0     0.7
+  fwd            [30, 0]   0/50           -         -        -       -      0.00          0     0       0     1.9     0     0.7
+  back          [-30, 0]   0/50           -         -        -       -      0.00          0     0       0     3.3     0     1.1
+  left           [0, 20]   0/50           -         -        -       -      0.00          0     0       0     2.5     0     1.2
+  right         [0, -20]   0/50           -         -        -       -      0.00          0     0       0     1.9     0     1.1
+== drift OFF
+  dir          target mm  success  clear mm flight ms true err est err hops/swap land falls falls nonfoot spin pk >10.7 leg dev
+  in_place        [0, 0]   0/50           -         -        -       -      0.00          0     0       0     2.4     0     0.7
+  fwd            [30, 0]   0/50           -         -        -       -      0.00          0     0       0     1.9     0     0.8
+  back          [-30, 0]   0/50           -         -        -       -      0.00          0     0       0     3.2     0     1.1
+  left           [0, 20]   0/50           -         -        -       -      0.00          0     0       0     2.5     0     1.2
+  right         [0, -20]   0/50           -         -        -       -      0.00          0     0       0     1.8     0     1.1
+== direction check, drift ON
+  dir             cmd mm    achieved mm   n   gain cross mm       trunk mm   (achieved = FEET midpoint)
+  in_place        [0, 0]     [2.3, 0.9]  50      -      2.5     [1.2, 1.0]
+  fwd            [30, 0]   [22.9, -2.0]  50   0.76      2.0   [21.8, -2.1]
+  back          [-30, 0]   [-13.6, 4.5]  50   0.45      4.5   [-15.1, 4.6]
+  left           [0, 20]   [-7.5, 20.6]  50   1.03      7.5   [-8.6, 20.9]
+  right         [0, -20]   [0.7, -19.6]  50   0.98      0.7  [-0.6, -19.9]
+  fwd/back separation: 0.61 of the commanded span
+  left/right separation: 1.01 of the commanded span
+  flags: none
+  phases (feet midpoint, median): dir             @touchdown             @end 1-foot ticks after
+                                  in_place        [2.0, 1.8]       [2.3, 0.9]                  0
+                                  fwd           [23.3, -1.9]     [22.9, -2.0]                  0
+                                  back          [-13.1, 1.1]     [-13.6, 4.5]                  3
+                                  left          [-5.0, 16.6]     [-7.5, 20.6]                  1
+                                  right         [2.5, -15.0]     [0.7, -19.6]                  1
+== direction check, drift OFF
+  dir             cmd mm    achieved mm   n   gain cross mm       trunk mm   (achieved = FEET midpoint)
+  in_place        [0, 0]     [3.0, 0.8]  50      -      3.2     [2.1, 0.9]
+  fwd            [30, 0]   [23.3, -1.9]  50   0.78      1.9   [22.2, -2.2]
+  back          [-30, 0]   [-13.9, 5.3]  50   0.46      5.3   [-15.2, 5.2]
+  left           [0, 20]   [-7.5, 20.6]  50   1.03      7.5   [-8.8, 20.9]
+  right         [0, -20]   [0.4, -19.4]  50   0.97      0.4  [-0.8, -19.6]
+  fwd/back separation: 0.62 of the commanded span
+  left/right separation: 1.00 of the commanded span
+  flags: none
+  phases (feet midpoint, median): dir             @touchdown             @end 1-foot ticks after
+                                  in_place        [2.8, 1.6]       [3.0, 0.8]                  0
+                                  fwd           [23.6, -1.9]     [23.3, -1.9]                  0
+                                  back          [-13.1, 0.4]     [-13.9, 5.3]                  3
+                                  left          [-4.8, 16.8]     [-7.5, 20.6]                  1
+                                  right         [2.6, -14.9]     [0.4, -19.4]                  1
